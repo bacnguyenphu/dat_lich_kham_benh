@@ -13,7 +13,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mysql2": "^3.14.0",
-    "sequelize": "^6.37.6"
+    "sequelize": "^6.37.6",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
