@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         // - id_description_detail (fk)
         name: DataTypes.STRING,
         images: DataTypes.STRING,
+        title: DataTypes.STRING,
         id_description_detail: DataTypes.STRING,
         
     }, {

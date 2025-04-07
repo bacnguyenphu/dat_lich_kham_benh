@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { register } from '../services/authService';
+import { FaAngleLeft } from "react-icons/fa6";
 
 function Register() {
     const navigate = useNavigate()
@@ -72,6 +73,14 @@ function Register() {
                     >
                         Đăng ký
                     </button>
+                    <p className='flex items-center justify-start gap-2 cursor-pointer mt-7'
+                        onClick={() => { navigate('/') }}
+                    >
+                        <span>
+                            <FaAngleLeft />
+                        </span>
+                        <span>Về trang chủ</span>
+                    </p>
                 </div>
             </div>
         </div>

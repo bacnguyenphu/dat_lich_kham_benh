@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { login } from '../services/authService';
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css';
-
+import { FaAngleLeft } from "react-icons/fa6";
 
 function Login() {
     const navigate = useNavigate()
@@ -15,6 +15,14 @@ function Login() {
     })
 
     const handleLogin = async () => {
+        if (data.phone === '' || data.password === '') {
+            Swal.fire({
+                title: "Log in fasle!",
+                text: "Fields cannot be left blank",
+                icon: "warning"
+            });
+            return
+        }
 
         const res = await login(data)
         if (res.err === 0) {
@@ -23,10 +31,10 @@ function Login() {
                 icon: "success"
             });
         }
-        else{
+        else {
             Swal.fire({
                 title: "Log in fasle!",
-                text:res.message,
+                text: res.message,
                 icon: "error"
             });
         }
@@ -64,6 +72,14 @@ function Login() {
                     <button className='bg-primary-100 w-full text-white font-semibold text-xl py-2 rounded-2xl cursor-pointer'
                         onClick={() => { handleLogin() }}
                     >Đăng nhập</button>
+                    <p className='flex items-center justify-start gap-2 cursor-pointer mt-7'
+                        onClick={() => { navigate('/') }}
+                    >
+                        <span>
+                            <FaAngleLeft />
+                        </span>
+                        <span>Về trang chủ</span>
+                    </p>
                 </div>
             </div>
         </div>
