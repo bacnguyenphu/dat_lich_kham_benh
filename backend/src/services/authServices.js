@@ -1,7 +1,6 @@
 import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
-import { where } from 'sequelize';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
@@ -49,6 +48,8 @@ const register = async (data) => {
 }
 
 const login = async (data) => {
+    console.log('check dât:  ',data);
+    
     try {
         if (!data.phone) {
             return {
@@ -84,7 +85,7 @@ const login = async (data) => {
 
         return {
             err: 0,
-            message: "Login success !"
+            message: "Log in success!"
         }
         
     } catch (error) {

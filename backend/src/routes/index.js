@@ -1,7 +1,10 @@
-
+import auth from './auth'
 
 const initRoutes = (app)=>{
-     return app.get('/', (req, res) => {
+
+    app.use('/api',auth)
+
+     return app.use('/', (req, res) => {
         res.send('Server on !')
       })
 }
