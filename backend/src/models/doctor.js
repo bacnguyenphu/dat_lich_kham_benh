@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     id_position: DataTypes.STRING,
     gender: DataTypes.STRING,
     price: DataTypes.FLOAT,
-    avatar: DataTypes.BLOB,
+    avatar: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Doctor',

@@ -3,16 +3,16 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Doctors', {
-        // irstName: DataTypes.STRING,
-        // lastName: DataTypes.STRING,
-        // phone: DataTypes.STRING,
-        // description: DataTypes.STRING,
-        // id_specialty: DataTypes.STRING,
-        // id_description_detail: DataTypes.STRING,
-        // id_position: DataTypes.STRING,
-        // gender: DataTypes.STRING,
-        // price: DataTypes.STRING,
-        // avatar: DataTypes.BLOB,
+      // irstName: DataTypes.STRING,
+      // lastName: DataTypes.STRING,
+      // phone: DataTypes.STRING,
+      // description: DataTypes.STRING,
+      // id_specialty: DataTypes.STRING,
+      // id_description_detail: DataTypes.STRING,
+      // id_position: DataTypes.STRING,
+      // gender: DataTypes.STRING,
+      // price: DataTypes.STRING,
+      // avatar: DataTypes.BLOB,
       id: {
         allowNull: false,
         primaryKey: true,
@@ -46,7 +46,7 @@ module.exports = {
         type: Sequelize.FLOAT
       },
       avatar: {
-        type: Sequelize.BLOB
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
