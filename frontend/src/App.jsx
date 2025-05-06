@@ -1,19 +1,46 @@
-import {Routes, Route} from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { HomePage, Login, Register, Specialty } from './components'
-import { LOGIN, REGISTER, SPECIALTY } from './utils/path'
-import { LayoutDefault } from './Layouts'
+import {
+  ADMIN, INFORMATION_DOCTOR, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
+  MANAGE_PACKAGE,
+  MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN, MEDICAL_PACKAGE,
+  REGISTER, SPECIALTY, STATISTICAL
+} from './utils/path'
+import { LayoutAdmin, LayoutDefault } from './Layouts'
+import Category_Package from './components/Category_Package'
+import {
+  InformationDoctor, ManagePackage, ManageSpecialty,
+  ManageUsers,
+  MedicalExaminationPlan, Position, Statistical
+} from './components/Admin'
+import ManageAppointment from './components/Admin/ManageAppointment'
 
 function App() {
 
   return (
     <>
       <Routes>
-        <Route path='/' element={<LayoutDefault/>}>
-          <Route index element={<HomePage/>}/>
-          <Route path={SPECIALTY} element ={<Specialty/>}/>
+        <Route path='/' element={<LayoutDefault />}>
+          <Route index element={<HomePage />} />
+          <Route path={SPECIALTY} element={<Specialty />} />
+          <Route path={MEDICAL_PACKAGE} element={<Category_Package />} />
         </Route>
-        <Route path={LOGIN} element={<Login/>}/>
-        <Route path={REGISTER} element={<Register/>}/>
+        <Route path={LOGIN} element={<Login />} />
+        <Route path={REGISTER} element={<Register />} />
+        <Route path={ADMIN} element={<LayoutAdmin />}>
+          <Route path={STATISTICAL} element={<Statistical />} />
+          <Route path={MANAGE_DOCTOR} element={null}>
+            <Route path={INFORMATION_DOCTOR} element={<InformationDoctor />} />
+            <Route path={MEDICAL_EXAMINATION_PLAN} element={<MedicalExaminationPlan />} />
+          </Route>
+          <Route path={MANAGE_MEDICAL} element={null}>
+            <Route path={MANAGE_POSITION} element={<Position />} />
+            <Route path={MANAGE_SPECIALTY} element={<ManageSpecialty />} />
+            <Route path={MANAGE_PACKAGE} element={<ManagePackage />} />
+          </Route>
+          <Route path={MANAGE_APPOINTMENT} element={<ManageAppointment />} />
+          <Route path={MANAGE_USERS} element={<ManageUsers />} />
+        </Route>
       </Routes>
     </>
   )

@@ -3,7 +3,10 @@ const { Sequelize } = require('sequelize');
 // Option 3: Passing parameters separately (other dialects)
 const sequelize = new Sequelize('dat_lich_kham_benh', 'root', null, {
   host: 'localhost',
-  dialect:  'mysql'
+  dialect:  'mysql',
+  define: {
+    freezeTableName: true // áp dụng cho toàn bộ model
+  }
 });
 
 const connectDB = async()=>{

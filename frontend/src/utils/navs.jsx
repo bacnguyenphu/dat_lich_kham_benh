@@ -1,7 +1,7 @@
 import doctors from '../assets/doctors.png'
 import packages from '../assets/packages.png'
 import specialty from '../assets/specialty.png'
-import { SPECIALTY } from './path'
+import { MEDICAL_PACKAGE, SPECIALTY } from './path'
 
 export const navs = [
     {
@@ -19,5 +19,6 @@ export const navs = [
         name: "Gói khám",
         title: "Khám sức khỏe tổng quát",
         image: packages,
+        path: MEDICAL_PACKAGE
     },
 ]

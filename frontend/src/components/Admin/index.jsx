@@ -1,0 +1,8 @@
+export {default as Sidebar} from './Sidebar'
+export {default as InformationDoctor} from './InformationDoctor'
+export {default as Statistical} from './Statistical'
+export {default as MedicalExaminationPlan} from './MedicalExaminationPlan'
+export {default as Position} from './Position'
+export {default as ManageSpecialty} from './ManageSpecialty'
+export {default as ManagePackage} from './ManagePackage'
+export {default as ManageUsers} from './ManageUsers'

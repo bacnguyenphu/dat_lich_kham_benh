@@ -1,11 +1,13 @@
 import auth from './auth'
 import insert from './insert'
 import specialty from './specialty'
+import category_package from './categoryPackage'
 
 const initRoutes = (app)=>{
 
     app.use('/api',auth)
     app.use('/api',specialty)
+    app.use('/api',category_package)
 
     app.use('/api',insert)
 

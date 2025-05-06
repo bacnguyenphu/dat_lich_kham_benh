@@ -34,7 +34,7 @@ function Specialty() {
                 {specialties.length > 0 &&
                     specialties.map((item) => {
                         return (
-                            <div className="lg:w-64 w-auto cursor-pointer">
+                            <div key={item.id} className="lg:w-64 w-auto cursor-pointer">
                                 <div className="w-full h-36">
                                     <img className="object-center object-cover size-full" src={item?.images} />
                                 </div>

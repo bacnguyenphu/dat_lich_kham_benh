@@ -8,7 +8,8 @@ import { useEffect, useState } from 'react';
 import { getSpecialties } from '../services/specialtyService';
 import { FaChevronLeft } from "react-icons/fa6";
 import { FaChevronRight } from "react-icons/fa6";
-import { SPECIALTY } from '../utils/path';
+import { MEDICAL_PACKAGE, SPECIALTY } from '../utils/path';
+import { getCategoryPackage } from '../services/categoryPackageService';
 
 function HomePage() {
 
@@ -18,19 +19,45 @@ function HomePage() {
         infinite: true,
         speed: 500,
         slidesToShow: 3,
-        slidesToScroll: 1,
+        slidesToScroll: 2,
         nextArrow: <SampleNextArrow />,
-        prevArrow: <SamplePrevArrow />
+        prevArrow: <SamplePrevArrow />,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    infinite: true,
+                    dots: false
+                }
+            },
+            {
+                breakpoint: 769,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                    initialSlide: 2
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1
+                }
+            }
+        ]
     };
 
     const CustomSlide = (props) => {
         const { key, image, name } = props;
         return (
-            <div key={key} className="xl:w-[370px] xl:h-[300px] cursor-pointer border-2 border-gray-400 p-5 rounded-xl mx-5">
-                <div className='h-52 rounded-xl'>
-                    <img className="object-center object-cover size-full" src={image} />
+            <div key={key} className=" mx-2.5 cursor-pointer border-2 border-gray-400 p-5 rounded-xl ">
+                <div className='h-36 rounded-xl w-full'>
+                    <img className="object-center object-contain size-full" src={image} />
                 </div>
-                <p className="text-center font-semibold pt-5">{name}</p>
+                <p className="text-center font-semibold pt-5 truncate">{name}</p>
             </div>
         );
     }
@@ -54,6 +81,7 @@ function HomePage() {
     }
 
     const [specialties, setSpecialties] = useState([])
+    const [categoryPackage, setCategoryPackage] = useState([])
 
     useEffect(() => {
         const fetchSpecialties = async () => {
@@ -62,7 +90,18 @@ function HomePage() {
                 setSpecialties(res.data)
             }
         }
-        fetchSpecialties()
+
+        const fetchCategoryPackage = async () => {
+            const res = await getCategoryPackage(6)
+            if (res.err === 0) {
+                setCategoryPackage(res.data)
+            }
+        }
+
+        const fetchData = async () => {
+            await Promise.all([fetchCategoryPackage(), fetchSpecialties()])
+        }
+        fetchData()
     }, [])
 
     return (
@@ -108,6 +147,31 @@ function HomePage() {
 
                         </Slider>
                     </div>
+                </div>
+
+                <div>
+                    <div className='mt-12 flex justify-between'>
+                        <p className='text-2xl font-semibold'>Danh mục khám bệnh</p>
+                        <button className='rounded-lg px-2 py-1 text-primary-100 border border-primary-100 cursor-pointer'
+                            onClick={() => { navigate(MEDICAL_PACKAGE) }}
+                        >Xem thêm</button>
+                    </div>
+                    <div className="slider-container mt-10">
+                        <Slider {...settings}>
+                            {categoryPackage.length > 0 &&
+                                categoryPackage.map((item, i) => {
+                                    return (
+                                        <CustomSlide key={item.id} image={item?.image} name={item.name} />
+                                    )
+                                })
+                            }
+
+                        </Slider>
+                    </div>
+                </div>
+
+                <div>
+                    <img src='https://i.imgur.com/H96q9Yo.jpeg'/>
                 </div>
             </div>
         </div>

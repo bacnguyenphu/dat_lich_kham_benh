@@ -5,4 +5,6 @@
     --color-primary-100: #00A2A1;
     --font-poppins: 'Poppins', 'sans-serif';
     --font-Lobster: 'Lobster', 'cursive';
+
+    --shadow-item: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
