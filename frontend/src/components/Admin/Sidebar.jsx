@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.png'
 import {
     FaUserDoctor, FaAngleDown, FaCircleInfo, FaPaperPlane,
-    FaBookMedical, FaChartSimple, FaFire, FaHouse,FaUserGroup 
+    FaBookMedical, FaChartSimple, FaFire, FaHouse, FaUserGroup
 } from "react-icons/fa6";
 import { FaFileMedicalAlt } from "react-icons/fa";
 import { RxCountdownTimer } from "react-icons/rx";
@@ -61,15 +61,26 @@ function Sidebar() {
                     </div>
                     <div className={`duration-300 overflow-hidden transition-all ${isDownDoctor ? 'max-h-24' : 'max-h-0'}`}>
                         <div>
-                            <NavLink to={`${MANAGE_DOCTOR}/${INFORMATION_DOCTOR}`} className='flex items-center gap-3 pl-16 h-12 cursor-pointer'
-
+                            <NavLink to={`${MANAGE_DOCTOR}/${INFORMATION_DOCTOR}`}
+                                className={({ isActive }) => {
+                                    return isActive ? "bg-primary-50/20 block" : ''
+                                }}
                             >
-                                <span><FaCircleInfo color="black" size={'1.25rem'} /></span>
-                                <p>Thông tin bác sĩ</p>
+                                <div className='flex items-center gap-3 pl-16 h-12 cursor-pointer'>
+                                    <span><FaCircleInfo color="black" size={'1.25rem'} /></span>
+                                    <p>Thông tin bác sĩ</p>
+                                </div>
+
                             </NavLink>
-                            <NavLink to={`${MANAGE_DOCTOR}/${MEDICAL_EXAMINATION_PLAN}`} className='flex items-center gap-3 pl-16 h-12 cursor-pointer'>
-                                <span><FaPaperPlane color="black" size={'1.25rem'} /></span>
-                                <p>Kế hoạch khám bệnh</p>
+                            <NavLink to={`${MANAGE_DOCTOR}/${MEDICAL_EXAMINATION_PLAN}`}
+                                className={({ isActive }) => {
+                                    return isActive ? "bg-primary-50/20 block" : ''
+                                }}
+                            >
+                                <div className='flex items-center gap-3 pl-16 h-12 cursor-pointer'>
+                                    <span><FaPaperPlane color="black" size={'1.25rem'} /></span>
+                                    <p>Kế hoạch khám bệnh</p>
+                                </div>
                             </NavLink>
                         </div>
                     </div>
@@ -89,17 +100,37 @@ function Sidebar() {
                         </div>
                     </div>
                     <div className={`duration-300 overflow-hidden transition-all ${isDownMedical ? 'max-h-36' : 'max-h-0'}`}>
-                        <NavLink to={`${MANAGE_MEDICAL}/${MANAGE_SPECIALTY}`} className='flex items-center gap-3 pl-16 h-12'>
-                            <span><FaFire color="black" size={'1.25rem'} /></span>
-                            <p>Chuyên khoa</p>
+                        <NavLink to={`${MANAGE_MEDICAL}/${MANAGE_SPECIALTY}`}
+                            className={({ isActive }) => {
+                                return isActive ? "bg-primary-50/20 block" : ''
+                            }}
+                        >
+                            <div className='flex items-center gap-3 pl-16 h-12'>
+                                <span><FaFire color="black" size={'1.25rem'} /></span>
+                                <p>Chuyên khoa</p>
+                            </div>
                         </NavLink>
-                        <NavLink to={`${MANAGE_MEDICAL}/${MANAGE_POSITION}`} className='flex items-center gap-3 pl-16 h-12'>
-                            <span><FaChartSimple color="black" size={'1.25rem'} /></span>
-                            <p>Chức vụ</p>
+                        <NavLink to={`${MANAGE_MEDICAL}/${MANAGE_POSITION}`}
+                            className={({ isActive }) => {
+                                return isActive ? "bg-primary-50/20 block" : ''
+                            }}
+                        >
+                            <div className='flex items-center gap-3 pl-16 h-12'>
+                                <span><FaChartSimple color="black" size={'1.25rem'} /></span>
+                                <p>Chức vụ</p>
+                            </div>
+
                         </NavLink>
-                        <NavLink to={`${MANAGE_MEDICAL}/${MANAGE_PACKAGE}`} className='flex items-center gap-3 pl-16 h-12'>
-                            <span><FaFileMedicalAlt color="black" size={'1.25rem'} /></span>
-                            <p>Gói khám</p>
+                        <NavLink to={`${MANAGE_MEDICAL}/${MANAGE_PACKAGE}`}
+                            className={({ isActive }) => {
+                                return isActive ? "bg-primary-50/20 block" : ''
+                            }}
+                        >
+                            <div className='flex items-center gap-3 pl-16 h-12'>
+                                <span><FaFileMedicalAlt color="black" size={'1.25rem'} /></span>
+                                <p>Gói khám</p>
+                            </div>
+
                         </NavLink>
                     </div>
                 </div>

@@ -18,15 +18,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING
       },
-      firstName: {
-        type: Sequelize.STRING
-      },
-      lastName: {
-        type: Sequelize.STRING
-      },
-      phone: {
-        type: Sequelize.STRING
-      },
       description: {
         type: Sequelize.STRING
       },
@@ -36,17 +27,11 @@ module.exports = {
       id_description_detail: {
         type: Sequelize.STRING
       },
-      gender: {
-        type: Sequelize.STRING
-      },
       id_position: {
         type: Sequelize.STRING
       },
       price: {
         type: Sequelize.FLOAT
-      },
-      avatar: {
-        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
