@@ -5,12 +5,11 @@ import { getPostions } from "../../services/positionService";
 import { getSpecialties } from "../../services/specialtyService";
 import DescriptionDetail from "./DescriptionDetail";
 
-
 function ModalCRUDdoctor() {
 
     const [postions, setPositions] = useState([])
     const [specialties, setSpecialties] = useState([])
-    const [value,setValue] = useState('')
+    const [html, setHtml] = useState('')
 
     useEffect(() => {
         const fetchPostions = async () => {
@@ -133,9 +132,15 @@ function ModalCRUDdoctor() {
                         </div>
                     </div>
                     <div className="mt-8 flex flex-col ">
+                        <p className="font-semibold">Giới thiệu</p>
+                        <div className="">
+                            <textarea className="outline-none border border-gray-400 rounded-md w-1/2 h-72 p-2"></textarea>
+                        </div>
+                    </div>
+                    <div className="mt-8 flex flex-col ">
                         <p className="font-semibold">Mô tả chi tiết<span className="text-red-500 font-medium">*</span></p>
-                        <div>
-                            {/* <DescriptionDetail value={value} setValue={setValue} /> */}
+                        <div className="">
+                            <DescriptionDetail html={html} setHtml={setHtml} />
                         </div>
                     </div>
                 </div>

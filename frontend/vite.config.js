@@ -8,4 +8,7 @@ export default defineConfig({
     tailwindcss(),
     react(),
   ],
+  define: {
+    global: 'window', // 👈 Đây là fix chính
+  },
 })
