@@ -65,7 +65,7 @@ function InformationDoctor() {
                 </div>
             </div>
             {
-                isShowModal && <ModalCRUDdoctor />
+                isShowModal && <ModalCRUDdoctor setIsShowModal={setIsShowModal}/>
             }
         </>
 

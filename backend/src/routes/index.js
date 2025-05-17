@@ -3,6 +3,7 @@ import insert from './insert'
 import specialty from './specialty'
 import category_package from './categoryPackage'
 import position from './position'
+import doctor from './doctor'
 
 const initRoutes = (app)=>{
 
@@ -10,6 +11,7 @@ const initRoutes = (app)=>{
     app.use('/api',specialty)
     app.use('/api',category_package)
     app.use('/api',position)
+    app.use('/api',doctor)
 
     app.use('/api',insert)
 

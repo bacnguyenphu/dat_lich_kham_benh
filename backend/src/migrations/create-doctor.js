@@ -21,13 +21,10 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
-      id_specialty: {
-        type: Sequelize.STRING
-      },
       id_description_detail: {
         type: Sequelize.STRING
       },
-      id_position: {
+      id_user: {
         type: Sequelize.STRING
       },
       price: {

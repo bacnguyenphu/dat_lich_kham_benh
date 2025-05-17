@@ -4,12 +4,12 @@ import { EditorState, convertToRaw } from "draft-js";
 import draftToHtml from "draftjs-to-html";
 import { useState } from "react";
 
-function DescriptionDetail({html, setHtml}) {
+function DescriptionDetail({payload,setPayload}) {
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const onEditorStateChange = (newState) => {
         setEditorState(newState);
         const rawContent = convertToRaw(newState.getCurrentContent());
-        setHtml( draftToHtml(rawContent))
+        setPayload({...payload,description_detail:draftToHtml(rawContent)})
     };
 
     return (

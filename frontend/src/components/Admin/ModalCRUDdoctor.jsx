@@ -4,12 +4,34 @@ import { useEffect, useState } from "react";
 import { getPostions } from "../../services/positionService";
 import { getSpecialties } from "../../services/specialtyService";
 import DescriptionDetail from "./DescriptionDetail";
+import imageAvatarDefault from '../../assets/defaultAvatar.png'
+import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
+import { createDoctor } from "../../services/doctorService";
 
-function ModalCRUDdoctor() {
+function ModalCRUDdoctor({ setIsShowModal }) {
 
     const [postions, setPositions] = useState([])
     const [specialties, setSpecialties] = useState([])
-    const [html, setHtml] = useState('')
+
+    const [payload, setPayload] = useState({
+        firstName: '',
+        lastName: '',
+        role: 'R2',
+        phone: '',
+        email: '',
+        password: '',
+        dateOfBirth: '',
+        gender: 'male',
+        address: '',
+        avatar: null,
+        price: '',
+        description: '',
+        id_specialty: [],
+        id_position: [],
+        description_detail: '',
+    })
+
+    const [imgUpload, setImgUpload] = useState() //cái này để upload lên cloudinary
 
     useEffect(() => {
         const fetchPostions = async () => {
@@ -30,62 +52,123 @@ function ModalCRUDdoctor() {
         fetchData()
     }, [])
 
+    const handleCheckbox = (e, type) => {
+        const value = e.target.value
+        if (type === "POSITION") {
+            setPayload(prev => {
+                return { ...prev, id_position: prev.id_position.includes(value) ? prev.id_position.filter(item => item !== value) : [...prev.id_position, value] }
+            })
+        }
+        if (type === "SPECIALTY") {
+            setPayload(prev => {
+                return { ...prev, id_specialty: prev.id_specialty.includes(value) ? prev.id_specialty.filter(item => item !== value) : [...prev.id_specialty, value] }
+            })
+        }
+    }
+
+    const handleImg = (e) => {
+        const file = e.target.files[0]
+        setPayload(prev => {
+            return { ...prev, avatar: URL.createObjectURL(file) }
+        })
+        setImgUpload(file)
+    }
+
+    const handleClickSubmit = async () => {
+        let linkImg = null
+        if (imgUpload) {
+            let formData = new FormData()
+            formData.append("file", imgUpload)
+            formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
+            const res = await uploadImgCloudinary(formData)
+            linkImg = res.data.url
+        }
+
+        const res = await createDoctor({ ...payload, avatar: linkImg})
+        console.log("check res: ",res);
+        
+    }
 
     return (
         <div className="fixed left-0 right-0 top-0 bottom-0 bg-black/40">
             <div className="w-6xl bg-white min-h-6 rounded-2xl mx-auto mt-4 px-5">
                 <div className="flex justify-between py-3 border-b">
                     <p className="text-xl font-semibold">Thêm bác sĩ</p>
-                    <span className="cursor-pointer"><IoMdClose size={'1.5rem'} /></span>
+                    <span className="cursor-pointer" onClick={() => setIsShowModal(false)}><IoMdClose size={'1.5rem'} /></span>
                 </div>
-                <div className="mt-5 pb-5 h-[610px] overflow-y-auto">
+                <div className="mt-5 pb-5 h-[550px] overflow-y-auto">
                     <div className="flex gap-6">
                         <div className="flex flex-col">
                             <label className="">
                                 Họ<span className="text-red-500">*</span>
                             </label>
-                            <input className="border border-gray-500 rounded-md p-1" />
+                            <input className="border border-gray-500 rounded-md p-1"
+                                onChange={(e) => { setPayload({ ...payload, firstName: e.target.value }) }}
+                            />
                         </div>
                         <div className="flex flex-col">
                             <label>Tên<span className="text-red-500">*</span></label>
-                            <input className="border border-gray-500 rounded-md p-1" />
+                            <input className="border border-gray-500 rounded-md p-1"
+                                onChange={(e) => { setPayload({ ...payload, lastName: e.target.value }) }} />
                         </div>
                         <div className="flex flex-col">
                             <label>Số điện thoại<span className="text-red-500">*</span></label>
-                            <input className="border border-gray-500 rounded-md p-1" />
+                            <input className="border border-gray-500 rounded-md p-1"
+                                onChange={(e) => { setPayload({ ...payload, phone: e.target.value }) }} />
                         </div>
                         <div className="flex flex-col">
                             <label>Giới tính<span className="text-red-500">*</span></label>
                             <div className="flex items-center gap-5">
                                 <div className="flex gap-1">
-                                    <input id="male" type="radio" name="gender" value={"Nam"} />
+                                    <input id="male" type="radio" name="gender" value={"male"} checked={payload.gender === "male"}
+                                        onChange={(e) => { setPayload({ ...payload, gender: e.target.value }) }} />
                                     <label className="cursor-pointer" htmlFor="male">Nam</label>
                                 </div>
                                 <div className="flex gap-1">
-                                    <input id="female" type="radio" name="gender" value={"Nữ"} />
+                                    <input id="female" type="radio" name="gender" value={"female"} checked={payload.gender === "female"}
+                                        onChange={(e) => { setPayload({ ...payload, gender: e.target.value }) }} />
                                     <label className="cursor-pointer" htmlFor="female">Nữ</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="mt-4 flex flex-col ">
-                        <label>Địa chỉ<span className="text-red-500">*</span></label>
-                        <input className="border border-gray-500 rounded-md p-1 w-3/5" />
+                    <div className="flex gap-5 mt-4">
+                        <div className="flex flex-col w-1/2">
+                            <label>Địa chỉ<span className="text-red-500">*</span></label>
+                            <input className="border border-gray-500 rounded-md p-1 "
+                                onChange={(e) => { setPayload({ ...payload, address: e.target.value }) }} />
+                        </div>
+                        <div className="flex flex-col w-1/2">
+                            <label>Ngày sinh<span className="text-red-500">*</span></label>
+                            <input className="border border-gray-500 rounded-md p-1 w-1/2" type="date"
+                                defaultValue={new Date().toISOString().split("T")[0]}
+                                onChange={(e) => { setPayload({ ...payload, dateOfBirth: e.target.value }) }}
+                            />
+                        </div>
                     </div>
+
                     <div className="flex gap-5">
                         <div className="w-1/2 mt-4 flex flex-col ">
                             <label>Email<span className="text-red-500">*</span></label>
-                            <input className="border border-gray-500 rounded-md p-1" disabled />
+                            <input className="border border-gray-500 rounded-md p-1"
+                                onChange={(e) => { setPayload({ ...payload, email: e.target.value }) }} />
                         </div>
                         <div className="w-1/2 mt-4 flex flex-col ">
                             <label>Mật khẩu<span className="text-red-500">*</span></label>
-                            <input className="border border-gray-500 rounded-md p-1" disabled />
+                            <input type="password" className="border border-gray-500 rounded-md p-1"
+                                onChange={(e) => { setPayload({ ...payload, password: e.target.value }) }} />
                         </div>
                     </div>
                     <div className="mt-5">
                         <p>Hình ảnh</p>
                         <div className="flex justify-center">
-                            <img className="size-24 object-cover object-center rounded-full" src="https://th.bing.com/th/id/OIP.Fh1DHVtoCoFAOCuuv9-NcwHaGT?w=203&h=180&c=7&r=0&o=7&cb=iwp2&dpr=1.3&pid=1.7&rm=3" />
+                            <img className="size-24 object-cover object-center rounded-full"
+                                alt="Avatar" src={(payload?.avatar == null) ? imageAvatarDefault : payload?.avatar}
+                                onError={(e) => {
+                                    e.target.onerror = null; // Ngăn lặp vô hạn
+                                    e.target.src = imageAvatarDefault; // Đổi sang ảnh mặc định
+                                }}
+                            />
 
                         </div>
                         <div className="flex justify-center mt-2">
@@ -93,13 +176,14 @@ function ModalCRUDdoctor() {
                                 <p className="cursor-pointer">Tải ảnh lên</p>
                                 <span><CiCirclePlus size={"1.25rem"} /></span>
                             </label>
-                            <input type="file" hidden id="uploadAvatar" />
+                            <input type="file" hidden id="uploadAvatar" onChange={(e) => { handleImg(e) }} />
                         </div>
                     </div>
                     <div className="mt-4 flex flex-col ">
                         <label>Giá khám<span className="text-red-500">*</span></label>
                         <div className="w-2/5 border border-gray-500 rounded-md p-1 flex items-center">
-                            <input className="outline-none w-[85%]" />
+                            <input className="outline-none w-[85%]"
+                                onChange={(e) => { setPayload({ ...payload, price: e.target.value }) }} />
                             <span className="w-[15%] text-center border-l text-gray-400">VND</span>
                         </div>
                     </div>
@@ -110,7 +194,8 @@ function ModalCRUDdoctor() {
                                 postions.map(item => {
                                     return (
                                         <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                            <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} />
+                                            <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id}
+                                                onChange={(e) => { handleCheckbox(e, "POSITION") }} />
                                             <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
                                         </div>
                                     )
@@ -124,7 +209,8 @@ function ModalCRUDdoctor() {
                                 specialties.map(item => {
                                     return (
                                         <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                            <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} />
+                                            <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id}
+                                                onChange={(e) => { handleCheckbox(e, "SPECIALTY") }} />
                                             <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
                                         </div>
                                     )
@@ -134,15 +220,20 @@ function ModalCRUDdoctor() {
                     <div className="mt-8 flex flex-col ">
                         <p className="font-semibold">Giới thiệu</p>
                         <div className="">
-                            <textarea className="outline-none border border-gray-400 rounded-md w-1/2 h-72 p-2"></textarea>
+                            <textarea className="outline-none border border-gray-400 rounded-md w-3/4 h-72 p-2"
+                                onChange={(e) => { setPayload({ ...payload, description: e.target.value }) }}></textarea>
                         </div>
                     </div>
                     <div className="mt-8 flex flex-col ">
                         <p className="font-semibold">Mô tả chi tiết<span className="text-red-500 font-medium">*</span></p>
                         <div className="">
-                            <DescriptionDetail html={html} setHtml={setHtml} />
+                            <DescriptionDetail payload={payload} setPayload={setPayload} />
                         </div>
                     </div>
+                </div>
+                <div className="flex gap-6 justify-end py-5 pr-5">
+                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => setIsShowModal(false)}>Thoát</button>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickSubmit() }}>Thêm</button>
                 </div>
             </div>
         </div>
