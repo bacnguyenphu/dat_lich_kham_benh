@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Doctor.belongsTo(models.User,{foreignKey:'id_user', as:'user'})
+      Doctor.belongsToMany(models.Position,{through:'Position_doctor', as:'position',foreignKey:'id_doctor'})
+      Doctor.belongsToMany(models.Specialty,{through:'Specialty_doctor', as:'specialty',foreignKey:'id_doctor'})
     }
   }
   Doctor.init({
@@ -26,9 +29,7 @@ module.exports = (sequelize, DataTypes) => {
 // - price
 
     description: DataTypes.STRING,
-    id_specialty: DataTypes.STRING,
     id_description_detail: DataTypes.STRING,
-    id_position: DataTypes.STRING,
     id_user: DataTypes.STRING,
     price: DataTypes.FLOAT,
   }, {

@@ -1,4 +1,4 @@
-const { createDoctor } = require("../services/doctorService");
+const { createDoctor, getDoctors } = require("../services/doctorService");
 
 const handleCreateDoctor = async (req, res) => {
     try {
@@ -12,4 +12,15 @@ const handleCreateDoctor = async (req, res) => {
     }
 }
 
-export { handleCreateDoctor }
+const handleGetDoctors = async(req,res)=>{
+    try {
+        const message = await getDoctors()
+        return res.status(200).json(message)
+        
+    } catch (error) {
+        console.log("Lỗi ở handleGetDoctors: ",error);
+        
+    }
+}
+
+export { handleCreateDoctor,handleGetDoctors }

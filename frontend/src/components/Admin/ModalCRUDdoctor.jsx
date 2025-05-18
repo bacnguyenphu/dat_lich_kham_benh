@@ -7,6 +7,7 @@ import DescriptionDetail from "./DescriptionDetail";
 import imageAvatarDefault from '../../assets/defaultAvatar.png'
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
 import { createDoctor } from "../../services/doctorService";
+import { toast } from "react-toastify";
 
 function ModalCRUDdoctor({ setIsShowModal }) {
 
@@ -86,6 +87,11 @@ function ModalCRUDdoctor({ setIsShowModal }) {
 
         const res = await createDoctor({ ...payload, avatar: linkImg})
         console.log("check res: ",res);
+        if(res.err===0){
+            toast.success(res.message)
+        }else{
+            toast.error(res.message)
+        }
         
     }
 

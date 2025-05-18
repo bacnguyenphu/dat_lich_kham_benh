@@ -76,4 +76,30 @@ const createDoctor = async (data) => {
     }
 }
 
-export { createDoctor }
+const getDoctors = async () => {
+    try {
+        const data = await db.Doctor.findAll({
+            attributes: ['id', 'description', 'price', 'createdAt',],
+            include: [
+                { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
+                { model: db.Position, as: 'position', attributes: ['name'],through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name'],through: { attributes: [] } }
+            ]
+        })
+        return {
+            err: 0,
+            message: "Get doctors success!",
+            data
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getDoctors: ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+
+export { createDoctor, getDoctors }
