@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
-import { HomePage, Login, Register, Specialty } from './components'
+import { Doctor, HomePage, Login, Register, Specialty } from './components'
 import {
-  ADMIN, INFORMATION_DOCTOR, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
+  ADMIN, DOCTORS, INFORMATION_DOCTOR, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
   MANAGE_PACKAGE,
   MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN, MEDICAL_PACKAGE,
   REGISTER, SPECIALTY, STATISTICAL
@@ -24,6 +24,7 @@ function App() {
         <Route path='/' element={<LayoutDefault />}>
           <Route index element={<HomePage />} />
           <Route path={SPECIALTY} element={<Specialty />} />
+          <Route path={DOCTORS} element={<Doctor/>}/>
           <Route path={MEDICAL_PACKAGE} element={<Category_Package />} />
         </Route>
         <Route path={LOGIN} element={<Login />} />

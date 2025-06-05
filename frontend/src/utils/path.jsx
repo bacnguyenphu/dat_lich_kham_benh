@@ -3,7 +3,9 @@ export const REGISTER = "/register"
 export const SPECIALTY = '/kham-chuyen-khoa'
 export const HOMEPAGE = '/'
 export const MEDICAL_PACKAGE = '/goi-kham'
+export const DOCTORS = '/bac-si'
 
+// Quản trị viên
 export const ADMIN = '/admin'
 export const STATISTICAL = 'statistical'
 export const MANAGE_DOCTOR = 'manage-doctor'

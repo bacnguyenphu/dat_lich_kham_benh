@@ -1,8 +1,11 @@
 import axios from '../utils/customAxios'
 
 const createDoctor = async(payload)=>{
-    // console.log(payload);
     return axios.post('create-doctor',payload)
 }
 
-export{createDoctor}
+const getDoctors = async()=>{
+    return axios.get('get-doctors')
+}
+
+export{createDoctor,getDoctors}
