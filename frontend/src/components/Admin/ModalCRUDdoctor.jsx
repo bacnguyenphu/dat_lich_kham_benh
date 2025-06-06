@@ -6,16 +6,17 @@ import { getSpecialties } from "../../services/specialtyService";
 import DescriptionDetail from "./DescriptionDetail";
 import imageAvatarDefault from '../../assets/defaultAvatar.png'
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
-import { createDoctor } from "../../services/doctorService";
+import { createDoctor, getDoctorById } from "../../services/doctorService";
 import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
 
-function ModalCRUDdoctor({ setIsShowModal }) {
+function ModalCRUDdoctor({ type, setIsShowModal }) {
 
     const [postions, setPositions] = useState([])
     const [specialties, setSpecialties] = useState([])
 
     const [payload, setPayload] = useState({
-        firstName: '',
+        firstName: "",
         lastName: '',
         role: 'R2',
         phone: '',
@@ -33,6 +34,9 @@ function ModalCRUDdoctor({ setIsShowModal }) {
     })
 
     const [imgUpload, setImgUpload] = useState() //cái này để upload lên cloudinary
+
+    const navigate = useNavigate()
+    const location = useLocation()
 
     useEffect(() => {
         const fetchPostions = async () => {
@@ -52,6 +56,46 @@ function ModalCRUDdoctor({ setIsShowModal }) {
         }
         fetchData()
     }, [])
+
+    useEffect(() => {
+        if (type !== "ADD") {
+            if (postions.length > 0 && specialties.length > 0) {
+                const query = new URLSearchParams(location.search)
+                const idDoctor = query.get("id")
+
+                const fetchDataDoctor = async () => {
+                    const res = await getDoctorById(idDoctor)
+                    console.log(res);
+                    if (res.err === 0) {
+                        setPayload({
+                            firstName: res?.data?.user?.firstName,
+                            lastName: res?.data?.user?.lastName,
+                            role: 'R2',
+                            phone: '',
+                            email: '',
+                            password: '',
+                            dateOfBirth: '',
+                            gender: 'male',
+                            address: '',
+                            avatar: null,
+                            price: '',
+                            description: '',
+                            id_specialty: [],
+                            id_position: [],
+                            description_detail: '',
+                        })
+                    }
+                }
+                fetchDataDoctor()
+            }
+        }
+
+
+    }, [postions, specialties])
+
+    // useEffect(()=>{},[payload])
+    // console.log(payload);
+    
 
     const handleCheckbox = (e, type) => {
         const value = e.target.value
@@ -85,22 +129,29 @@ function ModalCRUDdoctor({ setIsShowModal }) {
             linkImg = res.data.url
         }
 
-        const res = await createDoctor({ ...payload, avatar: linkImg})
-        console.log("check res: ",res);
-        if(res.err===0){
+        const res = await createDoctor({ ...payload, avatar: linkImg })
+        console.log("check res: ", res);
+        if (res.err === 0) {
             toast.success(res.message)
-        }else{
+        } else {
             toast.error(res.message)
         }
-        
+    }
+
+    const handleClickClose = () => {
+        setIsShowModal(false)
+        if (type !== "ADD") {
+            navigate(location.pathname)
+        }
     }
 
     return (
         <div className="fixed left-0 right-0 top-0 bottom-0 bg-black/40">
             <div className="w-6xl bg-white min-h-6 rounded-2xl mx-auto mt-4 px-5">
                 <div className="flex justify-between py-3 border-b">
-                    <p className="text-xl font-semibold">Thêm bác sĩ</p>
-                    <span className="cursor-pointer" onClick={() => setIsShowModal(false)}><IoMdClose size={'1.5rem'} /></span>
+                    {type === "ADD" && <p className="text-xl font-semibold">Thêm bác sĩ</p>}
+                    {type === "VIEW" && <p className="text-xl font-semibold">Thông tin bác sĩ</p>}
+                    <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
                 </div>
                 <div className="mt-5 pb-5 h-[550px] overflow-y-auto">
                     <div className="flex gap-6">
@@ -108,7 +159,7 @@ function ModalCRUDdoctor({ setIsShowModal }) {
                             <label className="">
                                 Họ<span className="text-red-500">*</span>
                             </label>
-                            <input className="border border-gray-500 rounded-md p-1"
+                            <input className="border border-gray-500 rounded-md p-1" value={payload.firstName||''}
                                 onChange={(e) => { setPayload({ ...payload, firstName: e.target.value }) }}
                             />
                         </div>
@@ -238,8 +289,9 @@ function ModalCRUDdoctor({ setIsShowModal }) {
                     </div>
                 </div>
                 <div className="flex gap-6 justify-end py-5 pr-5">
-                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => setIsShowModal(false)}>Thoát</button>
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickSubmit() }}>Thêm</button>
+                    <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
+                    {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickSubmit() }}>Thêm</button>}
+
                 </div>
             </div>
         </div>

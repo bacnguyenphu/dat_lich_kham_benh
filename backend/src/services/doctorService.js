@@ -76,20 +76,45 @@ const createDoctor = async (data) => {
     }
 }
 
-const getDoctors = async () => {
+const getDoctors = async (limit, page) => {
     try {
-        const data = await db.Doctor.findAll({
-            attributes: ['id', 'description', 'price', 'createdAt',],
+        if (!limit || !page) {
+            const data = await db.Doctor.findAll({
+                attributes: ['id', 'description', 'price', 'updatedAt',],
+                include: [
+                    { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
+                    { model: db.Position, as: 'position', attributes: ['name'], through: { attributes: [] } },
+                    { model: db.Specialty, as: 'specialty', attributes: ['name'], through: { attributes: [] } }
+                ]
+            })
+            return {
+                err: 0,
+                message: "Get doctors success!",
+                data,
+                page: 1,
+                totalPage: 0,
+            }
+        }
+
+        const { count, rows } = await db.Doctor.findAndCountAll({
+            attributes: ['id', 'description', 'price', 'updatedAt',],
+            distinct: true,
             include: [
                 { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
-                { model: db.Position, as: 'position', attributes: ['name'],through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name'],through: { attributes: [] } }
-            ]
-        })
+                { model: db.Position, as: 'position', attributes: ['name'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name'], through: { attributes: [] } }
+            ],
+            offset: (page - 1) * limit,
+            limit: limit,
+        });
+
         return {
             err: 0,
             message: "Get doctors success!",
-            data
+            data: rows,
+            page: page,
+            totalPage: Math.ceil(count / limit),
+            totalData: count
         }
 
     } catch (error) {
@@ -101,5 +126,39 @@ const getDoctors = async () => {
     }
 }
 
+const getDoctorById = async (idDoctor) => {
+    try {
+        if (!idDoctor) {
+            return {
+                err: -1,
+                message: `ID doctor is require`
+            }
+        }
 
-export { createDoctor, getDoctors }
+        const data = await db.Doctor.findOne({
+            where: { id: idDoctor },
+            attributes: ['id', 'description', 'price', 'updatedAt',],
+            include: [
+                { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
+                { model: db.Position, as: 'position', attributes: ['name'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name'], through: { attributes: [] } }
+            ]
+        })
+
+        return {
+            err: 0,
+            message: "Get doctor success",
+            data
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getDoctorById: ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+
+export { createDoctor, getDoctors, getDoctorById }
