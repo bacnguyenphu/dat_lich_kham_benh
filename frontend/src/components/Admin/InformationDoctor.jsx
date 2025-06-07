@@ -45,6 +45,12 @@ function InformationDoctor() {
         navigate(location.pathname+`?id=${idDoctor}`)
     }
 
+    const handleClickDelete = (idDoctor)=>{
+        setType("DELETE")
+        setIsShowModal(true)
+        navigate(location.pathname+`?id=${idDoctor}`)
+    }
+
     return (
         <>
             <div className="mt-10 w-6xl mx-auto shadow-item px-4 py-4">
@@ -93,7 +99,7 @@ function InformationDoctor() {
                                                 <div className="flex items-center gap-4">
                                                     <span className="cursor-pointer" onClick={()=>{handleClickView(doctor.id)}}><FaRegEye size={"1.25rem"} color="green" /></span>
                                                     <span className="cursor-pointer"><FaRegPenToSquare size={"1.25rem"} color="#EFB704" /></span>
-                                                    <span className="cursor-pointer"><MdDeleteOutline size={"1.5rem"} color="red" /></span>
+                                                    <span className="cursor-pointer" onClick={()=>{handleClickDelete(doctor.id)}}><MdDeleteOutline size={"1.5rem"} color="red" /></span>
                                                 </div>
                                             </td>
                                         </tr>

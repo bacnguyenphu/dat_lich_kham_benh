@@ -141,7 +141,8 @@ const getDoctorById = async (idDoctor) => {
             include: [
                 { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
                 { model: db.Position, as: 'position', attributes: ['name'], through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name'], through: { attributes: [] } }
+                { model: db.Specialty, as: 'specialty', attributes: ['name'], through: { attributes: [] } },
+                { model: db.Description_detail, as: 'description_detail', attributes: ['description', 'id'] },
             ]
         })
 
@@ -160,5 +161,56 @@ const getDoctorById = async (idDoctor) => {
     }
 }
 
+const deleteDoctorById = async (idDoctor, idUser, idDesciption) => {
+    try {
+        if (!idDoctor) {
+            return {
+                err: 1,
+                message: 'ID doctor is required'
+            }
+        }
+        if (!idUser) {
+            return {
+                err: 2,
+                message: 'ID user is required'
+            }
+        }
+        if (!idDesciption) {
+            return {
+                err: 3,
+                message: 'ID description required'
+            }
+        }
 
-export { createDoctor, getDoctors, getDoctorById }
+        await db.Doctor.destroy({
+            where: {
+                id: idDoctor,
+            },
+        });
+        await db.User.destroy({
+            where: {
+                id: idUser,
+            },
+        });
+        await db.User.destroy({
+            where: {
+                id: idDesciption,
+            },
+        });
+
+        return {
+            err: 0,
+            message: 'Delete doctor success'
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở deleteDoctorById: ", error);
+        return {
+            err: -999,
+            message: `Server error: ${error}`
+        }
+    }
+}
+
+
+export { createDoctor, getDoctors, getDoctorById, deleteDoctorById }

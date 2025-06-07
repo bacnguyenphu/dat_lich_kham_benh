@@ -11,10 +11,11 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Description_detail.hasOne(models.Doctor,{foreignKey:'id_description_detail',as:'doctor'})
         }
     }
     Description_detail.init({
-        description: DataTypes.STRING,
+        description: DataTypes.TEXT('medium'),
         
     }, {
         sequelize,
