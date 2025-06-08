@@ -33,8 +33,6 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
         id_position: [],
         description_detail: '',
     })
-    const [idUser, setIdUser] = useState('')
-    const [idDescription, setidDescription] = useState("")
 
     const [imgUpload, setImgUpload] = useState() //cái này để upload lên cloudinary
 
@@ -86,14 +84,11 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                             id_position: res?.data?.position.map(item => item.id),
                             description_detail: res?.data?.description_detail?.description || '',
                         })
-                        setIdUser(res?.data?.user?.id)
-                        setidDescription(res?.data?.description_detail?.id)
                     }
                 }
                 fetchDataDoctor()
             }
         }
-
 
     }, [postions, specialties])
 
@@ -144,7 +139,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     }
 
     const handleClickDelete = async () => {
-        const res = await deleteDoctorById({ idDoctor, idUser, idDescription })
+        const res = await deleteDoctorById(idDoctor)
         console.log('check res: ', res);
         if (res.err === 0) {
             setIsShowModal(false)
@@ -154,6 +149,11 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
         } else {
             toast.error(res.message)
         }
+    }
+
+    const handleClickUpdate = () => {
+        setIsShowModal(false)
+        navigate(location.pathname)
     }
 
     const handleClickClose = () => {
@@ -170,38 +170,39 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                     <div className="flex justify-between py-3 border-b">
                         {type === "ADD" && <p className="text-xl font-semibold">Thêm bác sĩ</p>}
                         {type === "VIEW" && <p className="text-xl font-semibold">Thông tin bác sĩ</p>}
+                        {type === "UPDATE" && <p className="text-xl font-semibold">Chỉnh sửa thông tin bác sĩ</p>}
                         <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
                     </div>
-                    <div className={`mt-5 pb-5 h-[550px] overflow-y-auto ${type === "VIEW" ? "cursor-not-allowed" : ''}`} >
+                    <div className={`mt-5 pb-5 h-[550px] overflow-y-auto`} >
                         <div className="flex gap-6">
                             <div className="flex flex-col">
                                 <label className="">
                                     Họ<span className="text-red-500">*</span>
                                 </label>
-                                <input className="border border-gray-500 rounded-md p-1" value={payload.firstName || ''}
+                                <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.firstName || ''}
                                     onChange={(e) => { setPayload({ ...payload, firstName: e.target.value }) }}
                                 />
                             </div>
                             <div className="flex flex-col">
                                 <label>Tên<span className="text-red-500">*</span></label>
-                                <input className="border border-gray-500 rounded-md p-1" value={payload.lastName || ''}
+                                <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.lastName || ''}
                                     onChange={(e) => { setPayload({ ...payload, lastName: e.target.value }) }} />
                             </div>
                             <div className="flex flex-col">
                                 <label>Số điện thoại<span className="text-red-500">*</span></label>
-                                <input className="border border-gray-500 rounded-md p-1" value={payload.phone || ''}
+                                <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.phone || ''}
                                     onChange={(e) => { setPayload({ ...payload, phone: e.target.value }) }} />
                             </div>
                             <div className="flex flex-col">
                                 <label>Giới tính<span className="text-red-500">*</span></label>
                                 <div className="flex items-center gap-5">
                                     <div className="flex gap-1">
-                                        <input id="male" type="radio" name="gender" value={"male"} checked={payload.gender === "male"}
+                                        <input disabled={type === "VIEW"} id="male" type="radio" name="gender" value={"male"} checked={payload.gender === "male"}
                                             onChange={(e) => { setPayload({ ...payload, gender: e.target.value }) }} />
                                         <label className="cursor-pointer" htmlFor="male">Nam</label>
                                     </div>
                                     <div className="flex gap-1">
-                                        <input id="female" type="radio" name="gender" value={"female"} checked={payload.gender === "female"}
+                                        <input disabled={type === "VIEW"} id="female" type="radio" name="gender" value={"female"} checked={payload.gender === "female"}
                                             onChange={(e) => { setPayload({ ...payload, gender: e.target.value }) }} />
                                         <label className="cursor-pointer" htmlFor="female">Nữ</label>
                                     </div>
@@ -211,12 +212,12 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                         <div className="flex gap-5 mt-4">
                             <div className="flex flex-col w-1/2">
                                 <label>Địa chỉ<span className="text-red-500">*</span></label>
-                                <input className="border border-gray-500 rounded-md p-1 " value={payload.address || ''}
+                                <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1 " value={payload.address || ''}
                                     onChange={(e) => { setPayload({ ...payload, address: e.target.value }) }} />
                             </div>
                             <div className="flex flex-col w-1/2">
                                 <label>Ngày sinh<span className="text-red-500">*</span></label>
-                                <input className="border border-gray-500 rounded-md p-1 w-1/2" type="date"
+                                <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1 w-1/2" type="date"
                                     value={payload.dateOfBirth}
                                     onChange={(e) => { setPayload({ ...payload, dateOfBirth: e.target.value }) }}
                                 />
@@ -226,12 +227,12 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                         <div className="flex gap-5">
                             <div className="w-1/2 mt-4 flex flex-col ">
                                 <label>Email<span className="text-red-500">*</span></label>
-                                <input className="border border-gray-500 rounded-md p-1" value={payload.email || ''}
+                                <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.email || ''}
                                     onChange={(e) => { setPayload({ ...payload, email: e.target.value }) }} />
                             </div>
                             <div className="w-1/2 mt-4 flex flex-col ">
                                 <label>Mật khẩu<span className="text-red-500">*</span></label>
-                                <input type="password" className="border border-gray-500 rounded-md p-1"
+                                <input disabled={type === "VIEW"} type="password" className="border border-gray-500 rounded-md p-1"
                                     onChange={(e) => { setPayload({ ...payload, password: e.target.value }) }} />
                             </div>
                         </div>
@@ -251,13 +252,13 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                     <p className="cursor-pointer">Tải ảnh lên</p>
                                     <span><CiCirclePlus size={"1.25rem"} /></span>
                                 </label>
-                                <input type="file" hidden id="uploadAvatar" onChange={(e) => { handleImg(e) }} />
+                                <input disabled={type === "VIEW"} type="file" hidden id="uploadAvatar" onChange={(e) => { handleImg(e) }} />
                             </div>
                         </div>
                         <div className="mt-4 flex flex-col ">
                             <label>Giá khám<span className="text-red-500">*</span></label>
                             <div className="w-2/5 border border-gray-500 rounded-md p-1 flex items-center">
-                                <input className="outline-none w-[85%]" value={payload.price || ''}
+                                <input disabled={type === "VIEW"} className="outline-none w-[85%]" value={payload.price || ''}
                                     onChange={(e) => { setPayload({ ...payload, price: e.target.value }) }} />
                                 <span className="w-[15%] text-center border-l text-gray-400">VND</span>
                             </div>
@@ -269,7 +270,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                     postions.map(item => {
                                         return (
                                             <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                                <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_position.some(i=>i===item.id)}
+                                                <input disabled={type === "VIEW"} id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_position.some(i => i === item.id)}
                                                     onChange={(e) => { handleCheckbox(e, "POSITION") }} />
                                                 <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
                                             </div>
@@ -284,7 +285,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                     specialties.map(item => {
                                         return (
                                             <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                                <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_specialty.some(i=>i===item.id)}
+                                                <input disabled={type === "VIEW"} id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_specialty.some(i => i === item.id)}
                                                     onChange={(e) => { handleCheckbox(e, "SPECIALTY") }} />
                                                 <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
                                             </div>
@@ -295,7 +296,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                         <div className="mt-8 flex flex-col ">
                             <p className="font-semibold">Giới thiệu</p>
                             <div className="">
-                                <textarea className="outline-none border border-gray-400 rounded-md w-3/4 h-72 p-2" value={payload.description || ''}
+                                <textarea disabled={type === "VIEW"} className="outline-none border border-gray-400 rounded-md w-3/4 h-72 p-2" value={payload.description || ''}
                                     onChange={(e) => { setPayload({ ...payload, description: e.target.value }) }}></textarea>
                             </div>
                         </div>
@@ -309,7 +310,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                     <div className="flex gap-6 justify-end py-5 pr-5">
                         <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
                         {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>Thêm</button>}
-
+                        {type === "UPDATE" && <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickUpdate() }}>Sửa</button>}
                     </div>
                 </div>
             }

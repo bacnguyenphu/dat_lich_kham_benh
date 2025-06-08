@@ -27,15 +27,15 @@ const createDoctor = async (data) => {
 
         await db.User.create({
             id: id_user,
-            firstName: data.firstName,
-            lastName: data.lastName,
+            firstName: data.firstName.trim(),
+            lastName: data.lastName.trim(),
             role: data.role,
-            phone: data.phone,
-            email: data.email,
+            phone: data.phone.trim(),
+            email: data.email.trim(),
             password: hashPass(data.password),
             dateOfBirth: data.dateOfBirth,
             gender: data.gender,
-            address: data.address,
+            address: data.address.trim(),
             avatar: data.avatar
         })
 
@@ -51,10 +51,10 @@ const createDoctor = async (data) => {
                     id_position: +item
                 })
             }
-        }else{
+        } else {
             return {
-                err:1,
-                message:"Position is require"
+                err: 1,
+                message: "Position is require"
             }
         }
 
@@ -65,10 +65,10 @@ const createDoctor = async (data) => {
                     id_specialty: item
                 })
             }
-        }else{
+        } else {
             return {
-                err:2,
-                message:"Specialty is require"
+                err: 2,
+                message: "Specialty is require"
             }
         }
 
@@ -118,11 +118,11 @@ const getDoctors = async (limit, page) => {
             limit: limit,
         });
 
-        if(rows.length===0){
-            return{
+        if (rows.length === 0) {
+            return {
                 err: 0,
                 message: "Get doctors success!",
-                data:[],
+                data: [],
                 page: 1,
                 totalPage: 0,
             }
@@ -159,14 +159,14 @@ const getDoctorById = async (idDoctor) => {
             where: { id: idDoctor },
             attributes: ['id', 'description', 'price', 'updatedAt',],
             include: [
-                { model: db.User, as: 'user', attributes: ['id','firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
-                { model: db.Position, as: 'position', attributes: ['name','id'], through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name','id'], through: { attributes: [] } },
+                { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
+                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id'], through: { attributes: [] } },
                 { model: db.Description_detail, as: 'description_detail', attributes: ['description', 'id'] },
             ]
         })
 
-        if(!data){
+        if (!data) {
             return {
                 err: 2,
                 message: `Doctor is not exist`
@@ -188,7 +188,7 @@ const getDoctorById = async (idDoctor) => {
     }
 }
 
-const deleteDoctorById = async (idDoctor, idUser, idDesciption) => {
+const deleteDoctorById = async (idDoctor) => {
     try {
         if (!idDoctor) {
             return {
@@ -196,27 +196,19 @@ const deleteDoctorById = async (idDoctor, idUser, idDesciption) => {
                 message: 'ID doctor is required'
             }
         }
-        if (!idUser) {
-            return {
-                err: 2,
-                message: 'ID user is required'
-            }
-        }
-        if (!idDesciption) {
-            return {
-                err: 3,
-                message: 'ID description required'
-            }
-        }
 
         const doctor = await db.Doctor.findOne({
             where: { id: idDoctor },
-            
+            attributes: ['id'],
+            include: [
+                { model: db.User, as: 'user', attributes: ['id'] },
+                { model: db.Description_detail, as: 'description_detail', attributes: ['id'] },
+            ]
         })
 
-        if(!doctor){
+        if (!doctor) {
             return {
-                err: 4,
+                err: 2,
                 message: `Doctor is not exist`
             }
         }
@@ -228,12 +220,12 @@ const deleteDoctorById = async (idDoctor, idUser, idDesciption) => {
         });
         await db.User.destroy({
             where: {
-                id: idUser,
+                id: doctor?.user?.id,
             },
         });
         await db.Description_detail.destroy({
             where: {
-                id: idDesciption,
+                id: doctor?.description_detail?.id,
             },
         });
 

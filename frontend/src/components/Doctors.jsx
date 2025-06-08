@@ -42,7 +42,7 @@ function Doctors() {
                 {doctors.length > 0 &&
                     doctors.map((doctor) => {
                         return (
-                            <div className="flex items-center gap-5 border-b border-gray-400 py-5">
+                            <div className="flex items-center gap-5 border-b border-gray-400 py-5 cursor-pointer">
                                 <div className="size-28">
                                     <img className="object-center object-cover size-full" src={(doctor?.user?.avatar) ? doctor?.user?.avatar : defaultAvatar} />
                                 </div>

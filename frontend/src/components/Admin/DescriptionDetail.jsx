@@ -38,6 +38,7 @@ function DescriptionDetail({ type, payload, setPayload }) {
                 wrapperClassName="w-[1024px] border p-2"
                 editorClassName="min-h-72 border p-2 overflow-auto"
                 onEditorStateChange={onEditorStateChange}
+                readOnly={type === "VIEW"}
             />
         </div>
     );
