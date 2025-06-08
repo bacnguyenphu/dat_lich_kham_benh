@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 function InformationDoctor() {
 
     const [isShowModal, setIsShowModal] = useState(false)
-    const [type,setType] = useState('')
+    const [type, setType] = useState('')
     const [doctors, setDoctors] = useState([])
     const [totalPages, setTotalPages] = useState(0)
     const limit = 7
@@ -22,33 +22,32 @@ function InformationDoctor() {
     const location = useLocation()
     const navigate = useNavigate()
 
-    useEffect(() => {
-        const fectDoctors = async () => {
-            const res = await getDoctors(limit,page)
-            if (res.err === 0) {
-                setDoctors(res.data)
-                setTotalPages(res?.totalPage)
-            }
+    const fectDoctors = async () => {
+        const res = await getDoctors(limit, page)
+        if (res.err === 0) {
+            setDoctors(res.data)
+            setTotalPages(res?.totalPage)
         }
-
+    }
+    useEffect(() => {
         fectDoctors();
     }, [page])
-    
-    const handleClickAdd=()=>{
+
+    const handleClickAdd = () => {
         setType("ADD")
         setIsShowModal(true)
     }
 
-    const handleClickView=(idDoctor)=>{
+    const handleClickView = (idDoctor) => {
         setType("VIEW")
         setIsShowModal(true)
-        navigate(location.pathname+`?id=${idDoctor}`)
+        navigate(location.pathname + `?id=${idDoctor}`)
     }
 
-    const handleClickDelete = (idDoctor)=>{
+    const handleClickDelete = (idDoctor) => {
         setType("DELETE")
         setIsShowModal(true)
-        navigate(location.pathname+`?id=${idDoctor}`)
+        navigate(location.pathname + `?id=${idDoctor}`)
     }
 
     return (
@@ -97,9 +96,9 @@ function InformationDoctor() {
                                             </td>
                                             <td className="p-4 py-5">
                                                 <div className="flex items-center gap-4">
-                                                    <span className="cursor-pointer" onClick={()=>{handleClickView(doctor.id)}}><FaRegEye size={"1.25rem"} color="green" /></span>
+                                                    <span className="cursor-pointer" onClick={() => { handleClickView(doctor.id) }}><FaRegEye size={"1.25rem"} color="green" /></span>
                                                     <span className="cursor-pointer"><FaRegPenToSquare size={"1.25rem"} color="#EFB704" /></span>
-                                                    <span className="cursor-pointer" onClick={()=>{handleClickDelete(doctor.id)}}><MdDeleteOutline size={"1.5rem"} color="red" /></span>
+                                                    <span className="cursor-pointer" onClick={() => { handleClickDelete(doctor.id) }}><MdDeleteOutline size={"1.5rem"} color="red" /></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -110,11 +109,11 @@ function InformationDoctor() {
                     </div>
                 </div>
                 <div>
-                    <Pagination setPage={setPage} totalPages={totalPages}/>
+                    <Pagination setPage={setPage} totalPages={totalPages} />
                 </div>
             </div>
             {
-                isShowModal && <ModalCRUDdoctor type={type} setIsShowModal={setIsShowModal} />
+                isShowModal && <ModalCRUDdoctor type={type} setIsShowModal={setIsShowModal} fectDoctors={fectDoctors}/>
             }
 
 

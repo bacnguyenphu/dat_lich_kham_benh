@@ -16,7 +16,7 @@ function DescriptionDetail({ type, payload, setPayload }) {
     useEffect(() => {
         if (type !== "ADD") {
             // const html = payload.description_detail;
-            const html = "<p>Xin chào <strong>thế giới</strong>!</p>";
+            const html = payload.description_detail;
             const contentBlock = htmlToDraft(html);
             if (contentBlock) {
                 const contentState = ContentState.createFromBlockArray(
@@ -28,7 +28,7 @@ function DescriptionDetail({ type, payload, setPayload }) {
             }
         }
 
-    }, []);
+    }, [payload]);
 
     return (
         <div className="prose">

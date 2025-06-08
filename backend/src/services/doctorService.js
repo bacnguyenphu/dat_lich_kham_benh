@@ -51,6 +51,11 @@ const createDoctor = async (data) => {
                     id_position: +item
                 })
             }
+        }else{
+            return {
+                err:1,
+                message:"Position is require"
+            }
         }
 
         if (data.id_specialty.length > 0) {
@@ -59,6 +64,11 @@ const createDoctor = async (data) => {
                     id_doctor: id_doctor,
                     id_specialty: item
                 })
+            }
+        }else{
+            return {
+                err:2,
+                message:"Specialty is require"
             }
         }
 
@@ -108,6 +118,16 @@ const getDoctors = async (limit, page) => {
             limit: limit,
         });
 
+        if(rows.length===0){
+            return{
+                err: 0,
+                message: "Get doctors success!",
+                data:[],
+                page: 1,
+                totalPage: 0,
+            }
+        }
+
         return {
             err: 0,
             message: "Get doctors success!",
@@ -130,7 +150,7 @@ const getDoctorById = async (idDoctor) => {
     try {
         if (!idDoctor) {
             return {
-                err: -1,
+                err: 1,
                 message: `ID doctor is require`
             }
         }
@@ -139,12 +159,19 @@ const getDoctorById = async (idDoctor) => {
             where: { id: idDoctor },
             attributes: ['id', 'description', 'price', 'updatedAt',],
             include: [
-                { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
-                { model: db.Position, as: 'position', attributes: ['name'], through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name'], through: { attributes: [] } },
+                { model: db.User, as: 'user', attributes: ['id','firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
+                { model: db.Position, as: 'position', attributes: ['name','id'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name','id'], through: { attributes: [] } },
                 { model: db.Description_detail, as: 'description_detail', attributes: ['description', 'id'] },
             ]
         })
+
+        if(!data){
+            return {
+                err: 2,
+                message: `Doctor is not exist`
+            }
+        }
 
         return {
             err: 0,
@@ -182,6 +209,18 @@ const deleteDoctorById = async (idDoctor, idUser, idDesciption) => {
             }
         }
 
+        const doctor = await db.Doctor.findOne({
+            where: { id: idDoctor },
+            
+        })
+
+        if(!doctor){
+            return {
+                err: 4,
+                message: `Doctor is not exist`
+            }
+        }
+
         await db.Doctor.destroy({
             where: {
                 id: idDoctor,
@@ -192,7 +231,7 @@ const deleteDoctorById = async (idDoctor, idUser, idDesciption) => {
                 id: idUser,
             },
         });
-        await db.User.destroy({
+        await db.Description_detail.destroy({
             where: {
                 id: idDesciption,
             },

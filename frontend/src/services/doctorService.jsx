@@ -12,4 +12,9 @@ const getDoctorById = async (idDoctor) => {
     return axios.get('get-doctors-by-id', { params: { idDoctor } })
 }
 
-export { createDoctor, getDoctors, getDoctorById }
+const deleteDoctorById = (data)=>{
+    console.log('check data: ', data );
+    return axios.delete('delete-doctor-by-id',{params: { ...data }})
+}
+
+export {createDoctor, getDoctors, getDoctorById, deleteDoctorById}

@@ -6,12 +6,12 @@ import { getSpecialties } from "../../services/specialtyService";
 import DescriptionDetail from "./DescriptionDetail";
 import imageAvatarDefault from '../../assets/defaultAvatar.png'
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
-import { createDoctor, getDoctorById } from "../../services/doctorService";
+import { createDoctor, deleteDoctorById, getDoctorById } from "../../services/doctorService";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 
-function ModalCRUDdoctor({ type, setIsShowModal }) {
+function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
     const [postions, setPositions] = useState([])
     const [specialties, setSpecialties] = useState([])
@@ -33,11 +33,15 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
         id_position: [],
         description_detail: '',
     })
+    const [idUser, setIdUser] = useState('')
+    const [idDescription, setidDescription] = useState("")
 
     const [imgUpload, setImgUpload] = useState() //cái này để upload lên cloudinary
 
     const navigate = useNavigate()
     const location = useLocation()
+    const query = new URLSearchParams(location.search)
+    const idDoctor = query.get("id")
 
     useEffect(() => {
         const fetchPostions = async () => {
@@ -61,9 +65,6 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
     useEffect(() => {
         if (type !== "ADD") {
             if (postions.length > 0 && specialties.length > 0) {
-                const query = new URLSearchParams(location.search)
-                const idDoctor = query.get("id")
-
                 const fetchDataDoctor = async () => {
                     const res = await getDoctorById(idDoctor)
                     console.log(res);
@@ -75,16 +76,18 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
                             phone: res?.data?.user?.phone,
                             email: res?.data?.user?.email,
                             password: '',
-                            dateOfBirth: res?.data?.user?.dateOfBirth.split("T")[0],
+                            dateOfBirth: res?.data?.user?.dateOfBirth?.split("T")[0],
                             gender: res?.data?.user?.gender,
                             address: res?.data?.user?.address,
                             avatar: res?.data?.user?.avatar,
                             price: res?.data?.price,
                             description: res?.data?.description,
-                            id_specialty: [],
-                            id_position: [],
-                            description_detail: '',
+                            id_specialty: res?.data?.specialty.map(item => item.id),
+                            id_position: res?.data?.position.map(item => item.id),
+                            description_detail: res?.data?.description_detail?.description || '',
                         })
+                        setIdUser(res?.data?.user?.id)
+                        setidDescription(res?.data?.description_detail?.id)
                     }
                 }
                 fetchDataDoctor()
@@ -94,13 +97,13 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
 
     }, [postions, specialties])
 
-    console.log(payload);
+    // console.log(payload);
 
     const handleCheckbox = (e, type) => {
         const value = e.target.value
         if (type === "POSITION") {
             setPayload(prev => {
-                return { ...prev, id_position: prev.id_position.includes(value) ? prev.id_position.filter(item => item !== value) : [...prev.id_position, value] }
+                return { ...prev, id_position: prev.id_position.includes(+value) ? prev.id_position.filter(item => item !== +value) : [...prev.id_position, +value] }
             })
         }
         if (type === "SPECIALTY") {
@@ -134,14 +137,23 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
             toast.success(res.message)
             setIsShowModal(false)
             navigate(location.pathname)
+            fectDoctors()
         } else {
             toast.error(res.message)
         }
     }
 
-    const handleClickDelete =()=>{
-        setIsShowModal(false)
-        navigate(location.pathname)
+    const handleClickDelete = async () => {
+        const res = await deleteDoctorById({ idDoctor, idUser, idDescription })
+        console.log('check res: ', res);
+        if (res.err === 0) {
+            setIsShowModal(false)
+            navigate(location.pathname)
+            toast.success(res.message)
+            fectDoctors()
+        } else {
+            toast.error(res.message)
+        }
     }
 
     const handleClickClose = () => {
@@ -257,7 +269,7 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
                                     postions.map(item => {
                                         return (
                                             <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                                <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id}
+                                                <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_position.some(i=>i===item.id)}
                                                     onChange={(e) => { handleCheckbox(e, "POSITION") }} />
                                                 <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
                                             </div>
@@ -272,7 +284,7 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
                                     specialties.map(item => {
                                         return (
                                             <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                                <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id}
+                                                <input id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_specialty.some(i=>i===item.id)}
                                                     onChange={(e) => { handleCheckbox(e, "SPECIALTY") }} />
                                                 <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
                                             </div>
@@ -321,7 +333,7 @@ function ModalCRUDdoctor({ type, setIsShowModal }) {
                     </div>
                     <div className="flex gap-6 justify-end py-5 pr-5">
                         <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
-                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={()=>{handleClickDelete()}}>Xóa</button>
+                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickDelete() }}>Xóa</button>
                     </div>
                 </div>
             }

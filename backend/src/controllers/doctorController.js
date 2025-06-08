@@ -37,11 +37,15 @@ const handleGetDoctorById = async (req, res) => {
 
 const handleDeleteDoctorById = async (req, res) => {
     try {
-        const {idDoctor,idUser,idDescription} = req.query.body
+        const idDoctor = req.query.idDoctor
+        const idUser = req.query.idUser
+        const idDescription = req.query.idDescription
+        console.log(idDoctor,idUser,idDescription);
+        
         const message = await deleteDoctorById(idDoctor,idUser,idDescription)
         return res.status(200).json(message)
     } catch (error) {
-        console.log("Lỗi ở handleDeleteDoctorById: ", error);
+        console.log("Lỗi ở handleDeleteDoctorById: >>>>>>", error);
     }
 }
 
