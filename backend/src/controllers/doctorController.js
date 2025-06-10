@@ -1,4 +1,4 @@
-const { createDoctor, getDoctors, getDoctorById, deleteDoctorById } = require("../services/doctorService");
+const { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor } = require("../services/doctorService");
 
 const handleCreateDoctor = async (req, res) => {
     try {
@@ -45,4 +45,14 @@ const handleDeleteDoctorById = async (req, res) => {
     }
 }
 
-export { handleCreateDoctor, handleGetDoctors, handleGetDoctorById, handleDeleteDoctorById }
+const handleUpdateDoctor =async(req,res)=>{
+    try {
+        const data = req.body
+        const message = await updateDoctor(data)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handleUpdateDoctor: >>>>>>", error);
+    }
+}
+
+export { handleCreateDoctor, handleGetDoctors, handleGetDoctorById, handleDeleteDoctorById, handleUpdateDoctor }

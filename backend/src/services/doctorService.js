@@ -1,6 +1,7 @@
 import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
+import { where } from 'sequelize';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
@@ -202,6 +203,8 @@ const deleteDoctorById = async (idDoctor) => {
             attributes: ['id'],
             include: [
                 { model: db.User, as: 'user', attributes: ['id'] },
+                { model: db.Position, as: 'position', attributes: ['id'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['id'], through: { attributes: [] } },
                 { model: db.Description_detail, as: 'description_detail', attributes: ['id'] },
             ]
         })
@@ -229,6 +232,24 @@ const deleteDoctorById = async (idDoctor) => {
             },
         });
 
+        for(const item of doctor.position){
+            await db.Position_doctor.destroy({
+                where:{
+                    id_doctor: idDoctor,
+                    id_position: item?.id
+                }
+            })
+        }
+
+        for(const item of doctor.specialty){
+            await db.Specialty_doctor.destroy({
+                where:{
+                    id_doctor: idDoctor,
+                    id_specialty: item?.id
+                }
+            })
+        }
+
         return {
             err: 0,
             message: 'Delete doctor success'
@@ -243,5 +264,126 @@ const deleteDoctorById = async (idDoctor) => {
     }
 }
 
+const updateDoctor = async (data) => {
+    try {
+        if (!data.idDoctor) {
+            return {
+                err: 1,
+                message: 'ID doctor is required'
+            }
+        }
+        const doctor = await db.Doctor.findOne({
+            where: { id: data?.idDoctor },
+            attributes: ['id'],
+            include: [
+                { model: db.User, as: 'user', attributes: ['id'] },
+                { model: db.Position, as: 'position', attributes: ['id'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['id'], through: { attributes: [] } },
+                { model: db.Description_detail, as: 'description_detail', attributes: ['id'] },
+            ]
+        })
 
-export { createDoctor, getDoctors, getDoctorById, deleteDoctorById }
+        if (!doctor) {
+            return {
+                err: 2,
+                message: `Doctor is not exist`
+            }
+        }
+
+        await db.Doctor.update(
+            {
+                description: data.description,
+                price: data.price,
+            },
+            {
+                where: { id: data?.idDoctor }
+            }
+        )
+
+        await db.User.update(
+            {
+                firstName: data.firstName.trim(),
+                lastName: data.lastName.trim(),
+                role: data.role,
+                phone: data.phone.trim(),
+                email: data.email.trim(),
+                password: hashPass(data.password),
+                dateOfBirth: data.dateOfBirth,
+                gender: data.gender,
+                address: data.address.trim(),
+                avatar: data.avatar
+            },
+            {
+                where: { id: doctor?.user?.id, }
+            }
+        )
+
+        await db.Description_detail.update(
+            {
+                description: data.description_detail
+            },
+            { where: { id: doctor?.description_detail?.id } }
+        )
+
+        for(const item of doctor.position){
+            await db.Position_doctor.destroy({
+                where:{
+                    id_doctor: data.idDoctor,
+                    id_position: item?.id
+                }
+            })
+        }
+
+        for(const item of doctor.specialty){
+            await db.Specialty_doctor.destroy({
+                where:{
+                    id_doctor: data.idDoctor,
+                    id_specialty: item?.id
+                }
+            })
+        }
+
+        if (data.id_position.length > 0) {
+            for (const item of data.id_position) {
+                await db.Position_doctor.create({
+                    id_doctor: data?.idDoctor,
+                    id_position: +item
+                })
+            }
+        } else {
+            return {
+                err: 1,
+                message: "Position is require"
+            }
+        }
+
+        if (data.id_specialty.length > 0) {
+            for (const item of data.id_specialty) {
+                await db.Specialty_doctor.create({
+                    id_doctor: data?.idDoctor,
+                    id_specialty: item
+                })
+            }
+        } else {
+            return {
+                err: 2,
+                message: "Specialty is require"
+            }
+        }
+
+        return {
+            err: 0,
+            message: "Update doctor success!"
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở updateDoctor: ", error);
+        return {
+            err: -999,
+            message: `Server error: ${error}`
+        }
+    }
+}
+
+
+export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor }

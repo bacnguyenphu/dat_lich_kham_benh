@@ -6,7 +6,7 @@ import { getSpecialties } from "../../services/specialtyService";
 import DescriptionDetail from "./DescriptionDetail";
 import imageAvatarDefault from '../../assets/defaultAvatar.png'
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
-import { createDoctor, deleteDoctorById, getDoctorById } from "../../services/doctorService";
+import { createDoctor, deleteDoctorById, getDoctorById, updateDoctor } from "../../services/doctorService";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
@@ -127,7 +127,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
         }
 
         const res = await createDoctor({ ...payload, avatar: linkImg })
-        console.log("check res: ", res);
+        // console.log("check res: ", res);
         if (res.err === 0) {
             toast.success(res.message)
             setIsShowModal(false)
@@ -140,7 +140,6 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
     const handleClickDelete = async () => {
         const res = await deleteDoctorById(idDoctor)
-        console.log('check res: ', res);
         if (res.err === 0) {
             setIsShowModal(false)
             navigate(location.pathname)
@@ -151,9 +150,17 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
         }
     }
 
-    const handleClickUpdate = () => {
-        setIsShowModal(false)
-        navigate(location.pathname)
+    const handleClickUpdate = async () => {
+        const res = await updateDoctor({ idDoctor, ...payload })
+        if (res.err === 0) {
+            setIsShowModal(false)
+            navigate(location.pathname)
+            toast.success(res.message)
+            fectDoctors()
+        } else {
+            toast.error(res.message)
+        }
+
     }
 
     const handleClickClose = () => {
