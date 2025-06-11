@@ -13,9 +13,6 @@ module.exports = {
             time_frame: {
                 type: Sequelize.STRING
             },
-            id_schedule: {
-                type: Sequelize.STRING
-            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

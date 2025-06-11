@@ -19,7 +19,6 @@ module.exports = (sequelize, DataTypes) => {
         // - id_schedule(fk)
 
         time_frame: DataTypes.STRING,
-        id_schedule: DataTypes.STRING,
     }, {
         sequelize,
         modelName: 'Time_frame',
