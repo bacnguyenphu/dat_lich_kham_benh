@@ -5,6 +5,7 @@ import category_package from './categoryPackage'
 import position from './position'
 import doctor from './doctor'
 import timeFrame from './timeFrame'
+import schedule from './schedule'
 
 const initRoutes = (app)=>{
 
@@ -14,6 +15,7 @@ const initRoutes = (app)=>{
     app.use('/api',position)
     app.use('/api',doctor)
     app.use('/api',timeFrame)
+    app.use('/api',schedule)
 
     app.use('/api',insert)
 
