@@ -59,12 +59,21 @@ function MedicalExaminationPlan() {
         if (selectedDoctor != null) {
             const fetchScheduleFollowDate = async () => {
                 const res = await getScheduleFollowDate(selectedDoctor?.value, selectedDate)
-                console.log('check res:   ', res);
+                // console.log('check res:   ', res);
                 if (res.err === 0 && res.data !== null) {
                     let temp = _.cloneDeep(timeFrames).map(item => {
                         return {
                             ...item,
                             selected: res.data.time_frame.some(item2=>item2.id===item.id)
+                        }
+                    })
+                    setTimeFrames(temp)
+                }
+                else{
+                    let temp = _.cloneDeep(timeFrames).map(item => {
+                        return {
+                            ...item,
+                            selected: false
                         }
                     })
                     setTimeFrames(temp)

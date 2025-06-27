@@ -24,23 +24,57 @@ const createOrUpdateSchedule = async (data) => {
             }
         }
 
-        let id_schedule = uuidv4()
-        await db.Schedule.create({
-            id: id_schedule,
-            id_doctor: data?.idDoctor,
-            appointment_date: data?.appointment_date
+        const schedule = await db.Schedule.findOne({
+            where: {
+                [Op.and]: [
+                    { id_doctor: data?.idDoctor },
+                    where(fn('DATE', col('appointment_date')), data?.appointment_date)
+                ]
+            },
+            include: [
+                { model: db.Time_frame, as: 'time_frame', through: { attributes: [] } },
+            ],
         })
 
-        for (const item of data?.time_frame) {
-            await db.Schedule_timeFrame.create({
-                id_schedule: id_schedule,
-                id_timeFrame: item
+        if (!schedule) {
+            let id_schedule = uuidv4()
+            await db.Schedule.create({
+                id: id_schedule,
+                id_doctor: data?.idDoctor,
+                appointment_date: data?.appointment_date
             })
-        }
+            for (const item of data?.time_frame) {
+                await db.Schedule_timeFrame.create({
+                    id_schedule: id_schedule,
+                    id_timeFrame: item
+                })
+            }
 
-        return {
-            err: 0,
-            message: "Create schedule for doctor success !"
+            return {
+                err: 0,
+                message: "Create schedule for doctor success !"
+            }
+        }
+        else {
+            for (const item of schedule?.time_frame) {
+                await db.Schedule_timeFrame.destroy({
+                    where: {
+                        id_schedule: schedule.id,
+                        id_timeFrame: item?.id
+                    }
+                })
+            }
+
+            for (const item of data?.time_frame) {
+                await db.Schedule_timeFrame.create({
+                    id_schedule: schedule.id,
+                    id_timeFrame: item
+                })
+            }
+            return {
+                err: 0,
+                message: "Update schedule for doctor success !"
+            }
         }
 
     } catch (error) {
@@ -70,8 +104,8 @@ const getScheduleFollowDate = async (data) => {
 
         const schedule = await db.Schedule.findOne({
             where: {
-                id_doctor: data?.id_doctor,
                 [Op.and]: [
+                    { id_doctor: data?.id_doctor },
                     where(fn('DATE', col('appointment_date')), data?.appointment_date)
                 ]
             },
