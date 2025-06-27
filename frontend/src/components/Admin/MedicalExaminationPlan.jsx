@@ -5,6 +5,8 @@ import _ from 'lodash'
 import Select from 'react-select';
 import { getDoctors } from "../../services/doctorService";
 import { createOrUpdateSchedule } from "../../services/scheduleService";
+import { getScheduleFollowDate } from "../../services/scheduleService";
+import { toast } from "react-toastify";
 
 function MedicalExaminationPlan() {
 
@@ -53,6 +55,27 @@ function MedicalExaminationPlan() {
         }
     }, [timeFrames])
 
+    useEffect(() => {
+        if (selectedDoctor != null) {
+            const fetchScheduleFollowDate = async () => {
+                const res = await getScheduleFollowDate(selectedDoctor?.value, selectedDate)
+                console.log('check res:   ', res);
+                if (res.err === 0 && res.data !== null) {
+                    let temp = _.cloneDeep(timeFrames).map(item => {
+                        return {
+                            ...item,
+                            selected: res.data.time_frame.some(item2=>item2.id===item.id)
+                        }
+                    })
+                    setTimeFrames(temp)
+                }
+
+            }
+            fetchScheduleFollowDate()
+        }
+
+    }, [selectedDoctor, selectedDate])
+
     const handleSelectTimeFrame = (id) => {
         let temp = _.cloneDeep(timeFrames)
         let index = temp.findIndex(item => item.id === id)
@@ -63,15 +86,19 @@ function MedicalExaminationPlan() {
     }
 
     const handleClickSave = async () => {
-        if (selectedDate && selectedDoctor && timeFrames.length>0) {
+        if (selectedDate && selectedDoctor && timeFrames.length > 0) {
             let payload = {
                 idDoctor: selectedDoctor.value,
                 appointment_date: selectedDate,
-                time_frame: timeFrames.filter(item=>item.selected===true).map(item=>item.id)
+                time_frame: timeFrames.filter(item => item.selected === true).map(item => item.id)
             }
             const res = await createOrUpdateSchedule(payload)
-            console.log('check res: ',res);
-            
+            if (res.err === 0) {
+                toast.success(res.message)
+            }
+            else {
+                toast.error(res.message)
+            }
         }
     }
 
@@ -89,7 +116,7 @@ function MedicalExaminationPlan() {
                 </div>
                 <div className="w-3/12">
                     <p className="mb-1">Chọn ngày <span className="text-red-500">*</span></p>
-                    <input type="date" className="border border-gray-300 rounded-md p-1.5 w-full" value={selectedDate} min={selectedDate}
+                    <input type="date" className="border border-gray-300 rounded-md p-1.5 w-full" value={selectedDate} min={new Date().toISOString().split("T")[0]}
                         onChange={(e) => { setSelectedDate(e.target.value) }} />
                 </div>
             </div>

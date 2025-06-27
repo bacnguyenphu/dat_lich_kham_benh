@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Schedule.belongsTo(models.Doctor,{foreignKey:'id_doctor', as:'schedule'})
+      Schedule.belongsToMany(models.Time_frame,{through:'Schedule_timeFrame', as:'time_frame',foreignKey:'id_schedule'})
     }
   }
   Schedule.init({
