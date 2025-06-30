@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
             Description_detail.hasOne(models.Doctor,{foreignKey:'id_description_detail',as:'doctor'})
+            Description_detail.hasOne(models.Specialty,{foreignKey:'id_description_detail',as:'specialty'})
         }
     }
     Description_detail.init({

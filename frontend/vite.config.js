@@ -11,4 +11,5 @@ export default defineConfig({
   define: {
     global: 'window', // 👈 Đây là fix chính
   },
+  
 })

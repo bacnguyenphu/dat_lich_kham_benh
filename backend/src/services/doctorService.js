@@ -112,8 +112,8 @@ const getDoctors = async (limit, page) => {
             distinct: true,
             include: [
                 { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
-                { model: db.Position, as: 'position', attributes: ['name'], through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name'], through: { attributes: [] } }
+                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id','slug'], through: { attributes: [] } },
             ],
             offset: (page - 1) * limit,
             limit: limit,
@@ -162,7 +162,7 @@ const getDoctorById = async (idDoctor) => {
             include: [
                 { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
                 { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id','slug'], through: { attributes: [] } },
                 { model: db.Description_detail, as: 'description_detail', attributes: ['description', 'id'] },
             ]
         })

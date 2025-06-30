@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import { Doctor, HomePage, Login, Register, Specialty } from './components'
+import { DetailDoctor, Doctor, HomePage, Login, Register, Specialty } from './components'
 import {
   ADMIN, DOCTORS, INFORMATION_DOCTOR, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
   MANAGE_PACKAGE,
@@ -24,11 +24,14 @@ function App() {
         <Route path='/' element={<LayoutDefault />}>
           <Route index element={<HomePage />} />
           <Route path={SPECIALTY} element={<Specialty />} />
-          <Route path={DOCTORS} element={<Doctor/>}/>
+          <Route path={DOCTORS} element={<Doctor />}/>
+          <Route path={`${DOCTORS}/chi-tiet/:idDoctor`} element={<DetailDoctor />} />
           <Route path={MEDICAL_PACKAGE} element={<Category_Package />} />
         </Route>
+
         <Route path={LOGIN} element={<Login />} />
         <Route path={REGISTER} element={<Register />} />
+
         <Route path={ADMIN} element={<LayoutAdmin />}>
           <Route path={STATISTICAL} element={<Statistical />} />
           <Route path={MANAGE_DOCTOR} element={null}>
@@ -43,6 +46,7 @@ function App() {
           <Route path={MANAGE_APPOINTMENT} element={<ManageAppointment />} />
           <Route path={MANAGE_USERS} element={<ManageUsers />} />
         </Route>
+
       </Routes>
       <ToastContainer
         position="top-center"

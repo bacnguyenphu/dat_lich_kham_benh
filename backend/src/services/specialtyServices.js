@@ -1,11 +1,10 @@
 import db from '../models/index'
 
-const getSpecialties = async (limit) => {
-    console.log('check limit: ', limit);
+const getSpecialties = async (limit, page) => {
 
     try {
         let specialties = []
-        if (!limit) {
+        if (!limit||!page) {
             specialties = await db.Specialty.findAll()
             return {
                 err: 0,
@@ -14,14 +13,23 @@ const getSpecialties = async (limit) => {
             }
         }
         else {
-            specialties = await db.Specialty.findAll({
-                offset: 0,
+            const { count, rows } = await db.Specialty.findAndCountAll({
+                attributes: ['id', 'name', 'images', 'slug',],
+                distinct: true,
+                include: [
+                    { model: db.Description_detail, as: 'description_detail', attributes: ['description'] },
+                ],
+                offset: (page - 1) * limit,
                 limit: limit,
-            })
+            });
+
             return {
                 err: 0,
-                message: "Get all specialties success !",
-                data: specialties
+                message: "Get specialties success !",
+                data: rows,
+                page: page,
+                totalPage: Math.ceil(count / limit),
+                totalData: count
             }
         }
 

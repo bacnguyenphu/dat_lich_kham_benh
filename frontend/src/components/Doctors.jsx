@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { HOMEPAGE } from "../utils/path";
+import { DOCTORS, HOMEPAGE } from "../utils/path";
 import { GoHome } from "react-icons/go";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -30,7 +30,7 @@ function Doctors() {
         <div className="lg:px-40 md:px-20 px-5 py-5">
             <div className="flex items-center">
                 <span className="cursor-pointer"
-                    onClick={() => { naviagte(HOMEPAGE) }}
+                    onClick={() => {naviagte(HOMEPAGE) }}
                 >
                     <GoHome color="#00A2A1" size={'1.25rem'} />
                 </span>
@@ -42,14 +42,16 @@ function Doctors() {
                 {doctors.length > 0 &&
                     doctors.map((doctor) => {
                         return (
-                            <div className="flex items-center gap-5 border-b border-gray-400 py-5 cursor-pointer">
+                            <div key={`doctor-${doctor.id}`} className="flex items-center gap-5 border-b border-gray-400 py-5 cursor-pointer"
+                            onClick={()=>{naviagte(`${DOCTORS}/chi-tiet/${doctor.id}`)}}
+                            >
                                 <div className="size-28">
                                     <img className="object-center object-cover size-full" src={(doctor?.user?.avatar) ? doctor?.user?.avatar : defaultAvatar} />
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {doctor?.position.map(item => {
                                         return (
-                                            <p className="text-xl">{item.name}{""}</p>
+                                            <p key={`pos-${item.id}`} className="text-xl">{item.name}{""}</p>
                                         )
                                     })}
                                     <p className="text-xl font-semibold">{doctor?.user?.firstName} {doctor?.user?.lastName}</p>

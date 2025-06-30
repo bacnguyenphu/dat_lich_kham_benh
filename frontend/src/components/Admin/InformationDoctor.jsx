@@ -5,7 +5,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { useState, useEffect } from "react";
 import ModalCRUDdoctor from "./ModalCRUDdoctor";
 import { getDoctors } from "../../services/doctorService";
-import moment from "moment";
+import dayjs from 'dayjs';
 import defaultAvatar from '../../assets/defaultAvatar.png'
 import Pagination from "../Pagination";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -13,11 +13,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 function InformationDoctor() {
 
     const [isShowModal, setIsShowModal] = useState(false)
-    const [type, setType] = useState('')
     const [doctors, setDoctors] = useState([])
+    const [type, setType] = useState('')
     const [totalPages, setTotalPages] = useState(0)
     const limit = 7
     const [page, setPage] = useState(1)
+
 
     const location = useLocation()
     const navigate = useNavigate()
@@ -44,7 +45,7 @@ function InformationDoctor() {
         navigate(location.pathname + `?id=${idDoctor}`)
     }
 
-    const handleClickUpdate=(idDoctor)=>{
+    const handleClickUpdate = (idDoctor) => {
         setType("UPDATE")
         setIsShowModal(true)
         navigate(location.pathname + `?id=${idDoctor}`)
@@ -84,7 +85,7 @@ function InformationDoctor() {
                                     return (
                                         <tr className="hover:bg-slate-50" key={doctor.id}>
                                             <td className="p-4 border-b border-slate-200 py-5">
-                                                <p className="block font-semibold text-sm text-slate-800">{index + 1}</p>
+                                                <p className="block font-semibold text-sm text-slate-800">{(page - 1) * limit + index + 1}</p>
                                             </td>
                                             <td className="p-4 border-b border-slate-200 py-5">
                                                 <div className="size-16 rounded-full overflow-hidden">
@@ -98,12 +99,12 @@ function InformationDoctor() {
                                                 <p className="text-sm text-slate-500">{doctor?.user?.phone}</p>
                                             </td>
                                             <td className="p-4 border-b border-slate-200 py-5">
-                                                <p className="text-sm text-slate-500">{moment(doctor.updatedAt).format("DD/MM/YYYY")}</p>
+                                                <p className="text-sm text-slate-500">{dayjs(doctor.updatedAt).format("DD/MM/YYYY")}</p>
                                             </td>
                                             <td className="p-4 py-5">
                                                 <div className="flex items-center gap-4">
                                                     <span className="cursor-pointer" onClick={() => { handleClickView(doctor.id) }}><FaRegEye size={"1.25rem"} color="green" /></span>
-                                                    <span className="cursor-pointer" onClick={()=>{handleClickUpdate(doctor.id)}}><FaRegPenToSquare size={"1.25rem"} color="#EFB704" /></span>
+                                                    <span className="cursor-pointer" onClick={() => { handleClickUpdate(doctor.id) }}><FaRegPenToSquare size={"1.25rem"} color="#EFB704" /></span>
                                                     <span className="cursor-pointer" onClick={() => { handleClickDelete(doctor.id) }}><MdDeleteOutline size={"1.5rem"} color="red" /></span>
                                                 </div>
                                             </td>
@@ -119,7 +120,7 @@ function InformationDoctor() {
                 </div>
             </div>
             {
-                isShowModal && <ModalCRUDdoctor type={type} setIsShowModal={setIsShowModal} fectDoctors={fectDoctors}/>
+                isShowModal && <ModalCRUDdoctor type={type} setIsShowModal={setIsShowModal} fectDoctors={fectDoctors} />
             }
 
 

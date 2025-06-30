@@ -1,5 +1,6 @@
 import { IoMdClose } from "react-icons/io";
 import { CiCirclePlus } from "react-icons/ci";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import { getPostions } from "../../services/positionService";
 import { getSpecialties } from "../../services/specialtyService";
@@ -9,12 +10,14 @@ import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
 import { createDoctor, deleteDoctorById, getDoctorById, updateDoctor } from "../../services/doctorService";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
-import moment from "moment";
+import { Validation } from "../../utils/validation";
 
 function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
     const [postions, setPositions] = useState([])
     const [specialties, setSpecialties] = useState([])
+    const [errors, setErrors] = useState({})
+    const [isLoading, setIsLoading] = useState(false)
 
     const [payload, setPayload] = useState({
         firstName: "",
@@ -117,24 +120,28 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     }
 
     const handleClickAdd = async () => {
-        let linkImg = null
-        if (imgUpload) {
-            let formData = new FormData()
-            formData.append("file", imgUpload)
-            formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
-            const res = await uploadImgCloudinary(formData)
-            linkImg = res.data.url
-        }
-
-        const res = await createDoctor({ ...payload, avatar: linkImg })
-        // console.log("check res: ", res);
-        if (res.err === 0) {
-            toast.success(res.message)
-            setIsShowModal(false)
-            navigate(location.pathname)
-            fectDoctors()
-        } else {
-            toast.error(res.message)
+        if (Validation(payload, setErrors)) {
+            setIsLoading(true)
+            let linkImg = null
+            if (imgUpload) {
+                let formData = new FormData()
+                formData.append("file", imgUpload)
+                formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
+                const res = await uploadImgCloudinary(formData)
+                linkImg = res.data.url
+            }
+            const res = await createDoctor({ ...payload, avatar: linkImg })
+            // console.log("check res: ", res);
+            if (res.err === 0) {
+                toast.success(res.message)
+                setIsShowModal(false)
+                navigate(location.pathname)
+                fectDoctors()
+                setIsLoading(false)
+            } else {
+                toast.error(res.message)
+                setIsLoading(false)
+            }
         }
     }
 
@@ -151,16 +158,20 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     }
 
     const handleClickUpdate = async () => {
-        const res = await updateDoctor({ idDoctor, ...payload })
-        if (res.err === 0) {
-            setIsShowModal(false)
-            navigate(location.pathname)
-            toast.success(res.message)
-            fectDoctors()
-        } else {
-            toast.error(res.message)
+        if (Validation(payload, setErrors)) {
+            setIsLoading(true)
+            const res = await updateDoctor({ idDoctor, ...payload })
+            if (res.err === 0) {
+                setIsShowModal(false)
+                navigate(location.pathname)
+                toast.success(res.message)
+                fectDoctors()
+                setIsLoading(false)
+            } else {
+                toast.error(res.message)
+                setIsLoading(false)
+            }
         }
-
     }
 
     const handleClickClose = () => {
@@ -182,25 +193,28 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                     </div>
                     <div className={`mt-5 pb-5 h-[550px] overflow-y-auto`} >
                         <div className="flex gap-6">
-                            <div className="flex flex-col">
+                            <div className="flex flex-col relative">
                                 <label className="">
                                     Họ<span className="text-red-500">*</span>
                                 </label>
                                 <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.firstName || ''}
                                     onChange={(e) => { setPayload({ ...payload, firstName: e.target.value }) }}
                                 />
+                                {errors.firstName && <small className="text-red-500 absolute -bottom-5">{errors.firstName}</small>}
                             </div>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col relative">
                                 <label>Tên<span className="text-red-500">*</span></label>
                                 <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.lastName || ''}
                                     onChange={(e) => { setPayload({ ...payload, lastName: e.target.value }) }} />
+                                {errors.lastName && <small className="text-red-500 absolute -bottom-5">{errors.lastName}</small>}
                             </div>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col relative">
                                 <label>Số điện thoại<span className="text-red-500">*</span></label>
                                 <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.phone || ''}
                                     onChange={(e) => { setPayload({ ...payload, phone: e.target.value }) }} />
+                                {errors.phone && <small className="text-red-500 absolute -bottom-5">{errors.phone}</small>}
                             </div>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col relative">
                                 <label>Giới tính<span className="text-red-500">*</span></label>
                                 <div className="flex items-center gap-5">
                                     <div className="flex gap-1">
@@ -216,13 +230,14 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex gap-5 mt-4">
-                            <div className="flex flex-col w-1/2">
+                        <div className="flex gap-5 mt-6">
+                            <div className="flex flex-col relative w-1/2">
                                 <label>Địa chỉ<span className="text-red-500">*</span></label>
                                 <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1 " value={payload.address || ''}
                                     onChange={(e) => { setPayload({ ...payload, address: e.target.value }) }} />
+                                {errors.address && <small className="text-red-500 absolute -bottom-5">{errors.address}</small>}
                             </div>
-                            <div className="flex flex-col w-1/2">
+                            <div className="flex flex-col relative w-1/2">
                                 <label>Ngày sinh<span className="text-red-500">*</span></label>
                                 <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1 w-1/2" type="date"
                                     value={payload.dateOfBirth}
@@ -231,16 +246,18 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                             </div>
                         </div>
 
-                        <div className="flex gap-5">
-                            <div className="w-1/2 mt-4 flex flex-col ">
+                        <div className="flex gap-5 mt-6">
+                            <div className="w-1/2 mt-4 flex flex-col relative ">
                                 <label>Email<span className="text-red-500">*</span></label>
                                 <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.email || ''}
                                     onChange={(e) => { setPayload({ ...payload, email: e.target.value }) }} />
+                                {errors.email && <small className="text-red-500 absolute -bottom-5">{errors.email}</small>}
                             </div>
-                            <div className="w-1/2 mt-4 flex flex-col ">
+                            <div className="w-1/2 mt-4 flex flex-col relative ">
                                 <label>Mật khẩu<span className="text-red-500">*</span></label>
                                 <input disabled={type === "VIEW"} type="password" className="border border-gray-500 rounded-md p-1"
                                     onChange={(e) => { setPayload({ ...payload, password: e.target.value }) }} />
+                                {errors.password && <small className="text-red-500 absolute -bottom-5">{errors.password}</small>}
                             </div>
                         </div>
                         <div className="mt-5">
@@ -262,13 +279,14 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                 <input disabled={type === "VIEW"} type="file" hidden id="uploadAvatar" onChange={(e) => { handleImg(e) }} />
                             </div>
                         </div>
-                        <div className="mt-4 flex flex-col ">
+                        <div className="mt-4 flex flex-col relative ">
                             <label>Giá khám<span className="text-red-500">*</span></label>
                             <div className="w-2/5 border border-gray-500 rounded-md p-1 flex items-center">
                                 <input disabled={type === "VIEW"} className="outline-none w-[85%]" value={payload.price || ''}
                                     onChange={(e) => { setPayload({ ...payload, price: e.target.value }) }} />
                                 <span className="w-[15%] text-center border-l text-gray-400">VND</span>
                             </div>
+                            {errors.price && <small className="text-red-500 absolute -bottom-5">{errors.price}</small>}
                         </div>
                         <div className="mt-8 flex flex-col ">
                             <p className="font-semibold">Chức vụ<span className="text-red-500 font-medium">*</span></p>
@@ -316,7 +334,9 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                     </div>
                     <div className="flex gap-6 justify-end py-5 pr-5">
                         <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
-                        {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>Thêm</button>}
+                        {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>
+                                   {isLoading?<span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters/></span>:<span>Thêm</span>} 
+                        </button>}
                         {type === "UPDATE" && <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickUpdate() }}>Sửa</button>}
                     </div>
                 </div>

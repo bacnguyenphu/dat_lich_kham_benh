@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Header } from "../components";
+import { Footer, Header } from "../components";
 
 function LayoutDefault() {
     return (
@@ -9,6 +9,10 @@ function LayoutDefault() {
             </div>
             <div>
                 <Outlet/>
+            </div>
+            <div className="bg-primary-50 h-12"></div>
+            <div>
+                <Footer/>
             </div>
         </div>
     );

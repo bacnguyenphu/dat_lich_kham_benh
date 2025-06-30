@@ -1,7 +1,7 @@
 import axios from "../utils/customAxios";
 
-const getSpecialties = (limit)=>{
-    return axios.get("get-specialties",{params:{limit}})
+const getSpecialties = (limit,page)=>{
+    return axios.get("get-specialties",{params:{limit,page}})
 }
 
 
