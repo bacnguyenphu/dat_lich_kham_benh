@@ -1,10 +1,12 @@
 import db from '../models/index'
+import { v4 as uuidv4 } from 'uuid'
+import { toSlug } from '../utils/toSlug'
 
 const getSpecialties = async (limit, page) => {
 
     try {
         let specialties = []
-        if (!limit||!page) {
+        if (!limit || !page) {
             specialties = await db.Specialty.findAll()
             return {
                 err: 0,
@@ -21,6 +23,7 @@ const getSpecialties = async (limit, page) => {
                 ],
                 offset: (page - 1) * limit,
                 limit: limit,
+                order: [['createdAt', 'DESC']]
             });
 
             return {
@@ -42,4 +45,46 @@ const getSpecialties = async (limit, page) => {
     }
 }
 
-export { getSpecialties }
+const createSchedule = async (data) => {
+    try {
+        if (!data.name) {
+            return {
+                err: 1,
+                message: "Name is required !"
+            }
+        }
+        const id_specialty = uuidv4()
+        const id_description_detail = uuidv4()
+
+        await db.Specialty.create({
+            id: id_specialty,
+            name: data.name,
+            images: data.linkImg,
+            slug: toSlug(data.name),
+            id_description_detail: id_description_detail
+        })
+
+        await db.Description_detail.create({
+            id: id_description_detail,
+            description: data.description_detail
+        })
+
+        return{
+            err:0,
+            message:"Create Specialty success !"
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở createSchedule !");
+        return {
+            err: -999,
+            messageL: `Error server: ${error}`
+        }
+    }
+}
+
+const deleteSpecialty = async(id)=>{
+    
+}
+
+export { getSpecialties,createSchedule }

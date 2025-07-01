@@ -183,7 +183,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
     return (
         <div className={`fixed left-0 right-0 top-0 bottom-0 bg-black/40`}>
-            {(type === "VIEW" || type === "ADD" || type === "UPDATE") &&
+            {(type !== "DELETE") &&
                 <div className="w-6xl bg-white min-h-6 rounded-2xl mx-auto mt-4 px-5">
                     <div className="flex justify-between py-3 border-b">
                         {type === "ADD" && <p className="text-xl font-semibold">Thêm bác sĩ</p>}
@@ -335,14 +335,16 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                     <div className="flex gap-6 justify-end py-5 pr-5">
                         <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
                         {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>
-                                   {isLoading?<span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters/></span>:<span>Thêm</span>} 
+                            {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Thêm</span>}
                         </button>}
-                        {type === "UPDATE" && <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickUpdate() }}>Sửa</button>}
+                        {type === "UPDATE" && <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickUpdate() }}>
+                            {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Sửa</span>}
+                        </button>}
                     </div>
                 </div>
             }
             {type === "DELETE" &&
-                <div className="w-2xl bg-white min-h-6 rounded-xl mx-auto mt-4 px-5 mt-10">
+                <div className="w-2xl bg-white min-h-6 rounded-xl mx-auto px-5 mt-10">
                     <div className="flex justify-between py-3 border-b">
                         <p className="text-xl font-semibold">Xóa bác sĩ</p>
                         <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>

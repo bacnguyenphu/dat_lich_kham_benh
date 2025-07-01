@@ -122,8 +122,6 @@ function InformationDoctor() {
             {
                 isShowModal && <ModalCRUDdoctor type={type} setIsShowModal={setIsShowModal} fectDoctors={fectDoctors} />
             }
-
-
         </>
 
     );

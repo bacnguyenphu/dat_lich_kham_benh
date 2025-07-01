@@ -22,6 +22,11 @@ export const Validation=(values,setErrors)=>{
         newErrors.price="Bạn phải điền giá tiền !"
     }
 
+    //chuyen khoa
+    if(values?.name===""){
+        newErrors.name="Bạn phải điền tên chuyên khoa !"
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0;
 }

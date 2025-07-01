@@ -7,19 +7,23 @@ import { MdDeleteOutline } from "react-icons/md";
 import defaultAvatar from '../../assets/defaultAvatar.png'
 import Pagination from "../Pagination";
 import { set } from "lodash";
+import ModalCRUDspecialty from "./ModalCRUDspecialty";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function ManageSpecialty() {
 
     const [specialties, setSpecialties] = useState([])
     const [totalPages, setTotalPages] = useState(0)
+    const [type,setType] = useState('')
     const [isShowModal, setIsShowModal] = useState(false)
     const limit = 7
     const [page, setPage] = useState(1)
 
+    const location = useLocation()
+    const navigate = useNavigate()
+
     const fetchSpecialties = async () => {
         const res = await getSpecialties(limit, page)
-        console.log(res);
-        
         if (res.err === 0) {
             setSpecialties(res?.data)
             setTotalPages(res?.totalPage)
@@ -30,11 +34,14 @@ function ManageSpecialty() {
     }, [page])
 
     const handleClickAdd = () => {
-
+        setIsShowModal(true)
+        setType("ADD")
     }
-
-    console.log(specialties);
-
+    const handleClickDelete = (id) => {
+        setType("DELETE")
+        setIsShowModal(true)
+        navigate(location.pathname + `?id=${id}`)
+    }
 
     return (
         <>
@@ -74,9 +81,8 @@ function ManageSpecialty() {
                                             </td>
                                             <td className="p-4 py-5">
                                                 <div className="flex items-center gap-4">
-                                                    <span className="cursor-pointer" ><FaRegEye size={"1.25rem"} color="green" /></span>
                                                     <span className="cursor-pointer"><FaRegPenToSquare size={"1.25rem"} color="#EFB704" /></span>
-                                                    <span className="cursor-pointer"><MdDeleteOutline size={"1.5rem"} color="red" /></span>
+                                                    <span className="cursor-pointer" onClick={()=>{handleClickDelete(item.id)}}><MdDeleteOutline size={"1.5rem"} color="red" /></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -90,6 +96,7 @@ function ManageSpecialty() {
                     <Pagination setPage={setPage} totalPages={+totalPages} />
                 </div>
             </div>
+            {isShowModal&&<ModalCRUDspecialty type={type} setIsShowModal={setIsShowModal} fetchSpecialties={fetchSpecialties}/>}
         </>
 
     );

@@ -1,4 +1,4 @@
-const { getSpecialties } = require("../services/specialtyServices");
+const { getSpecialties, createSchedule } = require("../services/specialtyServices");
 
 const handleGetSpecialties = async (req, res) => {
     try {
@@ -13,4 +13,15 @@ const handleGetSpecialties = async (req, res) => {
     }
 }
 
-export { handleGetSpecialties }
+const handleCreateSpecialty = async(req,res)=>{
+    try {
+        let data = req.body
+        const message = await createSchedule(data)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lối ở handleCreateSpecialty !");
+        
+    }
+}
+
+export { handleGetSpecialties,handleCreateSpecialty }
