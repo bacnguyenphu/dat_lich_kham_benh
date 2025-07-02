@@ -1,4 +1,4 @@
-const { getSpecialties, createSchedule, deleteSpecialty, getSpecialtyById } = require("../services/specialtyServices");
+const { getSpecialties, createSchedule, deleteSpecialty, getSpecialtyById, updateSpecialty } = require("../services/specialtyServices");
 
 const handleGetSpecialties = async (req, res) => {
     try {
@@ -46,4 +46,15 @@ const handleGetSpecialtyById = async (req, res) => {
     }
 }
 
-export { handleGetSpecialties, handleCreateSpecialty, handleDeleteSpecialty, handleGetSpecialtyById }
+const handleUpdateSpecialty = async (req, res) => {
+    try {
+        let data = req.body
+        const message = await updateSpecialty(data)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handleUpdateSpecialty: ", error);
+
+    }
+}
+
+export { handleGetSpecialties, handleCreateSpecialty, handleDeleteSpecialty, handleGetSpecialtyById, handleUpdateSpecialty }

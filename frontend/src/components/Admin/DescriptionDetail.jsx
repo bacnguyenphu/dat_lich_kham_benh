@@ -3,7 +3,7 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs"
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function DescriptionDetail({ type, payload, setPayload }) {
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -12,9 +12,17 @@ function DescriptionDetail({ type, payload, setPayload }) {
         const rawContent = convertToRaw(newState.getCurrentContent());
         setPayload({ ...payload, description_detail: draftToHtml(rawContent) })
     };
+    // const onEditorStateChange = useCallback((newState) => {
+    //     setEditorState(newState);
+    //     const rawContent = convertToRaw(newState.getCurrentContent());
+    //     setPayload((prev) => ({
+    //         ...prev,
+    //         description_detail: draftToHtml(rawContent),
+    //     }));
+    // }, []);
 
     useEffect(() => {
-        if (type !== "ADD") {
+        if (type !== "ADD" && editorState.getCurrentContent().getPlainText().trim() === ""&&payload.description_detail) {
             // const html = payload.description_detail;
             const html = payload.description_detail;
             const contentBlock = htmlToDraft(html);
@@ -31,17 +39,17 @@ function DescriptionDetail({ type, payload, setPayload }) {
     }, [payload]);
 
     return (
-        
-            <div className="prose w-full">
-                <Editor
-                    editorState={editorState}
-                    toolbarClassName="toolbarClassName"
-                    wrapperClassName="w-[900px] border p-2"
-                    editorClassName="min-h-72 border p-2 overflow-auto"
-                    onEditorStateChange={onEditorStateChange}
-                    readOnly={type === "VIEW"}
-                />
-            </div>
+
+        <div className="prose w-full">
+            <Editor
+                editorState={editorState}
+                toolbarClassName="toolbarClassName"
+                wrapperClassName="w-[900px] border p-2"
+                editorClassName="min-h-72 border p-2 overflow-auto"
+                onEditorStateChange={onEditorStateChange}
+                readOnly={type === "VIEW"}
+            />
+        </div>
 
     );
 }

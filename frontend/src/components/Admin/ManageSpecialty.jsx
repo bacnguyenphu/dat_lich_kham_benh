@@ -14,7 +14,7 @@ function ManageSpecialty() {
 
     const [specialties, setSpecialties] = useState([])
     const [totalPages, setTotalPages] = useState(0)
-    const [type,setType] = useState('')
+    const [type, setType] = useState('')
     const [isShowModal, setIsShowModal] = useState(false)
     const limit = 7
     const [page, setPage] = useState(1)
@@ -39,6 +39,11 @@ function ManageSpecialty() {
     }
     const handleClickDelete = (id) => {
         setType("DELETE")
+        setIsShowModal(true)
+        navigate(location.pathname + `?id=${id}`)
+    }
+    const handleClickUpdate = (id) => {
+        setType("UPDATE")
         setIsShowModal(true)
         navigate(location.pathname + `?id=${id}`)
     }
@@ -69,7 +74,7 @@ function ManageSpecialty() {
                                     return (
                                         <tr className="hover:bg-slate-50" key={item.id}>
                                             <td className="p-4 border-b border-slate-200 py-5">
-                                                <p className="block font-semibold text-sm text-slate-800">{(page-1)*limit+index+1}</p>
+                                                <p className="block font-semibold text-sm text-slate-800">{(page - 1) * limit + index + 1}</p>
                                             </td>
                                             <td className="p-4 border-b border-slate-200 py-5">
                                                 <div className="size-16 rounded-full overflow-hidden">
@@ -81,8 +86,8 @@ function ManageSpecialty() {
                                             </td>
                                             <td className="p-4 py-5">
                                                 <div className="flex items-center gap-4">
-                                                    <span className="cursor-pointer"><FaRegPenToSquare size={"1.25rem"} color="#EFB704" /></span>
-                                                    <span className="cursor-pointer" onClick={()=>{handleClickDelete(item.id)}}><MdDeleteOutline size={"1.5rem"} color="red" /></span>
+                                                    <span className="cursor-pointer" onClick={() => { handleClickUpdate(item.id) }}><FaRegPenToSquare size={"1.25rem"} color="#EFB704" /></span>
+                                                    <span className="cursor-pointer" onClick={() => { handleClickDelete(item.id) }}><MdDeleteOutline size={"1.5rem"} color="red" /></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -96,7 +101,7 @@ function ManageSpecialty() {
                     <Pagination setPage={setPage} totalPages={+totalPages} />
                 </div>
             </div>
-            {isShowModal&&<ModalCRUDspecialty type={type} setIsShowModal={setIsShowModal} fetchSpecialties={fetchSpecialties}/>}
+            {isShowModal && <ModalCRUDspecialty type={type} setIsShowModal={setIsShowModal} fetchSpecialties={fetchSpecialties} />}
         </>
 
     );

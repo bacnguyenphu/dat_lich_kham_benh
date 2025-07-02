@@ -60,7 +60,7 @@ const createSchedule = async (data) => {
         await db.Specialty.create({
             id: id_specialty,
             name: data.name,
-            images: data.linkImg,
+            images: data?.linkImg,
             slug: toSlug(data.name),
             id_description_detail: id_description_detail
         })
@@ -167,4 +167,64 @@ const getSpecialtyById = async (id) => {
     }
 }
 
-export { getSpecialties, createSchedule, deleteSpecialty, getSpecialtyById }
+const updateSpecialty = async (data) => {
+    try {
+        if (!data?.id) {
+            return {
+                err: 1,
+                message: "ID is required !"
+            }
+        }
+
+        const specialty = await db.Specialty.findOne({
+            where: { id: data.id },
+            attributes: ['id'],
+            include: [
+                { model: db.Description_detail, as: 'description_detail', attributes: ['id'] },
+            ]
+        })
+
+        if (!specialty) {
+            return {
+                err: 2,
+                message: 'Specialty is not exist !'
+            }
+        }
+        else {
+            let id_description_detail = uuidv4()
+            await db.Specialty.update(
+                {
+                    name: data.name,
+                    images: data?.linkImg,
+                    slug: toSlug(data.name),
+                },
+                {
+                    where: { id: data.id }
+                }
+            )
+
+            await db.Description_detail.update(
+                {
+                    description: data.description_detail,
+                },
+                {
+                    where: { id: specialty.description_detail.id }
+                },
+            )
+
+            return {
+                err: 0,
+                message: "Update specialty success !"
+            }
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở updateSpecialty !", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export { getSpecialties, createSchedule, deleteSpecialty, getSpecialtyById, updateSpecialty }

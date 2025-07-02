@@ -4,7 +4,7 @@ import { CiCirclePlus } from "react-icons/ci";
 import { useState } from "react";
 import DescriptionDetail from "./DescriptionDetail";
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
-import { createSpecialty, deleteSpecialty, getSpecialtyById } from "../../services/specialtyService";
+import { createSpecialty, deleteSpecialty, getSpecialtyById, updateSpecialty } from "../../services/specialtyService";
 import { Validation } from "../../utils/validation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "react-toastify";
@@ -81,16 +81,41 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
         }
     }
 
-    const handleClickDelete = async() => {
+    const handleClickDelete = async () => {
         const res = await deleteSpecialty(id)
-        if(res.err==0){
+        if (res.err == 0) {
             toast.success(res.message)
             setIsShowModal(false)
             navigate(location.pathname)
             fetchSpecialties()
         }
-        else{
+        else {
             toast.error(res.message)
+        }
+    }
+
+    const handleClickUpdate = async () => {
+        if (Validation(payload, setErrors)) {
+            setIsLoading(true)
+            let linkImg = payload?.linkImg
+            if (imgUpload) {
+                let formData = new FormData()
+                formData.append("file", imgUpload)
+                formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
+                const res = await uploadImgCloudinary(formData)
+                linkImg = res.data.url
+            }
+            const res = await updateSpecialty({ ...payload, linkImg: linkImg, id: id })
+            if (res.err === 0) {
+                fetchSpecialties()
+                setIsShowModal(false)
+                toast.success(res.message)
+                setIsLoading(false)
+            }
+            else {
+                toast.error(res.message)
+                setIsLoading(false)
+            }
         }
     }
 
@@ -99,13 +124,14 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
             {(type !== "DELETE") &&
                 <div className="w-5xl bg-white min-h-6 rounded-2xl mx-auto mt-10 px-5">
                     <div className="flex justify-between py-3 border-b">
-                        <p className="text-xl font-semibold">Thêm chuyên khoa</p>
+                        {type === "ADD" && <p className="text-xl font-semibold">Thêm chuyên khoa</p>}
+                        {type === "UPDATE" && <p className="text-xl font-semibold">Chỉnh sửa chuyên khoa</p>}
                         <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
                     </div>
                     <div className="mt-5 pb-5 h-[550px] overflow-y-auto">
                         <div className="flex flex-col relative w-1/2">
                             <label>Tên chuyên khoa<span className="text-red-500">*</span></label>
-                            <input className="border border-gray-500 rounded-md p-1" onChange={(e) => { setPayload({ ...payload, name: e.target.value }) }} />
+                            <input className="border border-gray-500 rounded-md p-1" value={payload.name} onChange={(e) => { setPayload({ ...payload, name: e.target.value }) }} />
                             {errors.name && <small className="text-red-500 absolute -bottom-5">{errors.name}</small>}
                         </div>
                         <div className="mt-5">
@@ -135,9 +161,12 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
                         </div>
                         <div className="flex gap-6 justify-end py-5 pr-5">
                             <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>
+                            {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>
                                 {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Thêm</span>}
-                            </button>
+                            </button>}
+                            {type === "UPDATE" && <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickUpdate() }}>
+                                {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Sửa</span>}
+                            </button>}
                         </div>
                     </div>
                 </div>
@@ -149,7 +178,7 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
                         <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
                     </div>
                     <div className="p-5 h-48">
-                        <p className="font-semibold">Bạn chắc có muốn xóa chuyên khoa {payload.name} ?</p>
+                        <p className="font-semibold">Bạn chắc có muốn xóa chuyên khoa: {payload.name} ?</p>
                         <div className="flex justify-center mt-10">
                             <img className="size-28 object-cover object-center rounded-full"
                                 alt="Avatar" src={(payload?.linkImg == null) ? imageAvatarDefault : payload?.linkImg}

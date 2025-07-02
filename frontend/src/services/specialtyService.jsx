@@ -17,4 +17,8 @@ const getSpecialtyById = (id) => {
     return axios.get("get-specialty-by-id", { params: { id } })
 }
 
-export { getSpecialties, createSpecialty, deleteSpecialty, getSpecialtyById }
+const updateSpecialty = (payload)=>{
+    return axios.post("update-specialty", payload)
+}
+
+export { getSpecialties, createSpecialty, deleteSpecialty, getSpecialtyById,updateSpecialty }
