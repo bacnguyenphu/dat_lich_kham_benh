@@ -4,10 +4,12 @@ import { CiCirclePlus } from "react-icons/ci";
 import { useState } from "react";
 import DescriptionDetail from "./DescriptionDetail";
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
-import { createSpecialty } from "../../services/specialtyService";
+import { createSpecialty, deleteSpecialty, getSpecialtyById } from "../../services/specialtyService";
 import { Validation } from "../../utils/validation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
 
@@ -20,8 +22,30 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
     const [isLoading, setIsLoading] = useState(false)
     const [imgUpload, setImgUpload] = useState()
 
+    const navigate = useNavigate()
+    const location = useLocation()
+    const query = new URLSearchParams(location.search)
+    const id = query.get("id")
+
+    useEffect(() => {
+        if (type !== "ADD" && id !== null) {
+            const fetchSpecialty = async () => {
+                const res = await getSpecialtyById(id)
+                if (res.err === 0) {
+                    setPayload({
+                        name: res?.data?.name,
+                        linkImg: res?.data?.images,
+                        description_detail: res?.data?.description_detail?.description
+                    })
+                }
+            }
+            fetchSpecialty()
+        }
+    }, [id])
+
     const handleClickClose = () => {
         setIsShowModal(false)
+        navigate(location.pathname)
     }
 
     const handleImg = (e) => {
@@ -57,8 +81,17 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
         }
     }
 
-    const handleClickDelete = () => {
-        
+    const handleClickDelete = async() => {
+        const res = await deleteSpecialty(id)
+        if(res.err==0){
+            toast.success(res.message)
+            setIsShowModal(false)
+            navigate(location.pathname)
+            fetchSpecialties()
+        }
+        else{
+            toast.error(res.message)
+        }
     }
 
     return (
@@ -112,14 +145,14 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
             {type === "DELETE" &&
                 <div className="w-2xl bg-white min-h-6 rounded-xl mx-auto px-5 mt-10">
                     <div className="flex justify-between py-3 border-b">
-                        <p className="text-xl font-semibold">Xóa bác sĩ</p>
+                        <p className="text-xl font-semibold">Xóa chuyên khoa</p>
                         <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
                     </div>
                     <div className="p-5 h-48">
                         <p className="font-semibold">Bạn chắc có muốn xóa chuyên khoa {payload.name} ?</p>
                         <div className="flex justify-center mt-10">
                             <img className="size-28 object-cover object-center rounded-full"
-                                alt="Avatar" src={(payload?.avatar == null) ? imageAvatarDefault : payload?.avatar}
+                                alt="Avatar" src={(payload?.linkImg == null) ? imageAvatarDefault : payload?.linkImg}
                                 onError={(e) => {
                                     e.target.onerror = null; // Ngăn lặp vô hạn
                                     e.target.src = imageAvatarDefault; // Đổi sang ảnh mặc định

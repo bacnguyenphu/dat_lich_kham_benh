@@ -1,6 +1,7 @@
 import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid'
 import { toSlug } from '../utils/toSlug'
+import { where } from 'sequelize'
 
 const getSpecialties = async (limit, page) => {
 
@@ -18,9 +19,9 @@ const getSpecialties = async (limit, page) => {
             const { count, rows } = await db.Specialty.findAndCountAll({
                 attributes: ['id', 'name', 'images', 'slug',],
                 distinct: true,
-                include: [
-                    { model: db.Description_detail, as: 'description_detail', attributes: ['description'] },
-                ],
+                // include: [
+                //     { model: db.Description_detail, as: 'description_detail', attributes: ['description'] },
+                // ],
                 offset: (page - 1) * limit,
                 limit: limit,
                 order: [['createdAt', 'DESC']]
@@ -69,9 +70,9 @@ const createSchedule = async (data) => {
             description: data.description_detail
         })
 
-        return{
-            err:0,
-            message:"Create Specialty success !"
+        return {
+            err: 0,
+            message: "Create Specialty success !"
         }
 
     } catch (error) {
@@ -83,8 +84,87 @@ const createSchedule = async (data) => {
     }
 }
 
-const deleteSpecialty = async(id)=>{
-    
+const deleteSpecialty = async (id) => {
+    try {
+        if (!id) {
+            return {
+                err: 1,
+                message: "ID is required !"
+            }
+        }
+
+        const specialty = await db.Specialty.findOne({
+            where: { id: id },
+            attributes: ['id'],
+            include: [
+                { model: db.Description_detail, as: 'description_detail', attributes: ['id'] },
+            ]
+        })
+
+        if (!specialty) {
+            return {
+                err: 2,
+                message: 'Specialty is not exist !'
+            }
+        } else {
+            await db.Specialty.destroy({
+                where: { id: id }
+            })
+            await db.Description_detail.destroy({
+                where: { id: specialty?.description_detail?.id }
+            })
+
+            return {
+                err: 0,
+                message: "Delete specialty success !"
+            }
+        }
+    } catch (error) {
+        console.log("Lỗi ở deleteSpecialty: ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
 }
 
-export { getSpecialties,createSchedule }
+const getSpecialtyById = async (id) => {
+    try {
+        if (!id) {
+            return {
+                err: 1,
+                message: "ID is required !"
+            }
+        }
+
+        const specialty = await db.Specialty.findOne({
+            where: { id: id },
+            attributes: ['id', 'name', 'images', 'slug',],
+            include: [
+                { model: db.Description_detail, as: 'description_detail', attributes: ['description'] },
+            ],
+        })
+
+        if (!specialty) {
+            return {
+                err: 2,
+                message: 'Specialty is not exist !'
+            }
+        }
+
+        return {
+            err: 0,
+            message: 'Get specialty success !',
+            data: specialty
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getSpecialtyById: ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export { getSpecialties, createSchedule, deleteSpecialty, getSpecialtyById }
