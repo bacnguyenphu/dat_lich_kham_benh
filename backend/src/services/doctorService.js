@@ -385,5 +385,37 @@ const updateDoctor = async (data) => {
     }
 }
 
+const getDoctorFollowSpecialty = async(id)=>{
+    try {
+        if (!id) {
+            return {
+                err: 1,
+                message: "ID specialty is required !"
+            }
+        }
 
-export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor }
+        const data = await db.Specialty.findOne({
+            where:{id:id},
+            include:[
+                { model: db.Doctor, as: 'doctor', through: { attributes: [] } },
+            ]
+            
+        })
+
+        return {
+            err:0,
+            message:"Get doctor follow specialty success !",
+            data:data
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getDoctorFollowSpecialty",error);
+        return{
+            err:-999,
+            message: `Server error: ${error}`
+        }
+    }
+}
+
+
+export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor,getDoctorFollowSpecialty }

@@ -85,8 +85,6 @@ function DetailDoctor() {
                     <span className="">/</span>
                     <span className="cursor-pointer" onClick={() => { naviagte(SPECIALTY) }}>Khám chuyên khoa</span>
                     <span className="">/</span>
-                    <span className="cursor-pointer" onClick={() => { naviagte(SPECIALTY) }}>Khám chuyên khoa</span>
-                    <span className="">/</span>
                     <span className="cursor-pointer">{doctor?.specialty[0].name}</span>
                     <span className="">/</span>
                     <div className="flex items-center gap-2 text-black">

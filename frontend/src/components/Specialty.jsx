@@ -1,6 +1,6 @@
 import { GoHome } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
-import { HOMEPAGE } from "../utils/path";
+import { HOMEPAGE, SPECIALTY } from "../utils/path";
 import { useEffect, useState } from "react";
 import { getSpecialties } from "../services/specialtyService";
 
@@ -34,7 +34,7 @@ function Specialty() {
                 {specialties.length > 0 &&
                     specialties.map((item) => {
                         return (
-                            <div key={item.id} className="lg:w-64 w-auto cursor-pointer">
+                            <div key={item.id} className="lg:w-64 w-auto cursor-pointer" onClick={()=>{naviagte(`${SPECIALTY}/${item?.slug}?id=${item.id}`)}}>
                                 <div className="w-full h-36">
                                     <img className="object-center object-cover size-full" src={item?.images} />
                                 </div>

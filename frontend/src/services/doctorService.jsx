@@ -16,8 +16,12 @@ const deleteDoctorById = (idDoctor) => {
     return axios.delete('delete-doctor-by-id', { params: { idDoctor } })
 }
 
-const updateDoctor = (data)=>{
-    return axios.put('update-doctor',data)
+const updateDoctor = (data) => {
+    return axios.put('update-doctor', data)
 }
 
-export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor }
+const getDoctorFollowSpecialty = (id) => {
+    return axios.get("get-doctor-follow-specialty", { params: { id } })
+}
+
+export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor, getDoctorFollowSpecialty }
