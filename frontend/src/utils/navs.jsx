@@ -12,7 +12,7 @@ export const navs = [
     },
     {
         name: "Bác sĩ",
-        title: "Tìm bác sĩ theo chuyên khoa",
+        title: "Chọn bác sĩ giỏi",
         image: doctors,
         path: DOCTORS
     },

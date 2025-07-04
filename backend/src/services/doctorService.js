@@ -113,7 +113,7 @@ const getDoctors = async (limit, page) => {
             include: [
                 { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
                 { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id','slug'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id', 'slug'], through: { attributes: [] } },
             ],
             offset: (page - 1) * limit,
             limit: limit,
@@ -162,7 +162,7 @@ const getDoctorById = async (idDoctor) => {
             include: [
                 { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
                 { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
-                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id','slug'], through: { attributes: [] } },
+                { model: db.Specialty, as: 'specialty', attributes: ['name', 'id', 'slug'], through: { attributes: [] } },
                 { model: db.Description_detail, as: 'description_detail', attributes: ['description', 'id'] },
             ]
         })
@@ -232,18 +232,18 @@ const deleteDoctorById = async (idDoctor) => {
             },
         });
 
-        for(const item of doctor.position){
+        for (const item of doctor.position) {
             await db.Position_doctor.destroy({
-                where:{
+                where: {
                     id_doctor: idDoctor,
                     id_position: item?.id
                 }
             })
         }
 
-        for(const item of doctor.specialty){
+        for (const item of doctor.specialty) {
             await db.Specialty_doctor.destroy({
-                where:{
+                where: {
                     id_doctor: idDoctor,
                     id_specialty: item?.id
                 }
@@ -325,18 +325,18 @@ const updateDoctor = async (data) => {
             { where: { id: doctor?.description_detail?.id } }
         )
 
-        for(const item of doctor.position){
+        for (const item of doctor.position) {
             await db.Position_doctor.destroy({
-                where:{
+                where: {
                     id_doctor: data.idDoctor,
                     id_position: item?.id
                 }
             })
         }
 
-        for(const item of doctor.specialty){
+        for (const item of doctor.specialty) {
             await db.Specialty_doctor.destroy({
-                where:{
+                where: {
                     id_doctor: data.idDoctor,
                     id_specialty: item?.id
                 }
@@ -385,7 +385,7 @@ const updateDoctor = async (data) => {
     }
 }
 
-const getDoctorFollowSpecialty = async(id)=>{
+const getDoctorFollowSpecialty = async (id) => {
     try {
         if (!id) {
             return {
@@ -394,28 +394,35 @@ const getDoctorFollowSpecialty = async(id)=>{
             }
         }
 
-        const data = await db.Specialty.findOne({
-            where:{id:id},
-            include:[
-                { model: db.Doctor, as: 'doctor', through: { attributes: [] } },
+        const data = await db.Doctor.findAll({
+            include: [
+                {
+                    model: db.Specialty,
+                    as: 'specialty',
+                    attributes: ['id'],
+                    through: { attributes: [] },
+                    where: { id: id }
+                },
+                { model: db.User, as: 'user', attributes: ['firstName', 'lastName','avatar','address'] },
+                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
             ]
-            
+
         })
 
         return {
-            err:0,
-            message:"Get doctor follow specialty success !",
-            data:data
+            err: 0,
+            message: "Get doctor follow specialty success !",
+            data: data
         }
 
     } catch (error) {
-        console.log("Lỗi ở getDoctorFollowSpecialty",error);
-        return{
-            err:-999,
+        console.log("Lỗi ở getDoctorFollowSpecialty", error);
+        return {
+            err: -999,
             message: `Server error: ${error}`
         }
     }
 }
 
 
-export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor,getDoctorFollowSpecialty }
+export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor, getDoctorFollowSpecialty }

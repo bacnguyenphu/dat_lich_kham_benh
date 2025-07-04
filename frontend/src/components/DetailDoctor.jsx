@@ -7,10 +7,11 @@ import { GiPositionMarker } from "react-icons/gi";
 import { FaChevronDown } from "react-icons/fa";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import defaultAvatar from '../assets/defaultAvatar.png'
-import dayjs from 'dayjs';
-import 'dayjs/locale/vi';
 import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 import { getScheduleFollowDate } from "../services/scheduleService";
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+import Schedules from "./Schedules";
 dayjs.locale('vi')
 
 
@@ -26,8 +27,8 @@ function DetailDoctor() {
         days.push(date)
     }
 
-    const [selectedDate, setSelectedDate] = useState(days[0])
     const [doctor, setDoctor] = useState(null)
+    const [selectedDate, setSelectedDate] = useState(days[0])
     const [timeFrames, setTimeFrames] = useState([])
     const [showModal, setShowModal] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
@@ -70,9 +71,6 @@ function DetailDoctor() {
         handleCloseModal()
     }
 
-    console.log(doctor);
-
-
     return (
         <div className="lg:px-40 md:px-20 px-5 py-5">
             <div className="flex items-center">
@@ -85,7 +83,7 @@ function DetailDoctor() {
                     <span className="">/</span>
                     <span className="cursor-pointer" onClick={() => { naviagte(SPECIALTY) }}>Khám chuyên khoa</span>
                     <span className="">/</span>
-                    <span className="cursor-pointer">{doctor?.specialty[0].name}</span>
+                    <span className="cursor-pointer" onClick={() => { naviagte(`${SPECIALTY}/${doctor?.specialty[0]?.slug}?id=${doctor?.specialty[0].id}`) }}>{doctor?.specialty[0].name}</span>
                     <span className="">/</span>
                     <div className="flex items-center gap-2 text-black">
                         {doctor?.position.map(item => {
@@ -121,28 +119,8 @@ function DetailDoctor() {
             </div>
 
             <div className="flex gap-5 mt-8 ">
-                <div className="w-1/2 flex flex-col">
-                    <p className="text-primary-100 font-semibold flex gap-3 items-center cursor-pointer border-b border-primary-100 w-fit"
-                        onClick={() => { setShowModal(true) }}
-                    >
-                        <span>{capitalizeFirstLetter(selectedDate.title)}</span>
-                        <span><FaChevronDown /></span>
-                    </p>
-                    <div className="flex gap-2 mt-7">
-                        <span><RiCalendarScheduleLine size={'1.5rem'} /></span>
-                        <span className="font-semibold text-gray-700">LỊCH KHÁM</span>
-                    </div>
-                    <div></div>
-                    <div className="mt-4 grid grid-cols-5 gap-3">
-                        {timeFrames && timeFrames?.length > 0 && timeFrames.map(item => {
-                            return (
-                                <div key={item?.id} className="bg-gray-200 text-center py-2 font-semibold cursor-pointer border-2 border-gray-200 hover:border-primary-100 duration-300">{item?.time_frame}</div>
-                            )
-                        })}
-                    </div>
-                    {(!timeFrames || timeFrames?.length === 0) &&
-                        <div className="font-semibold">{capitalizeFirstLetter(selectedDate.title)} bác sĩ chưa có lịch !</div>
-                    }
+                <div className="w-1/2">
+                    <Schedules idDoctor={idDoctor}/>
                 </div>
                 <div className="w-1/2 pl-5">
                     <div className="border-b border-gray-400 pb-4 w-fit">
