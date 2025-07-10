@@ -58,7 +58,9 @@ const handleUpdateDoctor =async(req,res)=>{
 const handleGetDoctorFollowSpecialty = async(req,res)=>{
     try {
         let id = req.query.id
-        const message = await getDoctorFollowSpecialty(id)
+        const limit = req.query.limit
+        const page = req.query.page
+        const message = await getDoctorFollowSpecialty(id,limit,page)
         return res.status(200).json(message)
     } catch (error) {
         console.log("Lỗi ở handleGetDoctorFollowSpecialty: ",error);

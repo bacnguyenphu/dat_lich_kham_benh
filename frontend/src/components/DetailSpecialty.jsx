@@ -43,6 +43,10 @@ function DetailSpecialty() {
 
     }, [])
 
+    useEffect(()=>{
+        
+    },[])
+
     console.log(doctors);
 
 

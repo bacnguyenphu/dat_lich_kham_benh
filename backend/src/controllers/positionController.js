@@ -1,8 +1,10 @@
-import { getPositions } from "../services/positionsService";
+import { getPositions,createPosition, deletePosition } from "../services/positionsService";
 
 const handleGetPositions = async(req,res)=>{
     try {
-        const message = await getPositions()
+        let limit = req.query.limit
+        let page = req.query.page
+        const message = await getPositions(+limit,+page)
         return res.status(200).json(message)
     } catch (error) {
         console.log("Lỗi ở handleGetPositions",error);
@@ -10,4 +12,24 @@ const handleGetPositions = async(req,res)=>{
     }
 }
 
-export{handleGetPositions}
+const handleCreatePosition = async(req,res)=>{
+    try {
+        let data = req.body
+        const message = await createPosition(data)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handleCreatePosition",error);
+    }
+}
+
+const handleDeletePosition = async(req,res)=>{
+    try {
+        let id = req.query.id
+        const message = await deletePosition(id)
+        return res.status(200).json(message)        
+    } catch (error) {
+        console.log("Lỗi ở handleDeletePosition",error);
+    }
+}
+
+export{handleGetPositions,handleCreatePosition,handleDeletePosition}

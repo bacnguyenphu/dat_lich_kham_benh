@@ -90,7 +90,7 @@ function Sidebar() {
                         <div className='flex items-center justify-between h-12 px-10 isDownMedical '
                             onClick={() => { setIsDownMedical(!isDownMedical) }}
                         >
-                            <div className='flex items-center gap-3'>
+                            <div className='flex items-center gap-3 cursor-pointer'>
                                 <span><FaBookMedical color="#00A2A1" size={'1.25rem'} /></span>
                                 <p>Quản lí y tế</p>
                             </div>

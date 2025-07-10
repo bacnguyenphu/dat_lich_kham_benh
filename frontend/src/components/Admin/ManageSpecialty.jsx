@@ -13,9 +13,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 function ManageSpecialty() {
 
     const [specialties, setSpecialties] = useState([])
-    const [totalPages, setTotalPages] = useState(0)
     const [type, setType] = useState('')
     const [isShowModal, setIsShowModal] = useState(false)
+    const [totalPages, setTotalPages] = useState(0)
     const limit = 7
     const [page, setPage] = useState(1)
 

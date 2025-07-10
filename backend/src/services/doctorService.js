@@ -401,18 +401,24 @@ const getDoctorFollowSpecialty = async (id) => {
                     as: 'specialty',
                     attributes: ['id'],
                     through: { attributes: [] },
-                    where: { id: id }
+                    where: { id: id },
+                    required: true
                 },
-                { model: db.User, as: 'user', attributes: ['firstName', 'lastName','avatar','address'] },
-                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
-            ]
-
+                { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'avatar', 'address'],required: true },
+                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] },required: true },
+            ],
+            // offset: (page - 1) * limit,
+            // limit: limit,
+            distinct: true,
         })
 
         return {
             err: 0,
             message: "Get doctor follow specialty success !",
-            data: data
+            data: data,
+            // page: +page,
+            // totalPage: Math.ceil(count / limit),
+            // totalData: count
         }
 
     } catch (error) {

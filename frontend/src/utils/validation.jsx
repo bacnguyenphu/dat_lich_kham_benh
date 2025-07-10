@@ -24,7 +24,7 @@ export const Validation=(values,setErrors)=>{
 
     //chuyen khoa
     if(values?.name===""){
-        newErrors.name="Bạn phải điền tên chuyên khoa !"
+        newErrors.name="Bạn phải điền tên !"
     }
 
     setErrors(newErrors)
