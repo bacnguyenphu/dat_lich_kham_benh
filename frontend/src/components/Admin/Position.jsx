@@ -36,8 +36,10 @@ function Position() {
         setType("ADD")
     }
 
-    const handleClickUpdate = () => {
-
+    const handleClickUpdate = (id) => {
+        setIsShowModal(true)
+        setType("UPDATE")
+        navigate(location.pathname + `?id=${id}`)
     }
 
     const handleClickDelete = (id) => {

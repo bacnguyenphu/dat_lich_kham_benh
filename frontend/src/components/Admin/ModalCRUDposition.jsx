@@ -2,9 +2,10 @@ import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { IoMdClose } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
-import { createPosition, deletePosition } from "../../services/positionService";
+import { createPosition, deletePosition, getPositionById, updatePosition } from "../../services/positionService";
 import { Validation } from "../../utils/validation";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 function ModalCRUDposition({ setIsShowModal, type, fetchPositions }) {
 
@@ -18,6 +19,19 @@ function ModalCRUDposition({ setIsShowModal, type, fetchPositions }) {
 
     const query = new URLSearchParams(location.search)
     const id = query.get("id")
+
+    useEffect(() => {
+        if (type === "UPDATE" && id) {
+            const fetchPositionById = async () => {
+                const res = await getPositionById(id)
+                if (res.err === 0) {
+                    setPayload({ ...payload, name: res.data?.name })
+                }
+            }
+            fetchPositionById()
+        }
+
+    }, [id])
 
     const handleClickClose = () => {
         setIsShowModal(false)
@@ -42,7 +56,7 @@ function ModalCRUDposition({ setIsShowModal, type, fetchPositions }) {
         }
     }
 
-    const handleClickDelete = async() => {
+    const handleClickDelete = async () => {
         const res = await deletePosition(id)
         if (res.err == 0) {
             toast.success(res.message)
@@ -55,18 +69,37 @@ function ModalCRUDposition({ setIsShowModal, type, fetchPositions }) {
         }
     }
 
+    const handleClickUpdate = async () => {
+        if (Validation(payload, setErrors)) {
+            setIsLoading(true)
+            
+            const res = await updatePosition({ ...payload, id: id })
+            if (res.err === 0) {
+                fetchPositions()
+                setIsShowModal(false)
+                toast.success(res.message)
+                setIsLoading(false)
+            }
+            else {
+                toast.error(res.message)
+                setIsLoading(false)
+            }
+        }
+    }
+
     return (
         <div className="fixed left-0 right-0 top-0 bottom-0 bg-black/40">
             <div className="w-2xl bg-white min-h-6 rounded-xl mx-auto px-5 mt-16">
                 <div className="flex justify-between py-3 border-b">
                     {type === "ADD" && <p className="text-xl font-semibold">Thêm chức vụ</p>}
                     {type === "DELETE" && <p className="text-xl font-semibold">Xóa chức vụ</p>}
+                    {type === "UPDATE" && <p className="text-xl font-semibold">Chỉnh sửa chức vụ</p>}
                     <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
                 </div>
                 <div className="p-5 h-32">
                     {type !== "DELETE" && <div className="flex flex-col relative ">
                         <p>Tên chức vụ</p>
-                        <input className="border border-gray-500 rounded-md p-1 w-full" onChange={(e) => { setPayload({ ...payload, name: e.target.value }) }} />
+                        <input className="border border-gray-500 rounded-md p-1 w-full" value={payload.name} onChange={(e) => { setPayload({ ...payload, name: e.target.value }) }} />
                         {errors.name && <small className="text-red-500 absolute -bottom-5">{errors.name}</small>}
                     </div>}
                     {type === "DELETE" &&
@@ -79,6 +112,9 @@ function ModalCRUDposition({ setIsShowModal, type, fetchPositions }) {
                     <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
                     {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>
                         {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Thêm</span>}
+                    </button>}
+                    {type === "UPDATE" && <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickUpdate() }}>
+                        {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Sửa</span>}
                     </button>}
                     {type === "DELETE" && <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickDelete() }}>Xóa</button>}
                 </div>

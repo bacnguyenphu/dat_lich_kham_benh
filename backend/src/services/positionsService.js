@@ -119,7 +119,7 @@ const updatePosition = async (data) => {
             }
         }
         const position = await db.Position.findOne({
-            where: { id: id },
+            where: { id: +data?.id },
         })
 
         if (!position) {
@@ -130,10 +130,10 @@ const updatePosition = async (data) => {
         } else {
             await db.Position.update(
                 {
-                    name:data.name
+                    name: data.name
                 },
                 {
-                    where: { id: id }
+                    where: { id: +data?.id }
                 }
             )
 
@@ -152,4 +152,42 @@ const updatePosition = async (data) => {
     }
 }
 
-export { getPositions, createPosition, deletePosition, updatePosition }
+const getPositionById = async (id) => {
+    try {
+        if (!id) {
+            return {
+                err: 1,
+                message: "ID is required !"
+            }
+        }
+
+        const position = await db.Position.findOne({
+            attributes: ['id', 'name'],
+            where: { id: id },
+        })
+
+        if (!position) {
+            return {
+                err: 2,
+                message: `Position is not exist !`,
+                data: null
+            }
+        }
+
+        return {
+            err: 0,
+            message: `Get position by id success !`,
+            data: position
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getPositionById: ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`,
+            data: null
+        }
+    }
+}
+
+export { getPositions, createPosition, deletePosition, updatePosition, getPositionById }
