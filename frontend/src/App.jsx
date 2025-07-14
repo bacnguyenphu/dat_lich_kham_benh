@@ -1,17 +1,19 @@
 import { Routes, Route } from 'react-router-dom'
 import { DetailDoctor, DetailSpecialty, Doctor, HomePage, Login, Register, Specialty } from './components'
 import {
-  ADMIN, DOCTORS, INFORMATION_DOCTOR, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
+  ADMIN, CATEGORY_PACKAGE, DOCTORS, INFORMATION_DOCTOR, INFORMATION_PAKAGE, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
   MANAGE_PACKAGE,
   MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN, MEDICAL_PACKAGE,
+  PACKAGE_PLAN,
   REGISTER, SPECIALTY, STATISTICAL
 } from './utils/path'
 import { LayoutAdmin, LayoutDefault } from './Layouts'
 import Category_Package from './components/Category_Package'
 import {
-  InformationDoctor, ManagePackage, ManageSpecialty,
+  CategoriesPackage,
+  InformationDoctor, InformationPackage, ManageSpecialty,
   ManageUsers,
-  MedicalExaminationPlan, Position, Statistical
+  MedicalExaminationPlan, PackagePlan, Position, Statistical
 } from './components/Admin'
 import ManageAppointment from './components/Admin/ManageAppointment'
 import { ToastContainer } from 'react-toastify';
@@ -39,10 +41,14 @@ function App() {
             <Route path={INFORMATION_DOCTOR} element={<InformationDoctor />} />
             <Route path={MEDICAL_EXAMINATION_PLAN} element={<MedicalExaminationPlan />} />
           </Route>
+          <Route path={MANAGE_PACKAGE} element={null}>
+            <Route path={INFORMATION_PAKAGE} element={<InformationPackage />} />
+            <Route path={PACKAGE_PLAN} element={<PackagePlan />} />
+            <Route path={CATEGORY_PACKAGE} element={<CategoriesPackage/>}/>
+          </Route>
           <Route path={MANAGE_MEDICAL} element={null}>
             <Route path={MANAGE_POSITION} element={<Position />} />
             <Route path={MANAGE_SPECIALTY} element={<ManageSpecialty />} />
-            <Route path={MANAGE_PACKAGE} element={<ManagePackage />} />
           </Route>
           <Route path={MANAGE_APPOINTMENT} element={<ManageAppointment />} />
           <Route path={MANAGE_USERS} element={<ManageUsers />} />

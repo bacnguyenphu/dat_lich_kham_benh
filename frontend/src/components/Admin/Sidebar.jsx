@@ -2,14 +2,17 @@ import { NavLink, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.png'
 import {
     FaUserDoctor, FaAngleDown, FaCircleInfo, FaPaperPlane,
-    FaBookMedical, FaChartSimple, FaFire, FaHouse, FaUserGroup
+    FaBookMedical, FaChartSimple, FaFire, FaHouse, FaUserGroup,
 } from "react-icons/fa6";
 import { FaFileMedicalAlt } from "react-icons/fa";
 import { RxCountdownTimer } from "react-icons/rx";
+import { BiCategoryAlt } from "react-icons/bi";
 import {
-    INFORMATION_DOCTOR, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
+    CATEGORY_PACKAGE,
+    INFORMATION_DOCTOR, INFORMATION_PAKAGE, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
     MANAGE_PACKAGE,
     MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN,
+    PACKAGE_PLAN,
     STATISTICAL
 } from '../../utils/path';
 import { useState } from 'react';
@@ -20,6 +23,7 @@ function Sidebar() {
 
     const [isDownDoctor, setIsDownDoctor] = useState(false)
     const [isDownMedical, setIsDownMedical] = useState(false)
+    const [isDownPackage, setIsDownPackage] = useState(false)
 
     const location = useLocation()
 
@@ -85,6 +89,7 @@ function Sidebar() {
                         </div>
                     </div>
                 </div>
+
                 <div>
                     <div className={`${pathManage === MANAGE_MEDICAL ? classActive : ''}`}>
                         <div className='flex items-center justify-between h-12 px-10 isDownMedical '
@@ -121,17 +126,57 @@ function Sidebar() {
                             </div>
 
                         </NavLink>
-                        <NavLink to={`${MANAGE_MEDICAL}/${MANAGE_PACKAGE}`}
-                            className={({ isActive }) => {
-                                return isActive ? "bg-primary-50/20 block" : ''
-                            }}
+
+                    </div>
+                </div>
+                <div>
+                    <div className={`${pathManage === MANAGE_PACKAGE ? classActive : ''}`}>
+                        <div className='flex items-center justify-between h-12 px-10 cursor-pointer '
+                            onClick={() => { setIsDownPackage(!isDownPackage) }}
                         >
-                            <div className='flex items-center gap-3 pl-16 h-12'>
-                                <span><FaFileMedicalAlt color="black" size={'1.25rem'} /></span>
+                            <div className='flex items-center gap-3'>
+                                <span><FaFileMedicalAlt color="#00A2A1" size={'1.25rem'} /></span>
                                 <p>Gói khám</p>
                             </div>
+                            <div className={`${isDownPackage ? 'rotate-180 duration-150' : 'rotate-0 duration-150'}`}>
+                                <FaAngleDown color='black' />
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`duration-300 overflow-hidden transition-all ${isDownPackage ? 'max-h-36' : 'max-h-0'}`}>
+                        <div>
+                            <NavLink to={`${MANAGE_PACKAGE}/${INFORMATION_PAKAGE}`}
+                                className={({ isActive }) => {
+                                    return isActive ? "bg-primary-50/20 block" : ''
+                                }}
+                            >
+                                <div className='flex items-center gap-3 pl-16 h-12 cursor-pointer'>
+                                    <span><FaCircleInfo color="black" size={'1.25rem'} /></span>
+                                    <p>Thông tin gói khám</p>
+                                </div>
 
-                        </NavLink>
+                            </NavLink>
+                            <NavLink to={`${MANAGE_PACKAGE}/${PACKAGE_PLAN}`}
+                                className={({ isActive }) => {
+                                    return isActive ? "bg-primary-50/20 block" : ''
+                                }}
+                            >
+                                <div className='flex items-center gap-3 pl-16 h-12 cursor-pointer'>
+                                    <span><FaPaperPlane color="black" size={'1.25rem'} /></span>
+                                    <p>Kế hoạch gói khám</p>
+                                </div>
+                            </NavLink>
+                            <NavLink to={`${MANAGE_PACKAGE}/${CATEGORY_PACKAGE}`}
+                                className={({ isActive }) => {
+                                    return isActive ? "bg-primary-50/20 block" : ''
+                                }}
+                            >
+                                <div className='flex items-center gap-3 pl-16 h-12 cursor-pointer'>
+                                    <span><BiCategoryAlt color="black" size={'1.25rem'} /></span>
+                                    <p>Danh mục gói khám</p>
+                                </div>
+                            </NavLink>
+                        </div>
                     </div>
                 </div>
                 <NavLink

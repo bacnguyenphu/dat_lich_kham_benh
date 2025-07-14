@@ -1,7 +1,6 @@
 import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid'
 import { toSlug } from '../utils/toSlug'
-import { where } from 'sequelize'
 
 const getSpecialties = async (limit, page) => {
 

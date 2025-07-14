@@ -68,7 +68,6 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
             if (postions.length > 0 && specialties.length > 0) {
                 const fetchDataDoctor = async () => {
                     const res = await getDoctorById(idDoctor)
-                    console.log(res);
                     if (res.err === 0) {
                         setPayload({
                             firstName: res?.data?.user?.firstName,
@@ -160,7 +159,15 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     const handleClickUpdate = async () => {
         if (Validation(payload, setErrors)) {
             setIsLoading(true)
-            const res = await updateDoctor({ idDoctor, ...payload })
+            let linkImg = payload?.linkImg
+            if (imgUpload) {
+                let formData = new FormData()
+                formData.append("file", imgUpload)
+                formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
+                const res = await uploadImgCloudinary(formData)
+                linkImg = res.data.url
+            }
+            const res = await updateDoctor({ idDoctor, ...payload, avatar: linkImg  })
             if (res.err === 0) {
                 setIsShowModal(false)
                 navigate(location.pathname)

@@ -5,12 +5,12 @@ import { FaRegPenToSquare } from "react-icons/fa6";
 import { MdDeleteOutline } from "react-icons/md";
 import defaultAvatar from '../../assets/defaultAvatar.png'
 import Pagination from "../Pagination";
-import ModalCRUDspecialty from "./ModalCRUDspecialty";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getCategoryPackage } from "../../services/categoryPackageService";
+import ModalCRUDcategoriesPackage from "./ModalCRUDcategoriesPackage";
 
-function ManageSpecialty() {
-
-    const [specialties, setSpecialties] = useState([])
+function CategoriesPackage() {
+    const [categoriesPackage, setCategoriesPackage] = useState([])
     const [type, setType] = useState('')
     const [isShowModal, setIsShowModal] = useState(false)
     const [totalPages, setTotalPages] = useState(0)
@@ -20,15 +20,15 @@ function ManageSpecialty() {
     const location = useLocation()
     const navigate = useNavigate()
 
-    const fetchSpecialties = async () => {
-        const res = await getSpecialties(limit, page)
+    const fetchCategoriesPackage = async () => {
+        const res = await getCategoryPackage(limit, page)
         if (res.err === 0) {
-            setSpecialties(res?.data)
+            setCategoriesPackage(res?.data)
             setTotalPages(res?.totalPage)
         }
     }
     useEffect(() => {
-        fetchSpecialties()
+        fetchCategoriesPackage()
     }, [page])
 
     const handleClickAdd = () => {
@@ -52,7 +52,7 @@ function ManageSpecialty() {
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-semibold">Quản lý chuyên khoa</h2>
                     <button className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-lg cursor-pointer flex items-center gap-3">
-                        <span onClick={() => { handleClickAdd() }}>Thêm chuyên khoa</span>
+                        <span onClick={() => { handleClickAdd() }}>Thêm danh mục</span>
                         <span><LuBadgePlus size={"1.25rem"} /></span>
                     </button>
                 </div>
@@ -63,12 +63,12 @@ function ManageSpecialty() {
                                 <tr className="border-b border-slate-300 bg-slate-50">
                                     <th className="p-4 text-sm font-normal leading-none text-slate-500">STT</th>
                                     <th className="p-4 text-sm font-normal leading-none text-slate-500">Ảnh</th>
-                                    <th className="p-4 text-sm font-normal leading-none text-slate-500">Chuyên khoa</th>
+                                    <th className="p-4 text-sm font-normal leading-none text-slate-500">Danh mục</th>
                                     <th className="p-4 text-sm font-normal leading-none text-slate-500">Chức năng</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {specialties.length > 0 && specialties.map((item, index) => {
+                                {categoriesPackage.length > 0 && categoriesPackage.map((item, index) => {
                                     return (
                                         <tr className="hover:bg-slate-50" key={item.id}>
                                             <td className="p-4 border-b border-slate-200 py-5">
@@ -76,7 +76,7 @@ function ManageSpecialty() {
                                             </td>
                                             <td className="p-4 border-b border-slate-200 py-5">
                                                 <div className="size-16 rounded-full overflow-hidden">
-                                                    <img src={(item?.images) ? item?.images : defaultAvatar} className="size-full object-center object-cover" />
+                                                    <img src={(item?.image) ? item?.image : defaultAvatar} className="size-full object-center object-cover" />
                                                 </div>
                                             </td>
                                             <td className="p-4 border-b border-slate-200 py-5">
@@ -99,10 +99,10 @@ function ManageSpecialty() {
                     <Pagination setPage={setPage} totalPages={+totalPages} />
                 </div>
             </div>
-            {isShowModal && <ModalCRUDspecialty type={type} setIsShowModal={setIsShowModal} fetchSpecialties={fetchSpecialties} />}
+            {isShowModal&&<ModalCRUDcategoriesPackage type={type} setIsShowModal={setIsShowModal} fetchCategoriesPackage={fetchCategoriesPackage}/>}
         </>
 
     );
 }
 
-export default ManageSpecialty;
+export default CategoriesPackage;

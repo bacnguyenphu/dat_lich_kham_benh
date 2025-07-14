@@ -1,4 +1,8 @@
 import db from '../models/index'
+import { v4 as uuidv4 } from 'uuid';
+import { toSlug } from '../utils/toSlug'
+import { where } from 'sequelize';
+
 const getCategoryPackage = async (limit, page) => {
     try {
         let data = []
@@ -34,8 +38,65 @@ const getCategoryPackage = async (limit, page) => {
             err: -999,
             message: `Error server: ${error}`
         }
-
     }
 }
 
-export { getCategoryPackage }
+const getCategoryPackageById = async (id) => {
+    try {
+        if (!id) {
+            return {
+                err: 1,
+                message: 'ID is required !'
+            }
+        }
+
+        const data = await db.Category_package.findOne({
+            where: { id },
+            attributes: ['id', 'name', 'image', 'description', 'slug'],
+        })
+
+        return {
+            err: 0,
+            message: 'Get category package by id success !',
+            data:data
+        }
+    } catch (error) {
+        console.log("Lỗi ở getCategoryPackageById: ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+const createCategoryPackage = async (data) => {
+    try {
+        if (!data.name) {
+            return {
+                err: 1,
+                message: 'Name is required !'
+            }
+        }
+        const id = uuidv4()
+        await db.Category_package.create({
+            id: id,
+            name: data.name,
+            image: data?.image,
+            description: data?.description,
+            slug: toSlug(data.name)
+        })
+
+        return {
+            err: 0,
+            message: 'Create category package success !'
+        }
+    } catch (error) {
+        console.log("Lỗi ở getCategoryPackage: ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export { getCategoryPackage, createCategoryPackage, getCategoryPackageById }

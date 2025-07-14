@@ -1,7 +1,6 @@
 import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
-import { where } from 'sequelize';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);

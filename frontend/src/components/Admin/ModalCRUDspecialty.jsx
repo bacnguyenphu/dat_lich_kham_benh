@@ -45,7 +45,9 @@ function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
 
     const handleClickClose = () => {
         setIsShowModal(false)
-        navigate(location.pathname)
+        if (type !== "ADD") {
+            navigate(location.pathname)
+        }
     }
 
     const handleImg = (e) => {
