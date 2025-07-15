@@ -1,4 +1,4 @@
-const { getCategoryPackage, createCategoryPackage, getCategoryPackageById } = require("../services/categoryPackageServices");
+const { getCategoryPackage, createCategoryPackage, getCategoryPackageById, updateCategoryPackage, deleteCategoryPackage } = require("../services/categoryPackageServices");
 
 const handleGetCategoryPackage = async (req, res) => {
     try {
@@ -21,7 +21,7 @@ const handleGetCategoryPackageById = async (req, res) => {
     }
 }
 
-const handleCreateCreatePackage = async (req, res) => {
+const handleCreateCreateCategoryPackage = async (req, res) => {
     try {
         const data = req.body
         const message = await createCategoryPackage(data)
@@ -31,4 +31,24 @@ const handleCreateCreatePackage = async (req, res) => {
     }
 }
 
-export { handleGetCategoryPackage, handleCreateCreatePackage,handleGetCategoryPackageById }
+const handleUpdateCategoryPackage = async (req, res) => {
+    try {
+        const data = req.body
+        const message = await updateCategoryPackage(data)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handleUpdateCategoryPackage");
+    }
+}
+
+const handelDeleteCategoryPackage = async (req, res) => {
+    try {
+        const id = req.query.id
+        const message = await deleteCategoryPackage(id)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handelDeleteCategoryPackage");
+    }
+}
+
+export { handleGetCategoryPackage, handleCreateCreateCategoryPackage, handleGetCategoryPackageById, handleUpdateCategoryPackage, handelDeleteCategoryPackage }
