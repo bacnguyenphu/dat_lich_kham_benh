@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
             Description_detail.hasOne(models.Doctor,{foreignKey:'id_description_detail',as:'doctor'})
             Description_detail.hasOne(models.Specialty,{foreignKey:'id_description_detail',as:'specialty'})
+            Description_detail.hasOne(models.Medical_package,{foreignKey:'id_description_detail',as:'medical_package'})
         }
     }
     Description_detail.init({

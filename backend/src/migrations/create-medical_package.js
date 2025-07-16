@@ -23,6 +23,12 @@ module.exports = {
             image: {
                 type: Sequelize.STRING
             },
+            description: {
+                type: Sequelize.STRING
+            },
+            id_category_package: {
+                type: Sequelize.STRING
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

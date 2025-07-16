@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Medical_package.belongsTo(models.Category_package,{foreignKey:'id_category_package', as:'category_package'})
+            Medical_package.belongsTo(models.Description_detail,{foreignKey:'id_description_detail', as:'description_detail'})
         }
     }
     Medical_package.init({
@@ -23,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
         id_description_detail: DataTypes.STRING,
         price: DataTypes.FLOAT,
         image: DataTypes.STRING,
+        description: DataTypes.STRING,
+        id_category_package: DataTypes.STRING,
     }, {
     sequelize,
     modelName: 'Medical_package',

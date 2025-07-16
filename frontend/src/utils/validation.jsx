@@ -27,6 +27,11 @@ export const Validation=(values,setErrors)=>{
         newErrors.name="Bạn phải điền tên !"
     }
 
+    //medical package
+    if(values?.id_category_package===''){
+        newErrors.id_category_package="Bạn phải chọn danh mục !"
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0;
 }

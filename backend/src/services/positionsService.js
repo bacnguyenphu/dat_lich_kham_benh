@@ -1,5 +1,4 @@
 import db from '../models/index'
-import { v4 as uuidv4 } from 'uuid'
 
 const getPositions = async (limit, page) => {
     try {
