@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getCategoryPackage } from "../../services/categoryPackageService";
 import DescriptionDetail from "./DescriptionDetail";
 import imageAvatarDefault from '../../assets/default_image.webp'
@@ -8,10 +8,10 @@ import { CiCirclePlus } from "react-icons/ci";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Validation } from "../../utils/validation";
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
-import { createMedicalPackage } from "../../services/medicalPackageService";
+import { createMedicalPackage, getMedicalPackageById, updateMedicalPackage } from "../../services/medicalPackageService";
 import { toast } from "react-toastify";
 
-function ModalCRUDpackage({ setIsShowModal, type }) {
+function ModalCRUDMedicalPackage({ setIsShowModal, type, fetchMedicalPackages }) {
 
     const [categoriesPackage, setCategoriesPackage] = useState([])
     const [payload, setPayload] = useState({
@@ -27,6 +27,9 @@ function ModalCRUDpackage({ setIsShowModal, type }) {
     const [isLoading, setIsLoading] = useState(false)
 
     const navigate = useNavigate()
+    const location = useLocation()
+    const query = new URLSearchParams(location.search)
+    const id = query.get("id")
 
     useEffect(() => {
         const fetchCategoriesPackage = async () => {
@@ -37,6 +40,24 @@ function ModalCRUDpackage({ setIsShowModal, type }) {
         }
         fetchCategoriesPackage()
     }, [])
+
+    useEffect(() => {
+        const fetchMedicalPackageById = async () => {
+            const res = await getMedicalPackageById(id)
+            if (res.err === 0) {
+                setPayload({
+                    ...payload,
+                    name: res?.data?.name,
+                    description_detail: res?.data?.description_detail?.description,
+                    price: res?.data?.price,
+                    image: res?.data?.image,
+                    description: res?.data?.description,
+                    id_category_package: res?.data?.category_package?.id
+                })
+            }
+        }
+        fetchMedicalPackageById()
+    }, [id])
 
     const handleImg = (e) => {
         const file = e.target.files[0]
@@ -75,7 +96,7 @@ function ModalCRUDpackage({ setIsShowModal, type }) {
             if (res.err === 0) {
                 toast.success(res.message)
                 setIsShowModal(false)
-                // fectDoctors()
+                fetchMedicalPackages()
                 setIsLoading(false)
             } else {
                 toast.error(res.message)
@@ -85,8 +106,29 @@ function ModalCRUDpackage({ setIsShowModal, type }) {
 
     }
 
-    const handleClickUpdate = () => {
-
+    const handleClickUpdate = async() => {
+        if (Validation(payload, setErrors)) {
+            setIsLoading(true)
+            let linkImg = payload?.linkImg
+            if (imgUpload) {
+                let formData = new FormData()
+                formData.append("file", imgUpload)
+                formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
+                const res = await uploadImgCloudinary(formData)
+                linkImg = res.data.url
+            }
+            const res = await updateMedicalPackage({ ...payload, image: linkImg, idMedicalPackage: id })
+            if (res.err === 0) {
+                fetchMedicalPackages()
+                setIsShowModal(false)
+                toast.success(res.message)
+                setIsLoading(false)
+            }
+            else {
+                toast.error(res.message)
+                setIsLoading(false)
+            }
+        }
     }
 
     return (
@@ -111,7 +153,7 @@ function ModalCRUDpackage({ setIsShowModal, type }) {
                                 categoriesPackage.map(item => {
                                     return (
                                         <div key={item.id} className="flex items-center gap-1">
-                                            <input type="radio" id={item.id} name="id_category_package" value={item.id} onChange={(e) => { handleOnchange(e) }} />
+                                            <input type="radio" id={item.id} name="id_category_package" value={item.id} checked={payload.id_category_package === item?.id} onChange={(e) => { handleOnchange(e) }} />
                                             <label htmlFor={item.id} className="text-sm">{item.name}</label>
                                         </div>
                                     )
@@ -172,4 +214,4 @@ function ModalCRUDpackage({ setIsShowModal, type }) {
     );
 }
 
-export default ModalCRUDpackage;
+export default ModalCRUDMedicalPackage;

@@ -1,35 +1,41 @@
-export const Validation=(values,setErrors)=>{
+export const Validation = (values, setErrors) => {
     let newErrors = {}
-    if(values?.firstName===''){
-        newErrors.firstName='Bạn phải điền họ !'
+    if (values?.firstName === '') {
+        newErrors.firstName = 'Bạn phải điền họ !'
     }
-    if(values?.lastName===""){
-        newErrors.lastName='Bạn phải điền tên !'
+    if (values?.lastName === "") {
+        newErrors.lastName = 'Bạn phải điền tên !'
     }
-    if(values?.phone===""){
-        newErrors.phone='Bạn phải điền số điện thoại !'
+    if (values?.phone === "") {
+        newErrors.phone = 'Bạn phải điền số điện thoại !'
     }
-    if(values?.email===""){
-        newErrors.email='Bạn phải điền email !'
+    if (values?.email === "") {
+        newErrors.email = 'Bạn phải điền email !'
     }
-    if(values?.password===""){
-        newErrors.password='Bạn phải điền mật khẩu !'
+    if (values?.password === "") {
+        newErrors.password = 'Bạn phải điền mật khẩu !'
     }
-    if(values?.address===""){
-        newErrors.address="Bạn phải điền địa chỉ !"
+    if (values?.address === "") {
+        newErrors.address = "Bạn phải điền địa chỉ !"
     }
-    if(values?.price===""){
-        newErrors.price="Bạn phải điền giá tiền !"
+    
+    if (!values?.price?.toString().trim()) {
+        newErrors.price = "Bạn phải điền giá tiền!";
+    } else {
+        const priceNumber = Number(values.price);
+        if (isNaN(priceNumber) || priceNumber < 0) {
+            newErrors.price = "Giá trị không hợp lệ!";
+        }
     }
 
     //chuyen khoa
-    if(values?.name===""){
-        newErrors.name="Bạn phải điền tên !"
+    if (values?.name === "") {
+        newErrors.name = "Bạn phải điền tên !"
     }
 
     //medical package
-    if(values?.id_category_package===''){
-        newErrors.id_category_package="Bạn phải chọn danh mục !"
+    if (values?.id_category_package === '') {
+        newErrors.id_category_package = "Bạn phải chọn danh mục !"
     }
 
     setErrors(newErrors)
