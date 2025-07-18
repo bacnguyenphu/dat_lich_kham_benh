@@ -3,7 +3,8 @@ import db from '../models/index'
 const getTimeFrames = async () => {
     try {
         const data = await db.Time_frame.findAll({
-             attributes: ['id', 'time_frame']
+             attributes: ['id', 'time_frame'],
+             order: [['createdAt', 'ASC']]
         })
         return{
             err:0,

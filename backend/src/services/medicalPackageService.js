@@ -6,9 +6,9 @@ const getMedicalPackages = async (limit, page) => {
         if (!limit || !page) {
             const data = await db.Medical_package.findAll({
                 attributes: ['id', 'description', 'price', 'name', 'image'],
-                // include: [
-                //     { model: db.Category_package, as: 'category_package', attributes: ['id', 'name', 'image', 'description'] },
-                // ]
+                include: [
+                    { model: db.Category_package, as: 'category_package', attributes: ['id', 'name', 'image', 'description'] },
+                ]
             })
             return {
                 err: 0,
@@ -210,4 +210,53 @@ const updateMedicalPackage = async (data) => {
     }
 }
 
-export { createMedicalPackage, getMedicalPackages, getMedicalPackageById, updateMedicalPackage }
+const deleteMedicalPackage = async (id) => {
+    try {
+        if (!id) {
+            return {
+                err: 1,
+                message: "Id is required !"
+            }
+        }
+
+        const medical_package = await db.Medical_package.findOne({
+            include: [
+                { model: db.Description_detail, as: 'description_detail', attributes: ['description', 'id'] },
+            ],
+            where: { id: id }
+        })
+
+        if (!medical_package) {
+            return {
+                err: 2,
+                message: 'Mecial package is not exist !'
+            }
+        }
+
+        await db.Medical_package.destroy(
+            {
+                where: { id: id }
+            }
+        )
+
+        await db.Description_detail.destroy(
+            {
+                where: { id: medical_package.description_detail.id }
+            }
+        )
+
+        return {
+            err: 0,
+            message: 'Delete medical package success !'
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở deleteMedicalPackage !");
+        return {
+            err: -999,
+            message: `Error server : ${error}`
+        }
+    }
+}
+
+export { createMedicalPackage, getMedicalPackages, getMedicalPackageById, updateMedicalPackage, deleteMedicalPackage }

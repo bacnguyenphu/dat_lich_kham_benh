@@ -16,4 +16,8 @@ const getMedicalPackageById = (id) => {
     return axios.get('get-medical-package-by-id', { params: { id } })
 }
 
-export { createMedicalPackage, getMedicalPackage, getMedicalPackageById, updateMedicalPackage }
+const deleteMedicalPackage = (id) => {
+    return axios.delete('delete-medical-package', { params: { id } })
+}
+
+export { createMedicalPackage, getMedicalPackage, getMedicalPackageById, updateMedicalPackage, deleteMedicalPackage }

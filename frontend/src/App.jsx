@@ -39,11 +39,11 @@ function App() {
           <Route path={STATISTICAL} element={<Statistical />} />
           <Route path={MANAGE_DOCTOR} element={null}>
             <Route path={INFORMATION_DOCTOR} element={<InformationDoctor />} />
-            <Route path={MEDICAL_EXAMINATION_PLAN} element={<MedicalExaminationPlan />} />
+            <Route path={MEDICAL_EXAMINATION_PLAN} element={<MedicalExaminationPlan type={'DOCTOR'} />} />
           </Route>
           <Route path={MANAGE_PACKAGE} element={null}>
             <Route path={INFORMATION_PAKAGE} element={<InformationPackage />} />
-            <Route path={PACKAGE_PLAN} element={<PackagePlan />} />
+            <Route path={PACKAGE_PLAN} element={<MedicalExaminationPlan type={'MEDICAL_PACKAGE'}/>} />
             <Route path={CATEGORY_PACKAGE} element={<CategoriesPackage/>}/>
           </Route>
           <Route path={MANAGE_MEDICAL} element={null}>
