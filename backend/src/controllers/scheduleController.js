@@ -14,10 +14,10 @@ const handleCreateOrUpdateSchedule = async (req, res) => {
 const handleGetScheduleFollowDate = async(req,res)=>{
     try {
         const id_doctor = req.query.id_doctor
+        const idMedicalPackage = req.query.idMedicalPackage
         const appointment_date = req.query.appointment_date
-        console.log('check query : ',id_doctor,"   ",appointment_date);
         
-        const message = await getScheduleFollowDate({id_doctor,appointment_date})
+        const message = await getScheduleFollowDate({id_doctor,idMedicalPackage,appointment_date})
         return res.status(200).json(message)
     } catch (error) {
         console.log("Lỗi ở handleGetScheduleFollowDate :",error);

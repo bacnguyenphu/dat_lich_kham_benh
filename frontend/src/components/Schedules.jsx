@@ -27,7 +27,10 @@ function Schedules({idDoctor}) {
     useEffect(() => {
         if (idDoctor !== null) {
             const fetchSchedule = async () => {
-                const res = await getScheduleFollowDate(idDoctor, selectedDate.value)
+                const res = await getScheduleFollowDate({
+                    id_doctor:idDoctor,
+                    appointment_date: selectedDate.value
+                })
                 if (res.err === 0) {
                     setTimeFrames(res?.data?.time_frame)
                 }

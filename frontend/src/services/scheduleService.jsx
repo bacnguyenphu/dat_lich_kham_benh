@@ -4,8 +4,10 @@ const createOrUpdateSchedule = (payload)=>{
     // console.log('check payload: ',payload);
     return axios.post('create-or-update-schedule',payload)
 }
-const getScheduleFollowDate = (id_doctor,appointment_date)=>{
-    return axios.get("get-schedule-follow-date",{params:{id_doctor,appointment_date}})    
+const getScheduleFollowDate = (data)=>{
+    console.log(data);
+    
+    return axios.get("get-schedule-follow-date",{params:data})    
 }
 
 export{createOrUpdateSchedule,getScheduleFollowDate}

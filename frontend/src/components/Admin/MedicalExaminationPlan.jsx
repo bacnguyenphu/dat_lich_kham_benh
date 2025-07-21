@@ -57,7 +57,7 @@ function MedicalExaminationPlan({ type }) {
             }
         }
 
-        if(type==="MEDICAL_PACKAGE"){
+        if (type === "MEDICAL_PACKAGE") {
             const fetchMedicalPackage = async () => {
                 const res = await getMedicalPackage()
                 if (res.err === 0 && res.data.length > 0) {
@@ -75,12 +75,22 @@ function MedicalExaminationPlan({ type }) {
             }
         }
 
-    }, [timeFrames])
+    }, [timeFrames, type])
 
     useEffect(() => {
         if (selectedItem != null) {
+            const tses = {
+                [type === "DOCTOR" ? "id_doctor" : "idMedicalPackage"]: selectedItem.value,
+                appointment_date: selectedDate
+            }
+
+            console.log(tses);
+
             const fetchScheduleFollowDate = async () => {
-                const res = await getScheduleFollowDate(selectedItem?.value, selectedDate)
+                const res = await getScheduleFollowDate({
+                    [type === "DOCTOR" ? "id_doctor" : "idMedicalPackage"]: selectedItem.value,
+                    appointment_date: selectedDate
+                })
                 // console.log('check res:   ', res);
                 if (res.err === 0 && res.data !== null) {
                     let temp = _.cloneDeep(timeFrames).map(item => {
@@ -119,11 +129,13 @@ function MedicalExaminationPlan({ type }) {
     const handleClickSave = async () => {
         if (selectedDate && selectedItem && timeFrames.length > 0) {
             let payload = {
-                idDoctor: selectedItem.value,
+                [type === "DOCTOR" ? "idDoctor" : "idMedicalPackage"]: selectedItem.value,
                 appointment_date: selectedDate,
                 time_frame: timeFrames.filter(item => item.selected === true).map(item => item.id)
             }
             const res = await createOrUpdateSchedule(payload)
+            console.log(payload);
+
             if (res.err === 0) {
                 toast.success(res.message)
             }

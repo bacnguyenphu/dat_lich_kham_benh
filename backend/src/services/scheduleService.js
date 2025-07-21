@@ -5,10 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 // tạo hoặc cập nhập lịch khám bệnh
 const createOrUpdateSchedule = async (data) => {
     try {
-        if (!data.idDoctor) {
+        if (!data.idDoctor && !data.idMedicalPackage) {
             return {
                 err: 1,
-                message: "ID doctor is required !"
+                message: "ID doctor or medical package is required !"
             }
         }
         if (!data.appointment_date) {
@@ -27,7 +27,7 @@ const createOrUpdateSchedule = async (data) => {
         const schedule = await db.Schedule.findOne({
             where: {
                 [Op.and]: [
-                    { id_doctor: data?.idDoctor },
+                    { [data?.idDoctor ? "id_doctor" : "id_medical_package"]: (data?.idDoctor ? data?.idDoctor : data?.idMedicalPackage) },
                     where(fn('DATE', col('appointment_date')), data?.appointment_date)
                 ]
             },
@@ -41,6 +41,7 @@ const createOrUpdateSchedule = async (data) => {
             await db.Schedule.create({
                 id: id_schedule,
                 id_doctor: data?.idDoctor,
+                id_medical_package: data?.idMedicalPackage,
                 appointment_date: data?.appointment_date
             })
             for (const item of data?.time_frame) {
@@ -52,7 +53,7 @@ const createOrUpdateSchedule = async (data) => {
 
             return {
                 err: 0,
-                message: "Create schedule for doctor success !"
+                message: "Create schedule success !"
             }
         }
         else {
@@ -89,23 +90,23 @@ const createOrUpdateSchedule = async (data) => {
 // lấy thời gian khám bệnh của bác sĩ theo ngày
 const getScheduleFollowDate = async (data) => {
     try {
-        if (!data.id_doctor) {
+        if (!data.id_doctor && !data.idMedicalPackage) {
             return {
                 err: 1,
-                message: "ID doctor is required"
+                message: "ID doctor or medical package is required !"
             }
         }
         if (!data.appointment_date) {
             return {
                 err: 1,
-                message: "ID doctor is required"
+                message: "Date is required"
             }
         }
 
         const schedule = await db.Schedule.findOne({
             where: {
                 [Op.and]: [
-                    { id_doctor: data?.id_doctor },
+                    { [data?.id_doctor ? "id_doctor" : "id_medical_package"]: (data?.id_doctor ? data?.id_doctor : data?.idMedicalPackage) },
                     where(fn('DATE', col('appointment_date')), data?.appointment_date)
                 ]
             },
