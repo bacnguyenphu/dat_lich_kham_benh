@@ -53,6 +53,9 @@ const getCategoryPackageById = async (id) => {
         const data = await db.Category_package.findOne({
             where: { id },
             attributes: ['id', 'name', 'image', 'description', 'slug'],
+            include: [
+                { model: db.Medical_package, as: 'medical_package', attributes: ['id','image','name','description','price'] },
+            ]
         })
 
         return {
@@ -135,9 +138,9 @@ const updateCategoryPackage = async (data) => {
             { where: { id: data.id } }
         )
 
-        return{
-            err:0,
-            message:'Update category required success !'
+        return {
+            err: 0,
+            message: 'Update category required success !'
         }
 
     } catch (error) {
@@ -149,9 +152,9 @@ const updateCategoryPackage = async (data) => {
     }
 }
 
-const deleteCategoryPackage  = async(id)=>{
+const deleteCategoryPackage = async (id) => {
     try {
-        if(!id){
+        if (!id) {
             return {
                 err: 1,
                 message: "Id is required"
@@ -159,7 +162,7 @@ const deleteCategoryPackage  = async(id)=>{
         }
 
         const cate = await db.Category_package.findOne({
-            where: { id},
+            where: { id },
         })
 
         if (!cate) {
@@ -170,13 +173,13 @@ const deleteCategoryPackage  = async(id)=>{
         }
 
         await db.Category_package.destroy({
-            where:{id}
+            where: { id }
         })
 
         return {
-                err: 0,
-                message: 'Delete category package success !'
-            }
+            err: 0,
+            message: 'Delete category package success !'
+        }
 
     } catch (error) {
         console.log("Lỗi ở deleteCategoryPackage: ", error);
@@ -187,4 +190,4 @@ const deleteCategoryPackage  = async(id)=>{
     }
 }
 
-export { getCategoryPackage, createCategoryPackage, getCategoryPackageById, updateCategoryPackage,deleteCategoryPackage }
+export { getCategoryPackage, createCategoryPackage, getCategoryPackageById, updateCategoryPackage, deleteCategoryPackage }

@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
 import { GoHome } from "react-icons/go";
 import { getCategoryPackage } from "../services/categoryPackageService";
+import { useNavigate } from "react-router-dom";
+import { MEDICAL_PACKAGE } from "../utils/path";
 
 function Category_Package() {
 
     const [categoryPackage, setCategoryPackage] = useState([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchData = async () => {
             const res = await getCategoryPackage()
-            console.log(res);
             setCategoryPackage(res.data)
 
         }
         fetchData()
     }, [])
+
+    console.log(categoryPackage);
+    
 
     return (
         <div className="lg:px-40 md:px-20 px-5 py-5">
@@ -38,7 +43,9 @@ function Category_Package() {
                 {categoryPackage.length > 0 &&
                     categoryPackage.map(item => {
                         return (
-                            <div key={item.id} className="w-[170px] h-60  flex flex-col items-center gap-5 pt-5 shadow-item cursor-pointer">
+                            <div key={item.id} className="w-[170px] h-60  flex flex-col items-center gap-5 pt-5 shadow-item cursor-pointer"
+                            onClick={()=>{navigate(`${MEDICAL_PACKAGE}/${item?.slug}?id=${item.id}`)}}
+                            >
                                 <div className="w-[135px] h-[135px] rounded-full overflow-hidden bg-[#DEECDD]">
                                     <img className="object-cover object-center size-full" src={item?.image} />
                                 </div>

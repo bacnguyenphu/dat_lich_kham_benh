@@ -3,11 +3,11 @@ import { Footer, Header } from "../components";
 
 function LayoutDefault() {
     return (
-        <div>
+        <div className="flex flex-col min-h-screen">
             <div>
                 <Header />
             </div>
-            <div>
+            <div className="grow">
                 <Outlet/>
             </div>
             <div className="bg-primary-50 h-12"></div>

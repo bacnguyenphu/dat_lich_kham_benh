@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import { DetailDoctor, DetailSpecialty, Doctor, HomePage, Login, Register, Specialty } from './components'
+import { DetailDoctor, DetailSpecialty, Doctor, HomePage, ListMedicalPackgeFollowCategory, Login, Register, Specialty } from './components'
 import {
   ADMIN, CATEGORY_PACKAGE, DOCTORS, INFORMATION_DOCTOR, INFORMATION_PAKAGE, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
   MANAGE_PACKAGE,
@@ -13,7 +13,7 @@ import {
   CategoriesPackage,
   InformationDoctor, InformationPackage, ManageSpecialty,
   ManageUsers,
-  MedicalExaminationPlan, PackagePlan, Position, Statistical
+  MedicalExaminationPlan, Position, Statistical
 } from './components/Admin'
 import ManageAppointment from './components/Admin/ManageAppointment'
 import { ToastContainer } from 'react-toastify';
@@ -30,6 +30,7 @@ function App() {
           <Route path={DOCTORS} element={<Doctor />} />
           <Route path={`${DOCTORS}/chi-tiet/:idDoctor`} element={<DetailDoctor />} />
           <Route path={MEDICAL_PACKAGE} element={<Category_Package />} />
+          <Route path={`${MEDICAL_PACKAGE}/:slug`} element={<ListMedicalPackgeFollowCategory/>}/>
         </Route>
 
         <Route path={LOGIN} element={<Login />} />

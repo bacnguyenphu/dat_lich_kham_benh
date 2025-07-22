@@ -42,7 +42,7 @@ function ModalCRUDMedicalPackage({ setIsShowModal, type, fetchMedicalPackages })
     }, [])
 
     useEffect(() => {
-        if (type !== "ADD") {
+        if (type !== "ADD"&&id) {
             const fetchMedicalPackageById = async () => {
                 const res = await getMedicalPackageById(id)
                 if (res.err === 0) {
