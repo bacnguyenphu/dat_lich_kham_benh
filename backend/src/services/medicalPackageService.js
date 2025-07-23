@@ -59,7 +59,7 @@ const getMedicalPackageById = async (id) => {
 
         const data = await db.Medical_package.findOne({
             include: [
-                { model: db.Category_package, as: 'category_package', attributes: ['id', 'name', 'image', 'description'] },
+                { model: db.Category_package, as: 'category_package', attributes: ['id', 'name', 'image', 'description','slug'] },
                 { model: db.Description_detail, as: 'description_detail', attributes: ['description', 'id'] },
             ],
             where: { id }
@@ -259,4 +259,46 @@ const deleteMedicalPackage = async (id) => {
     }
 }
 
-export { createMedicalPackage, getMedicalPackages, getMedicalPackageById, updateMedicalPackage, deleteMedicalPackage }
+const getMedicalPackageFollowCategory = async (idCategory, limit, page) => {
+    try {
+        if (!idCategory) {
+            return {
+                err: 1,
+                message: 'ID category is required !'
+            }
+        }
+        const { count, rows } = await db.Medical_package.findAndCountAll({
+            attributes: ['id', 'description', 'price', 'name', 'image'],
+            distinct: true,
+            include: [
+                { 
+                    model: db.Category_package, 
+                    as: 'category_package', 
+                    attributes: ['name'],
+                    where: { id: idCategory }, 
+                },
+            ],
+            offset: (page - 1) * limit,
+            limit: limit,
+            order: [['createdAt', 'DESC']]
+        });
+
+        return{
+            err: 0,
+            message: "Get medical package follow category success !",
+            data: rows,
+            page: +page,
+            totalPage: Math.ceil(count / limit),
+            totalData: count
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getMedicalPackageFollowCategory !");
+        return {
+            err: -999,
+            message: `Error server : ${error}`
+        }
+    }
+}
+
+export { createMedicalPackage, getMedicalPackages, getMedicalPackageById, updateMedicalPackage, deleteMedicalPackage, getMedicalPackageFollowCategory }

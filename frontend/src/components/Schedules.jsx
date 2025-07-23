@@ -7,7 +7,7 @@ import 'dayjs/locale/vi';
 import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 dayjs.locale('vi')
 
-function Schedules({idDoctor}) {
+function Schedules({idDoctor,idMedicalPackage}) {
 
     const days = []
 
@@ -29,6 +29,18 @@ function Schedules({idDoctor}) {
             const fetchSchedule = async () => {
                 const res = await getScheduleFollowDate({
                     id_doctor:idDoctor,
+                    appointment_date: selectedDate.value
+                })
+                if (res.err === 0) {
+                    setTimeFrames(res?.data?.time_frame)
+                }
+            }
+            fetchSchedule()
+        }
+        if (idMedicalPackage !== null) {
+            const fetchSchedule = async () => {
+                const res = await getScheduleFollowDate({
+                    idMedicalPackage:idMedicalPackage,
                     appointment_date: selectedDate.value
                 })
                 if (res.err === 0) {
@@ -69,12 +81,12 @@ function Schedules({idDoctor}) {
                 <div className="mt-4 grid grid-cols-5 gap-3">
                     {timeFrames && timeFrames?.length > 0 && timeFrames.map(item => {
                         return (
-                            <div key={item?.id} className="bg-gray-200 text-center py-2 font-semibold cursor-pointer border-2 border-gray-200 hover:border-primary-100 duration-300">{item?.time_frame}</div>
+                            <div key={item?.id} className="bg-gray-200 text-center py-2 font-semibold text-sm cursor-pointer border-2 border-gray-200 hover:border-primary-100 duration-300">{item?.time_frame}</div>
                         )
                     })}
                 </div>
                 {(!timeFrames || timeFrames?.length === 0) &&
-                    <div className="font-semibold">{capitalizeFirstLetter(selectedDate.title)} bác sĩ chưa có lịch !</div>
+                    <div className="font-semibold">{capitalizeFirstLetter(selectedDate.title)} chưa có lịch khám!</div>
                 }
             </div>
             {/* làm modal chọn ngày */}

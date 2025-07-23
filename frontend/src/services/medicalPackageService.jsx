@@ -20,4 +20,9 @@ const deleteMedicalPackage = (id) => {
     return axios.delete('delete-medical-package', { params: { id } })
 }
 
-export { createMedicalPackage, getMedicalPackage, getMedicalPackageById, updateMedicalPackage, deleteMedicalPackage }
+const getMedicalPackageFollowCategory = (data)=>{
+    return axios.get('get-medical-package-follow-category',{ params: data })
+}
+
+export { createMedicalPackage, getMedicalPackage, getMedicalPackageById, 
+    updateMedicalPackage, deleteMedicalPackage, getMedicalPackageFollowCategory }

@@ -20,8 +20,8 @@ const updateDoctor = (data) => {
     return axios.put('update-doctor', data)
 }
 
-const getDoctorFollowSpecialty = (id) => {
-    return axios.get("get-doctor-follow-specialty", { params: { id } })
+const getDoctorFollowSpecialty = (id, limit, page) => {
+    return axios.get("get-doctor-follow-specialty", { params: { id, limit, page } })
 }
 
 export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor, getDoctorFollowSpecialty }

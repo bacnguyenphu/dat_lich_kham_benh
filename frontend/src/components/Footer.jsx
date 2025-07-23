@@ -27,7 +27,7 @@ function Footer() {
                 <h4 className="font-semibold">Công ty trách nhiệm hữu hạn một thành viên MMT.</h4>
                 <div className="flex gap-1 items-center mt-2">
                     <span><IoLocationOutline/></span>
-                    <p>Thôn Tây Xuân Vy, xã Hoằng Thanh,chuyện Hoằng Hóa, tỉnh Thanh Hóa.</p>
+                    <p>Thôn Tây Xuân Vy, xã Hoằng Thanh, tỉnh Thanh Hóa.</p>
                 </div>
                 <div className="flex gap-1 items-center mt-2">
                     <span><FaPhoneAlt/></span>

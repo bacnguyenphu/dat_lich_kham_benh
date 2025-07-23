@@ -384,7 +384,7 @@ const updateDoctor = async (data) => {
     }
 }
 
-const getDoctorFollowSpecialty = async (id) => {
+const getDoctorFollowSpecialty = async (id,limit,page) => {
     try {
         if (!id) {
             return {
@@ -393,7 +393,28 @@ const getDoctorFollowSpecialty = async (id) => {
             }
         }
 
-        const data = await db.Doctor.findAll({
+        // const data = await db.Doctor.findAll({
+        //     include: [
+        //         {
+        //             model: db.Specialty,
+        //             as: 'specialty',
+        //             attributes: ['id'],
+        //             through: { attributes: [] },
+        //             where: { id: id },
+        //             required: true
+        //         },
+        //         { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'avatar', 'address'],required: true },
+        //         { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] },required: true },
+        //     ],
+        //     // offset: (page - 1) * limit,
+        //     // limit: limit,
+        //     distinct: true,
+        // })
+
+        console.log('chedkdkdkd: ',id);
+        
+
+        const { count, rows } = await db.Doctor.findAndCountAll({
             include: [
                 {
                     model: db.Specialty,
@@ -406,18 +427,18 @@ const getDoctorFollowSpecialty = async (id) => {
                 { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'avatar', 'address'],required: true },
                 { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] },required: true },
             ],
-            // offset: (page - 1) * limit,
-            // limit: limit,
+            offset: (page - 1) * limit,
+            limit: limit,
             distinct: true,
         })
 
         return {
             err: 0,
             message: "Get doctor follow specialty success !",
-            data: data,
-            // page: +page,
-            // totalPage: Math.ceil(count / limit),
-            // totalData: count
+            data: rows,
+            page: +page,
+            totalPage: Math.ceil(count / limit),
+            totalData: count
         }
 
     } catch (error) {

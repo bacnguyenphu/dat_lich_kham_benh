@@ -1,4 +1,4 @@
-import { createMedicalPackage, deleteMedicalPackage, getMedicalPackageById, getMedicalPackages, updateMedicalPackage } from "../services/medicalPackageService";
+import { createMedicalPackage, deleteMedicalPackage, getMedicalPackageById, getMedicalPackageFollowCategory, getMedicalPackages, updateMedicalPackage } from "../services/medicalPackageService";
 
 const handleCreateMedicalPackage = async (req, res) => {
     try {
@@ -33,6 +33,18 @@ const handleGetMedicalPackage = async (req, res) => {
     }
 }
 
+const handleGetMedicalPackageFollowCategory = async (req, res) => {
+    try {
+        let limit = req.query.limit
+        let page = req.query.page
+        let idCategory = req.query.idCategory
+        const message = await getMedicalPackageFollowCategory(idCategory, +limit, +page)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log('Lỗi ở handleGetMedicalPackage: ', error);
+    }
+}
+
 const handleGetMedicalPackageById = async (req, res) => {
     try {
         let id = req.query.id
@@ -53,4 +65,7 @@ const handleDeleteMedicalPackage = async (req, res) => {
     }
 }
 
-export { handleCreateMedicalPackage, handleGetMedicalPackage, handleGetMedicalPackageById, handleUpdateMedicalPackage, handleDeleteMedicalPackage }
+export {
+    handleCreateMedicalPackage, handleGetMedicalPackage, handleGetMedicalPackageById,
+    handleUpdateMedicalPackage, handleDeleteMedicalPackage, handleGetMedicalPackageFollowCategory
+}

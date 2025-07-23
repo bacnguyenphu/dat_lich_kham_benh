@@ -4,34 +4,13 @@ import { SPECIALTY } from "../utils/path";
 import { useEffect, useState } from "react";
 import { getDoctorById } from "../services/doctorService";
 import { GiPositionMarker } from "react-icons/gi";
-import { FaChevronDown } from "react-icons/fa";
-import { RiCalendarScheduleLine } from "react-icons/ri";
 import defaultAvatar from '../assets/defaultAvatar.png'
-import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
-import { getScheduleFollowDate } from "../services/scheduleService";
-import dayjs from 'dayjs';
-import 'dayjs/locale/vi';
 import Schedules from "./Schedules";
-dayjs.locale('vi')
 
 
 function DetailDoctor() {
 
-    const days = []
-
-    for (let i = 0; i < 7; i++) {
-        const date = {
-            title: dayjs().add(i, 'day').format('dddd - DD/MM'),
-            value: dayjs().add(i, 'day').format('YYYY-MM-DD'),
-        }
-        days.push(date)
-    }
-
     const [doctor, setDoctor] = useState(null)
-    const [selectedDate, setSelectedDate] = useState(days[0])
-    const [timeFrames, setTimeFrames] = useState([])
-    const [showModal, setShowModal] = useState(false)
-    const [isClosing, setIsClosing] = useState(false)
 
     const naviagte = useNavigate()
     const { idDoctor } = useParams();
@@ -45,31 +24,6 @@ function DetailDoctor() {
         }
         fetchDoctor()
     }, [idDoctor])
-
-    useEffect(() => {
-        if (doctor !== null) {
-            const fetchSchedule = async () => {
-                const res = await getScheduleFollowDate(idDoctor, selectedDate.value)
-                if (res.err === 0) {
-                    setTimeFrames(res?.data?.time_frame)
-                }
-            }
-            fetchSchedule()
-        }
-    }, [doctor, selectedDate])
-
-    const handleCloseModal = () => {
-        setIsClosing(true)
-        setTimeout(() => {
-            setShowModal(false)
-            setIsClosing(false)
-        }, 500)
-    }
-
-    const handleChooseDate = (day) => {
-        setSelectedDate(day)
-        handleCloseModal()
-    }
 
     return (
         <div className="lg:px-40 md:px-20 px-5 py-5">
@@ -138,31 +92,6 @@ function DetailDoctor() {
             <div className="prose">
                 {doctor && <div dangerouslySetInnerHTML={{ __html: doctor?.description_detail?.description }} />}
             </div>
-
-            {/* làm modal chọn ngày */}
-            {showModal &&
-                <div className={`fixed bg-black/55 top-0 left-0 bottom-0 right-0 ${isClosing ? "animate-fade-out" : "animate-fade-in"}`}
-                    onClick={(e) => {
-                        if (e.target == e.currentTarget) {
-                            handleCloseModal()
-                        }
-                    }}
-                >
-                    <div className={`bg-white px-5 absolute bottom-0 w-full ${isClosing ? "animate-slide-down" : "animate-slide-top"}`}>
-                        {days.length > 0 && days.map(day => {
-                            return (
-                                <div className="py-3 text-lg cursor-pointer" key={day.value}
-                                    onClick={() => { handleChooseDate(day) }}>
-                                    {capitalizeFirstLetter(day.title)}
-                                </div>
-                            )
-                        })}
-                        <div className="py-3 text-lg cursor-pointer" onClick={() => { handleCloseModal() }}>
-                            Bỏ qua
-                        </div>
-                    </div>
-                </div>
-            }
 
         </div>
     );

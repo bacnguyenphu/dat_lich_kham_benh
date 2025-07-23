@@ -18,9 +18,6 @@ function Category_Package() {
         fetchData()
     }, [])
 
-    console.log(categoryPackage);
-    
-
     return (
         <div className="lg:px-40 md:px-20 px-5 py-5">
             <div className="flex items-center">
