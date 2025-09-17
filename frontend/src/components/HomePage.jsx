@@ -65,7 +65,7 @@ function HomePage() {
     function SampleNextArrow(props) {
         const { onClick } = props;
         return (
-            <div onClick={onClick} className='hidden lg:block absolute top-[45%] left-[98%] z-20 cursor-pointer border p-2 rounded-full bg-white border border-[#34929E]'>
+            <div onClick={onClick} className='hidden lg:block absolute top-[45%] left-[98%] z-20 cursor-pointer p-2 rounded-full bg-white border border-[#34929E]'>
                 <FaChevronRight size={"1.5em"} color={"#34929E"} />
             </div>
         );
@@ -74,7 +74,7 @@ function HomePage() {
     function SamplePrevArrow(props) {
         const { onClick } = props;
         return (
-            <div onClick={onClick} className='hidden lg:block absolute top-[45%] translate-x-[-10%] z-20 cursor-pointer border p-2 rounded-full bg-white border border-[#34929E]'>
+            <div onClick={onClick} className='hidden lg:block absolute top-[45%] translate-x-[-10%] z-20 cursor-pointer p-2 rounded-full bg-white border border-[#34929E]'>
                 <FaChevronLeft size={"1.5em"} color={"#34929E"} />
             </div>
         );
@@ -109,7 +109,7 @@ function HomePage() {
             <div className="xl:h-[465px] lg:h-[400px] md:h-[365px] h-[265px]">
                 <img className="object-center object-cover size-full" src={family} />
             </div>
-            <div className='lg:px-40 md:px-20 px-5'>
+            <div className='lg:px-40 md:px-20 px-5 pb-10'>
                 <div className=' mt-10'>
                     <p className='text-2xl font-semibold'>Dành cho bạn</p>
                     <div className='flex flex-wrap gap-20 mt-10 justify-center lg:justify-start'>
@@ -138,7 +138,7 @@ function HomePage() {
                     <div className="slider-container mt-10">
                         <Slider {...settings}>
                             {specialties.length > 0 &&
-                                specialties.map((item, i) => {
+                                specialties.map((item) => {
                                     return (
                                         <CustomSlide key={item.id} image={item?.images} name={item.name} />
                                     )
@@ -159,20 +159,16 @@ function HomePage() {
                     <div className="slider-container mt-10">
                         <Slider {...settings}>
                             {categoryPackage.length > 0 &&
-                                categoryPackage.map((item, i) => {
+                                categoryPackage.map((item) => {
                                     return (
                                         <CustomSlide key={item.id} image={item?.image} name={item.name} />
                                     )
                                 })
                             }
-
                         </Slider>
                     </div>
                 </div>
 
-                <div>
-                    <img src='https://i.imgur.com/H96q9Yo.jpeg'/>
-                </div>
             </div>
         </div>
 

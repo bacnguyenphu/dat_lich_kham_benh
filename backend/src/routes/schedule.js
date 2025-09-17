@@ -1,8 +1,9 @@
 const express = require('express')
-const { handleCreateOrUpdateSchedule, handleGetScheduleFollowDate } = require('../controllers/scheduleController')
+const { handleCreateOrUpdateSchedule, handleGetScheduleFollowDate, handleGetScheduleOfDoctor } = require('../controllers/scheduleController')
 const router = express.Router()
 
 router.post("/create-or-update-schedule",handleCreateOrUpdateSchedule)
 router.get("/get-schedule-follow-date",handleGetScheduleFollowDate)
+router.get("/get-schedule-of-doctor",handleGetScheduleOfDoctor)
 
 export default router

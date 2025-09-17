@@ -1,6 +1,7 @@
 import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
+import { randomString } from '../utils/randomString';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
@@ -29,12 +30,14 @@ const register = async (data) => {
             defaults: {
                 phone: data.phone,
                 id: uuidv4(),
-                password: hashPass(data.password)
-            }
+                password: hashPass(data.password),
+                firstName:`user_${randomString()}`
+            },
         })
 
         return {
             err: created ? 0 : -3,
+            data: created ? user : null,
             message: created ? "Register success !" : "Phone is exist !"
         }
 
@@ -48,9 +51,9 @@ const register = async (data) => {
 }
 
 const login = async (data) => {
-    console.log('check dât:  ',data);
-    
     try {
+        console.log('check>>',data);
+        
         if (!data.phone) {
             return {
                 err: -1,
@@ -64,6 +67,7 @@ const login = async (data) => {
             }
         }
         const user = await db.User.findOne({
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
             where: {
                 phone: data.phone
             }
@@ -83,11 +87,14 @@ const login = async (data) => {
             }
         }
 
+        let {password,...other} = user.dataValues
+
         return {
             err: 0,
+            data:other,
             message: "Log in success!"
         }
-        
+
     } catch (error) {
         console.log("Lỗi ở login : ", error);
 

@@ -11,6 +11,8 @@ import { createDoctor, deleteDoctorById, getDoctorById, updateDoctor } from "../
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Validation } from "../../utils/validation";
+import { getScheduleOfDoctor } from "../../services/scheduleService";
+import dayjs from "dayjs";
 
 function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
@@ -18,6 +20,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     const [specialties, setSpecialties] = useState([])
     const [errors, setErrors] = useState({})
     const [isLoading, setIsLoading] = useState(false)
+    const [scheduleOfDoctor, setScheduleOfDoctor] = useState([])
 
     const [payload, setPayload] = useState({
         firstName: "",
@@ -94,7 +97,17 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
     }, [postions, specialties])
 
-    // console.log(payload);
+    useEffect(() => {
+        if (type === "VIEW" && idDoctor) {
+            const fetchScheduleOfDoctor = async () => {
+                const res = await getScheduleOfDoctor(idDoctor)
+                if (res.err === 0) {
+                    setScheduleOfDoctor(res.data)
+                }
+            }
+            fetchScheduleOfDoctor()
+        }
+    }, [idDoctor])
 
     const handleCheckbox = (e, type) => {
         const value = e.target.value
@@ -167,7 +180,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                 const res = await uploadImgCloudinary(formData)
                 linkImg = res.data.url
             }
-            const res = await updateDoctor({ idDoctor, ...payload, avatar: linkImg  })
+            const res = await updateDoctor({ idDoctor, ...payload, avatar: linkImg })
             if (res.err === 0) {
                 setIsShowModal(false)
                 navigate(location.pathname)
@@ -295,6 +308,33 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                             </div>
                             {errors.price && <small className="text-red-500 absolute -bottom-5">{errors.price}</small>}
                         </div>
+                        {type === "VIEW" &&
+                            <div className="mt-4 flex flex-col">
+                                <label className="font-semibold">Lịch khám</label>
+                                <div className="mt-4 flex flex-col gap-5">
+                                    {scheduleOfDoctor.length > 0 &&
+                                        scheduleOfDoctor.map(schedule => {
+                                            return (
+                                                <div className="flex flex-col gap-2">
+                                                    <p className="text-blue-700 font-semibold text-xl">{dayjs(schedule?.appointment_date).format("DD/MM/YYYY")}</p>
+                                                    <div key={schedule.item} className=" grid grid-cols-5 gap-3">
+                                                        {schedule?.time_frame && schedule?.time_frame.length > 0 &&
+                                                            schedule.time_frame.map(item => {
+                                                                return (
+                                                                    <div key={item?.id} className="bg-gray-200 text-center py-2 font-semibold text-sm cursor-pointer border-2 border-gray-200 duration-300">{item?.time_frame}</div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    {scheduleOfDoctor.length === 0&&
+                                        <p className="text-blue-700 font-semibold text-xl">Bác sĩ chưa có lịch khám !</p>
+                                    }
+                                </div>
+                            </div>
+                        }
                         <div className="mt-8 flex flex-col ">
                             <p className="font-semibold">Chức vụ<span className="text-red-500 font-medium">*</span></p>
                             <div className="grid grid-cols-5 gap-x-6 gap-y-3">

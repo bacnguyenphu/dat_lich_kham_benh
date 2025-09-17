@@ -126,11 +126,14 @@ function ListMedicalPackgeFollowCategory() {
                 {medicalPackages.length === 0 &&
                     <h3>Chưa có gói khám !</h3>
                 }
-                <div className="">
-                    <Pagination setPage={setPage} totalPages={totalPages} />
-                </div>
+                {medicalPackages.length !== 0 &&
+                    <div className="">
+                        <Pagination setPage={setPage} totalPages={totalPages} />
+                    </div>
+                }
+
             </div>
-        </div>
+        </div >
     );
 }
 

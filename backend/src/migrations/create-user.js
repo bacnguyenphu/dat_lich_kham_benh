@@ -26,7 +26,8 @@ module.exports = {
       },
       role: {
         type: Sequelize.STRING,
-        defaultValue: 'USER'
+        allowNull: false,
+        defaultValue: 'R3'
       },
       phone: {
         type: Sequelize.STRING

@@ -1,4 +1,4 @@
-import { createOrUpdateSchedule, getScheduleFollowDate } from "../services/scheduleService";
+import { createOrUpdateSchedule, getScheduleFollowDate, getScheduleOfDoctor } from "../services/scheduleService";
 
 const handleCreateOrUpdateSchedule = async (req, res) => {
     try {
@@ -25,4 +25,16 @@ const handleGetScheduleFollowDate = async(req,res)=>{
     }
 }
 
-export { handleCreateOrUpdateSchedule,handleGetScheduleFollowDate }
+const handleGetScheduleOfDoctor = async(req,res)=>{
+    try {
+        const idDoctor = req.query.idDoctor
+
+        const message = await getScheduleOfDoctor(idDoctor)
+        return res.status(200).json(message)
+        
+    } catch (error) {
+        console.log("Lỗi ở handleGetScheduleOfDoctor :",error);
+    }
+}
+
+export { handleCreateOrUpdateSchedule,handleGetScheduleFollowDate, handleGetScheduleOfDoctor }

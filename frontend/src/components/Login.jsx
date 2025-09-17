@@ -2,20 +2,24 @@ import bg_image from '../assets/bg_login.png'
 import { useNavigate } from 'react-router-dom';
 import { REGISTER } from '../utils/path';
 import { useState } from 'react';
-import { login } from '../services/authService';
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { FaAngleLeft } from "react-icons/fa6";
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../redux/authSlice';
 
 function Login() {
+    // const { data, token, loading, error } = useSelector(state => state.auth)
+    const dispatch = useDispatch()
+
     const navigate = useNavigate()
-    const [data, setData] = useState({
+    const [payload, setPayload] = useState({
         phone: '',
         password: ''
     })
 
     const handleLogin = async () => {
-        if (data.phone === '' || data.password === '') {
+        if (payload.phone === '' || payload.password === '') {
             Swal.fire({
                 title: "Log in fasle!",
                 text: "Fields cannot be left blank",
@@ -24,17 +28,20 @@ function Login() {
             return
         }
 
-        const res = await login(data)
-        if (res.err === 0) {
+        const res = await dispatch(loginUser(payload))
+
+        if (res.payload?.error === 0) {
             Swal.fire({
-                title: res.message,
+                title: res.payload?.message,
                 icon: "success"
+            }).then(() => {
+                navigate('/');
             });
         }
         else {
             Swal.fire({
                 title: "Log in fasle!",
-                text: res.message,
+                text: res.payload?.message,
                 icon: "error"
             });
         }
@@ -48,13 +55,13 @@ function Login() {
                     <div className='flex flex-col gap-1 '>
                         <label>Số điện thoại</label>
                         <input className='border border-primary-50 outline-hidden rounded-xs p-1'
-                            onChange={(e) => { setData({ ...data, phone: e.target.value }) }}
+                            onChange={(e) => { setPayload({ ...payload, phone: e.target.value }) }}
                         />
                     </div>
                     <div className='flex flex-col gap-1'>
                         <label>Mật khẩu</label>
                         <input className='border border-primary-50 outline-hidden rounded-xs p-1' type='password'
-                            onChange={(e) => { setData({ ...data, password: e.target.value }) }}
+                            onChange={(e) => { setPayload({ ...payload, password: e.target.value }) }}
                         />
                         <div className='lg:flex justify-between block'>
                             <p className='italic text-blue-400 cursor-pointer text-[14px]'>Quên mật khẩu</p>

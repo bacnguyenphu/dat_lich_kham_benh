@@ -130,4 +130,37 @@ const getScheduleFollowDate = async (data) => {
     }
 }
 
-export { createOrUpdateSchedule, getScheduleFollowDate }
+// lấy các lịch khám của bác sĩ
+const getScheduleOfDoctor = async (idDoctor) => {
+    try {
+        if (!idDoctor) {
+            return {
+                err: 1,
+                message: "Id doctor is required !"
+            }
+        }
+
+        const data = await db.Schedule.findAll({
+            where: { id_doctor: idDoctor },
+            attributes: ["appointment_date","id"],
+            include: [
+                { model: db.Time_frame, as: 'time_frame', through: { attributes: [] } },
+            ],
+        })
+
+        return {
+            err: 0,
+            message: "Get schedule of doctor success",
+            data: data
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getScheduleOfDoctor", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export { createOrUpdateSchedule, getScheduleFollowDate, getScheduleOfDoctor }
