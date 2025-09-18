@@ -1,4 +1,5 @@
 export const Validation = (values, setErrors) => {
+
     let newErrors = {}
     if (values?.firstName === '') {
         newErrors.firstName = 'Bạn phải điền họ !'
@@ -18,10 +19,9 @@ export const Validation = (values, setErrors) => {
     if (values?.address === "") {
         newErrors.address = "Bạn phải điền địa chỉ !"
     }
-    
-    if (!values?.price?.toString().trim()) {
+
+    if (values?.price === "") {
         newErrors.price = "Bạn phải điền giá tiền!";
-    } else {
         const priceNumber = Number(values.price);
         if (isNaN(priceNumber) || priceNumber < 0) {
             newErrors.price = "Giá trị không hợp lệ!";

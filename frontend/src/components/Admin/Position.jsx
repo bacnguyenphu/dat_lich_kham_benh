@@ -28,9 +28,6 @@ function Position() {
         fetchPositions()
     }, [page])
 
-    console.log(positions);
-
-
     const handleClickAdd = () => {
         setIsShowModal(true)
         setType("ADD")

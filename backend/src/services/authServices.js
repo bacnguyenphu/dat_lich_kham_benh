@@ -31,7 +31,13 @@ const register = async (data) => {
                 phone: data.phone,
                 id: uuidv4(),
                 password: hashPass(data.password),
-                firstName:`user_${randomString()}`
+                firstName: data?.firstName || `user_${randomString()}`,
+                lastName: data?.lastName || null,
+                email: data?.email || null,
+                dateOfBirth: data?.dateOfBirth || null,
+                gender: data?.gender || null,
+                address: data?.address || null,
+                avatar: data?.avatar || null,
             },
         })
 
@@ -52,8 +58,8 @@ const register = async (data) => {
 
 const login = async (data) => {
     try {
-        console.log('check>>',data);
-        
+        console.log('check>>', data);
+
         if (!data.phone) {
             return {
                 err: -1,
@@ -87,11 +93,11 @@ const login = async (data) => {
             }
         }
 
-        let {password,...other} = user.dataValues
+        let { password, ...other } = user.dataValues
 
         return {
             err: 0,
-            data:other,
+            data: other,
             message: "Log in success!"
         }
 
