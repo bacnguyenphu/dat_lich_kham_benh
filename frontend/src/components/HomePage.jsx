@@ -6,8 +6,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useEffect, useState } from 'react';
 import { getSpecialties } from '../services/specialtyService';
-import { FaChevronLeft } from "react-icons/fa6";
-import { FaChevronRight } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaEye, FaHandHoldingMedical, FaUserDoctor  } from "react-icons/fa6";
+import { BiSolidNavigation } from "react-icons/bi";
 import { MEDICAL_PACKAGE, SPECIALTY } from '../utils/path';
 import { getCategoryPackage } from '../services/categoryPackageService';
 
@@ -149,8 +149,8 @@ function HomePage() {
                     </div>
                 </div>
 
-                <div>
-                    <div className='mt-12 flex justify-between'>
+                <div className='mt-12 '>
+                    <div className='flex justify-between'>
                         <p className='text-2xl font-semibold'>Danh mục khám bệnh</p>
                         <button className='rounded-lg px-2 py-1 text-primary-100 border border-primary-100 cursor-pointer'
                             onClick={() => { navigate(MEDICAL_PACKAGE) }}
@@ -169,6 +169,39 @@ function HomePage() {
                     </div>
                 </div>
 
+                <div className='mt-12'>
+                    <h2 className='text-2xl font-semibold text-center'>Thống kê</h2>
+                    <div className='flex gap-20 items-center justify-center mt-10'>
+                        <div className='flex flex-col items-center w-1/8'>
+                            <div>
+                                <FaHandHoldingMedical size={"3rem"} color='#4ABCE2' />
+                            </div>
+                            <h3 className='font-bold text-2xl mt-4'>3.0M+</h3>
+                            <p className='text-xl text-gray-500'>Lượt khám</p>
+                        </div>
+                        <div className='flex flex-col items-center w-1/8'>
+                            <div>
+                                <FaUserDoctor size={"3rem"} color='#4ABCE2' />
+                            </div>
+                            <h3 className='font-bold text-2xl mt-4'>200+</h3>
+                            <p className='text-xl text-gray-500'>Bác sĩ</p>
+                        </div>
+                        <div className='flex flex-col items-center w-1/8'>
+                            <div>
+                                <BiSolidNavigation size={"3rem"} color='#4ABCE2' />
+                            </div>
+                            <h3 className='font-bold text-2xl mt-4'>300K+</h3>
+                            <p className='text-xl text-gray-500 break-words text-center'>Lượt truy cập hàng tháng</p>
+                        </div>
+                        <div className='flex flex-col items-center w-1/8'>
+                            <div>
+                                <FaEye size={"3rem"} color='#4ABCE2' />
+                            </div>
+                            <h3 className='font-bold text-2xl mt-4'>10.1K+</h3>
+                            <p className='text-xl text-gray-500 break-words text-center'>Lượt truy cập hàng ngày</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
