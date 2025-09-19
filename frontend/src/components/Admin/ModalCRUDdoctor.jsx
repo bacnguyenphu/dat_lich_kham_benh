@@ -273,9 +273,9 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                     onChange={(e) => { setPayload({ ...payload, email: e.target.value }) }} />
                                 {errors.email && <small className="text-red-500 absolute -bottom-5">{errors.email}</small>}
                             </div>
-                            <div className="w-1/2 mt-4 flex flex-col relative ">
+                            <div className={`w-1/2 mt-4 flex flex-col relative ${type!=="ADD"?'opacity-60 cursor-not-allowed':''}`}>
                                 <label>Mật khẩu<span className="text-red-500">*</span></label>
-                                <input disabled={type === "VIEW"} type="password" className="border border-gray-500 rounded-md p-1"
+                                <input disabled={type === "VIEW" ||type==="UPDATE"} type="password" className="border border-gray-500 rounded-md p-1"
                                     onChange={(e) => { setPayload({ ...payload, password: e.target.value }) }} />
                                 {errors.password && <small className="text-red-500 absolute -bottom-5">{errors.password}</small>}
                             </div>

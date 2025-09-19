@@ -306,7 +306,6 @@ const updateDoctor = async (data) => {
                 role: data.role,
                 phone: data.phone.trim(),
                 email: data.email.trim(),
-                password: hashPass(data.password),
                 dateOfBirth: data.dateOfBirth,
                 gender: data.gender,
                 address: data.address.trim(),
