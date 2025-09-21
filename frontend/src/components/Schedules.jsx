@@ -5,11 +5,14 @@ import { getScheduleFollowDate } from "../services/scheduleService";
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
+import { useNavigate } from "react-router-dom";
+import { MAKE_APPOINTMENT } from "../utils/path";
 dayjs.locale('vi')
 
-function Schedules({idDoctor,idMedicalPackage}) {
+function Schedules({ idDoctor, idMedicalPackage }) {
 
     const days = []
+    const navigate = useNavigate()
 
     for (let i = 0; i < 7; i++) {
         const date = {
@@ -21,14 +24,15 @@ function Schedules({idDoctor,idMedicalPackage}) {
 
     const [selectedDate, setSelectedDate] = useState(days[0])
     const [timeFrames, setTimeFrames] = useState([])
+
     const [showModal, setShowModal] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
 
     useEffect(() => {
-        if (idDoctor !== null) {
+        if (idDoctor) {
             const fetchSchedule = async () => {
                 const res = await getScheduleFollowDate({
-                    id_doctor:idDoctor,
+                    id_doctor: idDoctor,
                     appointment_date: selectedDate.value
                 })
                 if (res.err === 0) {
@@ -37,10 +41,10 @@ function Schedules({idDoctor,idMedicalPackage}) {
             }
             fetchSchedule()
         }
-        if (idMedicalPackage !== null) {
+        if (idMedicalPackage) {
             const fetchSchedule = async () => {
                 const res = await getScheduleFollowDate({
-                    idMedicalPackage:idMedicalPackage,
+                    idMedicalPackage: idMedicalPackage,
                     appointment_date: selectedDate.value
                 })
                 if (res.err === 0) {
@@ -50,6 +54,15 @@ function Schedules({idDoctor,idMedicalPackage}) {
             fetchSchedule()
         }
     }, [selectedDate])
+
+    const handleNavigateMakeAppointment = (idTimeFrame) => {
+        if (idDoctor) {
+            navigate(`${MAKE_APPOINTMENT}?idDoctor=${idDoctor}&date=${selectedDate?.value}&tf=${idTimeFrame}`)
+        }
+        if (idMedicalPackage) {
+            navigate(`${MAKE_APPOINTMENT}?idMedicalPackage=${idMedicalPackage}&date=${selectedDate?.value}&tf=${idTimeFrame}`)
+        }
+    }
 
     const handleCloseModal = () => {
         setIsClosing(true)
@@ -81,7 +94,13 @@ function Schedules({idDoctor,idMedicalPackage}) {
                 <div className="mt-4 grid grid-cols-5 gap-3">
                     {timeFrames && timeFrames?.length > 0 && timeFrames.map(item => {
                         return (
-                            <div key={item?.id} className="bg-gray-200 text-center py-2 font-semibold text-sm cursor-pointer border-2 border-gray-200 hover:border-primary-100 duration-300">{item?.time_frame}</div>
+                            <div key={item?.id} className="bg-gray-200 text-center py-2 font-semibold text-sm cursor-pointer border-2 border-gray-200 hover:border-primary-100 duration-300"
+                                onClick={() => {
+                                    handleNavigateMakeAppointment(item?.id)
+                                }}
+                            >
+                                {item?.time_frame}
+                            </div>
                         )
                     })}
                 </div>

@@ -4,7 +4,7 @@ import { getMedicalPackageById } from "../services/medicalPackageService";
 import { GoHome } from "react-icons/go";
 import { HOMEPAGE, MEDICAL_PACKAGE } from "../utils/path";
 import defaultAvatar from '../assets/default_image.webp'
-import Schedules from "./Schedules";
+import Schedules from "../components/Schedules";
 
 function DetailMedicalPackage() {
     const [medicalPackage, setMedicalPackage] = useState(null)
@@ -50,13 +50,13 @@ function DetailMedicalPackage() {
                     <p className="whitespace-pre-line mt-3 text-gray-700">
                         {medicalPackage?.description}
                     </p>
-                   
+
                 </div>
             </div>
 
             <div className="flex gap-5 mt-8 ">
                 <div className="w-1/2">
-                    <Schedules idMedicalPackage={medicalPackage?.id} />
+                    <Schedules idMedicalPackage={id} />
                 </div>
                 <div className="w-1/2 pl-5">
                     <div className="border-b border-gray-400 pb-4 w-fit">

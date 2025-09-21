@@ -1,0 +1,7 @@
+export {default as DetailDoctor} from './DetailDoctor'
+export {default as DetailMedicalPackage} from './DetailMedicalPackage'
+export {default as Login} from './Login'
+export {default as Register} from './Register'
+export {default as DetailSpecialty} from './DetailSpecialty'
+export {default as HomePage} from './HomePage'
+export {default as MakeAppointment} from './MakeAppointment'

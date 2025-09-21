@@ -6,9 +6,8 @@ import { useEffect } from "react";
 import { getSpecialtyById } from "../services/specialtyService";
 import { getDoctorFollowSpecialty } from "../services/doctorService";
 import defaultAvatar from '../assets/defaultAvatar.png'
-import Schedules from "./Schedules";
 import { GiPositionMarker } from "react-icons/gi";
-import Pagination from "./Pagination";
+import { Pagination, Schedules } from "../components";
 
 function DetailSpecialty() {
 

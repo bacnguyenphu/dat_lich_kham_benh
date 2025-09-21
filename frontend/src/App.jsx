@@ -1,7 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
-import { DetailDoctor, DetailMedicalPackage, DetailSpecialty, Doctor, HomePage, ListMedicalPackgeFollowCategory, Login, Register, Specialty } from './components'
+import { Doctor, ListMedicalPackgeFollowCategory, Specialty } from './components'
 import {
-  ADMIN, CATEGORY_PACKAGE, DOCTORS, INFORMATION_DOCTOR, INFORMATION_PAKAGE, LOGIN, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
+  ADMIN, CATEGORY_PACKAGE, DOCTORS, INFORMATION_DOCTOR, INFORMATION_PAKAGE, LOGIN,
+  MAKE_APPOINTMENT, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
   MANAGE_PACKAGE,
   MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN, MEDICAL_PACKAGE,
   PACKAGE_PLAN,
@@ -17,6 +18,10 @@ import {
 } from './components/Admin'
 import ManageAppointment from './components/Admin/ManageAppointment'
 import { ToastContainer } from 'react-toastify';
+import {
+  DetailDoctor, DetailMedicalPackage, DetailSpecialty,
+  HomePage, Login, MakeAppointment, Register
+} from './pages'
 
 function App() {
 
@@ -30,8 +35,9 @@ function App() {
           <Route path={DOCTORS} element={<Doctor />} />
           <Route path={`${DOCTORS}/chi-tiet/:idDoctor`} element={<DetailDoctor />} />
           <Route path={MEDICAL_PACKAGE} element={<Category_Package />} />
-          <Route path={`${MEDICAL_PACKAGE}/:slug`} element={<ListMedicalPackgeFollowCategory/>}/>
-          <Route path={`${MEDICAL_PACKAGE}/:slug/:id`} element={<DetailMedicalPackage/>}/>
+          <Route path={`${MEDICAL_PACKAGE}/:slug`} element={<ListMedicalPackgeFollowCategory />} />
+          <Route path={`${MEDICAL_PACKAGE}/:slug/:id`} element={<DetailMedicalPackage />} />
+          <Route path={MAKE_APPOINTMENT} element={<MakeAppointment/>} />
         </Route>
 
         <Route path={LOGIN} element={<Login />} />
@@ -45,8 +51,8 @@ function App() {
           </Route>
           <Route path={MANAGE_PACKAGE} element={null}>
             <Route path={INFORMATION_PAKAGE} element={<InformationPackage />} />
-            <Route path={PACKAGE_PLAN} element={<MedicalExaminationPlan type={'MEDICAL_PACKAGE'}/>} />
-            <Route path={CATEGORY_PACKAGE} element={<CategoriesPackage/>}/>
+            <Route path={PACKAGE_PLAN} element={<MedicalExaminationPlan type={'MEDICAL_PACKAGE'} />} />
+            <Route path={CATEGORY_PACKAGE} element={<CategoriesPackage />} />
           </Route>
           <Route path={MANAGE_MEDICAL} element={null}>
             <Route path={MANAGE_POSITION} element={<Position />} />

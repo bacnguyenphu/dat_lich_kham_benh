@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { GoHome } from "react-icons/go";
 import { getCategoryPackage } from "../services/categoryPackageService";
 import { useNavigate } from "react-router-dom";
-import { MEDICAL_PACKAGE } from "../utils/path";
+import { HOMEPAGE, MEDICAL_PACKAGE } from "../utils/path";
 
 function Category_Package() {
 
@@ -22,7 +22,7 @@ function Category_Package() {
         <div className="lg:px-40 md:px-20 px-5 py-5">
             <div className="flex items-center">
                 <span className="cursor-pointer"
-                    onClick={() => { naviagte(HOMEPAGE) }}
+                    onClick={() => { navigate(HOMEPAGE) }}
                 >
                     <GoHome color="#00A2A1" size={'1.25rem'} />
                 </span>

@@ -8,6 +8,7 @@ import timeFrame from './timeFrame'
 import schedule from './schedule'
 import medical_package from './medicalPackage'
 import user from './user'
+import appointment from './appointment'
 
 const initRoutes = (app) => {
 
@@ -20,6 +21,7 @@ const initRoutes = (app) => {
   app.use('/api', schedule)
   app.use('/api', medical_package)
   app.use('/api', user)
+  app.use('/api', appointment)
 
   app.use('/api', insert)
 

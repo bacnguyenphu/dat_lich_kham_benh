@@ -3,13 +3,12 @@ import logo from '../assets/logo.png'
 import { HOMEPAGE, LOGIN, REGISTER } from '../utils/path';
 import { navs } from '../utils/navs';
 import { useSelector } from 'react-redux';
-import defaultAvatar from '../assets/defaultAvatar.png'
+import UserDropdown from './UserDropdown';
 
 function Header() {
 
     const navigate = useNavigate()
     const auth = useSelector(state => state.auth)
-    console.log(auth);
 
     return (
         <div className="h-[80px] lg:px-40 md:px-20 px-5 bg-[#EAFBFB] flex items-center">
@@ -34,11 +33,8 @@ function Header() {
                 })}
             </div>
             {auth && auth?.token ?
-                <div className='w-1/5 hidden xl:flex xl:justify-end xl:items-center gap-4 cursor-pointer'>
-                    <p className='font-semibold'>{auth?.data?.firstName} {auth?.data?.lastName}</p>
-                    <div className="size-12 rounded-full overflow-hidden">
-                        <img src={(auth?.data?.avatar) ? auth?.data?.avatar : defaultAvatar} className="size-full object-center object-cover" />
-                    </div>
+                <div className='w-1/5 hidden xl:block'>
+                    <UserDropdown auth={auth} />
                 </div>
                 :
                 <div className='w-1/5 text-white hidden xl:flex xl:justify-end gap-4'>

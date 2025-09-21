@@ -1,11 +1,11 @@
 import { GoHome } from "react-icons/go";
 import { useNavigate, useParams } from "react-router-dom";
-import { SPECIALTY } from "../utils/path";
+import { HOMEPAGE, SPECIALTY } from "../utils/path";
 import { useEffect, useState } from "react";
 import { getDoctorById } from "../services/doctorService";
 import { GiPositionMarker } from "react-icons/gi";
 import defaultAvatar from '../assets/defaultAvatar.png'
-import Schedules from "./Schedules";
+import Schedules from "../components/Schedules";
 
 
 function DetailDoctor() {
@@ -74,7 +74,7 @@ function DetailDoctor() {
 
             <div className="flex gap-5 mt-8 ">
                 <div className="w-1/2">
-                    <Schedules idDoctor={idDoctor}/>
+                    <Schedules idDoctor={idDoctor} />
                 </div>
                 <div className="w-1/2 pl-5">
                     <div className="border-b border-gray-400 pb-4 w-fit">
