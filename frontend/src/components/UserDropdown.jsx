@@ -5,6 +5,7 @@ import { IoIosLogOut } from "react-icons/io";
 import { RxCountdownTimer } from "react-icons/rx";
 import { FaCaretDown } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react";
+import { PROFILE } from "../utils/path";
 
 function UserDropdown({ auth }) {
 
@@ -29,7 +30,7 @@ function UserDropdown({ auth }) {
         {
             title: "Thông tin cá nhân",
             icon: <CiUser size={'1.5rem'} />,
-            path: "USER_PROFILE"
+            path: PROFILE
         },
         {
             title: "Lịch hẹn",
@@ -57,7 +58,6 @@ function UserDropdown({ auth }) {
             {showModal &&
                 <div className="w-[250px] rounded-xl absolute right-0 bg-white shadow-[0px_8px_10px_-2px_rgba(0,_0,_0,_0.4)] z-[100] p-5 text-black mt-2">
                     <div className="flex gap-4 cursor-pointer"
-
                     >
                         <div className="size-14 border p-1 rounded-full overflow-hidden cursor-pointer">
                             <img

@@ -5,6 +5,7 @@ export const HOMEPAGE = '/'
 export const MEDICAL_PACKAGE = '/goi-kham'
 export const DOCTORS = '/bac-si'
 export const MAKE_APPOINTMENT = '/dat-lich-kham'
+export const PROFILE = '/thong-tin-ca-nhan'
 
 // Quản trị viên
 export const ADMIN = '/admin'

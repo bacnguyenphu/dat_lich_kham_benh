@@ -6,6 +6,7 @@ import {
   MANAGE_PACKAGE,
   MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN, MEDICAL_PACKAGE,
   PACKAGE_PLAN,
+  PROFILE,
   REGISTER, SPECIALTY, STATISTICAL
 } from './utils/path'
 import { LayoutAdmin, LayoutDefault } from './Layouts'
@@ -20,7 +21,7 @@ import ManageAppointment from './components/Admin/ManageAppointment'
 import { ToastContainer } from 'react-toastify';
 import {
   DetailDoctor, DetailMedicalPackage, DetailSpecialty,
-  HomePage, Login, MakeAppointment, Register
+  HomePage, Login, MakeAppointment, Profile, Register
 } from './pages'
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
           <Route path={MEDICAL_PACKAGE} element={<Category_Package />} />
           <Route path={`${MEDICAL_PACKAGE}/:slug`} element={<ListMedicalPackgeFollowCategory />} />
           <Route path={`${MEDICAL_PACKAGE}/:slug/:id`} element={<DetailMedicalPackage />} />
-          <Route path={MAKE_APPOINTMENT} element={<MakeAppointment/>} />
+          <Route path={MAKE_APPOINTMENT} element={<MakeAppointment />} />
+          <Route path={PROFILE} element={<Profile />} />
         </Route>
 
         <Route path={LOGIN} element={<Login />} />

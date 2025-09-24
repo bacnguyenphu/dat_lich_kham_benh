@@ -101,7 +101,6 @@ function ModalCRUDuser({ type, setIsShowModal, fetchUsers }) {
                 linkImg = res.data.url
             }
             const res = await updateUser({ idUser, ...payload, avatar: linkImg })
-            console.log("check res>>", res);
 
             if (res.err === 0) {
                 setIsShowModal(false)

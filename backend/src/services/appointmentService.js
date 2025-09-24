@@ -28,7 +28,7 @@ const getInfoToMakeAppointment = async (data) => {
             where: { id: data?.idDoctor },
             attributes: ['id', 'description', 'price',],
             include: [
-                { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'phone', 'email', 'dateOfBirth', 'gender', 'address', 'avatar'] },
+                { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'avatar'] },
                 { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
             ]
         })
@@ -55,5 +55,7 @@ const getInfoToMakeAppointment = async (data) => {
         }
     }
 }
+
+
 
 export { getInfoToMakeAppointment }
