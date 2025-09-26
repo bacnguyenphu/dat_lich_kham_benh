@@ -4,4 +4,9 @@ const getInfoToMakeAppointment = (payload) => {
     return axios.get('get-info-make-appointment', { params: { ...payload } })
 }
 
-export { getInfoToMakeAppointment }
+const createAppointment = (payload) => {
+    
+    return axios.post("create-appointment", payload)
+}
+
+export { getInfoToMakeAppointment,createAppointment }

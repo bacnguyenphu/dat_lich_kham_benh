@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import defaultAvatar from '../assets/defaultAvatar.png'
 import { CiCirclePlus } from "react-icons/ci";
 import { IoIosSave } from "react-icons/io";
@@ -7,6 +7,11 @@ import { Validation } from "../utils/validation";
 import { uploadImgCloudinary } from "../services/uploadImgCloudinary";
 import { updateUser } from "../services/userService";
 import { toast } from "react-toastify";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import _ from 'lodash'
+import { getUserRedux } from "../redux/authSlice";
+import dayjs from "dayjs";
+dayjs.locale('vi')
 
 function Profile() {
     const auth = useSelector(state => state.auth)
@@ -14,6 +19,7 @@ function Profile() {
     const [errors, setErrors] = useState({})
     const [isLoading, setIsLoading] = useState(false)
     const [payload, setPayload] = useState(auth.data || {})
+    const dispatch = useDispatch()
 
     const handleImg = (e) => {
         const file = e.target.files[0]
@@ -34,11 +40,14 @@ function Profile() {
                 const res = await uploadImgCloudinary(formData)
                 linkImg = res.data.url
             }
-            const res = await updateUser({ ...payload, avatar: linkImg })
+            const {id,...rest} = _.cloneDeep(payload)
+            const newPayload = {idUser:id,...rest}
+            const res = await updateUser({ ...newPayload, avatar: linkImg })
             console.log("check res>>", res);
 
             if (res.err === 0) {
                 toast.success(res.message)
+                await dispatch(getUserRedux(id))
                 setIsLoading(false)
             } else {
                 toast.error(res.message)
@@ -100,7 +109,7 @@ function Profile() {
                     <div className="flex flex-col relative w-1/2">
                         <label>Ngày sinh<span className="text-red-500">*</span></label>
                         <input className="border border-gray-500 rounded-md p-1 w-1/2" type="date"
-                            value={payload.dateOfBirth || ""}
+                             value={payload.dateOfBirth ? dayjs(payload.dateOfBirth).format("YYYY-MM-DD") : ""}
                             onChange={(e) => { setPayload({ ...payload, dateOfBirth: e.target.value }) }}
                         />
                     </div>
