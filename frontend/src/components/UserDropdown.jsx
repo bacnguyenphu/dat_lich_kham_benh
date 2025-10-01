@@ -5,7 +5,7 @@ import { IoIosLogOut } from "react-icons/io";
 import { RxCountdownTimer } from "react-icons/rx";
 import { FaCaretDown } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react";
-import { PROFILE } from "../utils/path";
+import { APPOINTMENT, PROFILE } from "../utils/path";
 
 function UserDropdown({ auth }) {
 
@@ -35,7 +35,7 @@ function UserDropdown({ auth }) {
         {
             title: "Lịch hẹn",
             icon: <RxCountdownTimer size={'1.5rem'} />,
-            path: "USER_PROFILE"
+            path: APPOINTMENT
         },
         {
             title: "Đăng xuất",

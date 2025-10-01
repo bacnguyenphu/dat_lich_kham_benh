@@ -1,4 +1,4 @@
-import { createAppointment, getInfoToMakeAppointment } from "../services/appointmentService";
+import { createAppointment, getAppointmentOfUser, getInfoToMakeAppointment } from "../services/appointmentService";
 
 const handleGetInfoToMakeAppointment = async (req, res) => {
     try {
@@ -23,4 +23,14 @@ const handleCreateAppointment = async (req, res) => {
     }
 }
 
-export { handleGetInfoToMakeAppointment, handleCreateAppointment }
+const handleGetAppointmentOfUser = async(req,res)=>{
+    try {
+        const idUser = req.query.idUser
+        const message = await getAppointmentOfUser(idUser);
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log(`Lỗi ở handleGetAppointmentOfUser: `, error);
+    }
+}
+
+export { handleGetInfoToMakeAppointment, handleCreateAppointment,handleGetAppointmentOfUser }

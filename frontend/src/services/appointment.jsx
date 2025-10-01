@@ -5,8 +5,12 @@ const getInfoToMakeAppointment = (payload) => {
 }
 
 const createAppointment = (payload) => {
-    
+
     return axios.post("create-appointment", payload)
 }
 
-export { getInfoToMakeAppointment,createAppointment }
+const getAppointmentOfUser = (idUser) => {
+    return axios.get("get-appointment-of-user", { params: { idUser } })
+}
+
+export { getInfoToMakeAppointment, createAppointment,getAppointmentOfUser }

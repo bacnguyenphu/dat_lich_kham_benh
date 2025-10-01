@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
             Medical_package.belongsTo(models.Category_package,{foreignKey:'id_category_package', as:'category_package'})
             Medical_package.belongsTo(models.Description_detail,{foreignKey:'id_description_detail', as:'description_detail'})
+            Medical_package.hasMany(models.Appointment,{foreignKey:'id_medical_package',as:'medical_package'})
         }
     }
     Medical_package.init({

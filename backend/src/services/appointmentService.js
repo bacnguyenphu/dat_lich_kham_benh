@@ -23,29 +23,48 @@ const getInfoToMakeAppointment = async (data) => {
                 message: "time_frame is required !"
             }
         }
-
-        const doctor = await db.Doctor.findOne({
-            where: { id: data?.idDoctor },
-            attributes: ['id', 'description', 'price',],
-            include: [
-                { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'avatar'] },
-                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
-            ]
-        })
-
         const timeFrame = await db.Time_frame.findOne({
             where: { id: data?.time_frame }
         })
 
-        return {
-            err: 0,
-            message: "Get success !",
-            data: {
-                doctor,
-                time_frame: timeFrame.time_frame,
-                appointment_date: data?.appointment_date
+        if (data?.idDoctor) {
+            const doctor = await db.Doctor.findOne({
+                where: { id: data?.idDoctor },
+                attributes: ['id', 'description', 'price',],
+                include: [
+                    { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'avatar'] },
+                    { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
+                ]
+            })
+
+            return {
+                err: 0,
+                message: "Get success !",
+                data: {
+                    doctor,
+                    time_frame: timeFrame.time_frame,
+                    appointment_date: data?.appointment_date
+                }
             }
         }
+
+        if (data?.idMedicalPackage) {
+            const Medical_package = await db.Medical_package.findOne({
+                where: { id: data.idMedicalPackage },
+                attributes: ['id', 'image', 'price', 'name'],
+            })
+
+            return {
+                err: 0,
+                message: "Get success !",
+                data: {
+                    Medical_package,
+                    time_frame: timeFrame.time_frame,
+                    appointment_date: data?.appointment_date
+                }
+            }
+        }
+
 
     } catch (error) {
         console.log("Lỗi ở getInfoToMakeAppointment :", error);
@@ -121,20 +140,39 @@ const createAppointment = async (data) => {
     }
 }
 
-const getAppointmentOfUser = async(idUser)=>{
+const getAppointmentOfUser = async (idUser) => {
     try {
-        if(!idUser){
-            return{
-                err:1,
-                message:"ID user required"
+        if (!idUser) {
+            return {
+                err: 1,
+                message: "ID user required"
             }
         }
 
         const data = await db.Appointment.findAll({
-            where:{id_patient:idUser},
-
+            where: { id_patient: idUser },
+            attributes: ['id', 'appointment_date', 'time','status'],
+            include: [
+                { 
+                    model: db.Doctor, as: 'doctor', attributes: ['price'],
+                    include:[
+                        { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
+                        { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'avatar'] },
+                    ] 
+                },
+                { 
+                    model: db.Medical_package, as: 'medical_package', attributes: ['id', 'image', 'price', 'name'],
+                },
+            ],
+            order: [['createdAt', 'DESC']]
         })
-        
+
+        return{
+            err:0,
+            message:"Get appointment of user success !",
+            data
+        }
+
     } catch (error) {
         console.log("Lỗi ở getAppointmentOfUser :", error);
         return {
@@ -144,4 +182,4 @@ const getAppointmentOfUser = async(idUser)=>{
     }
 }
 
-export { getInfoToMakeAppointment, createAppointment }
+export { getInfoToMakeAppointment, createAppointment, getAppointmentOfUser }

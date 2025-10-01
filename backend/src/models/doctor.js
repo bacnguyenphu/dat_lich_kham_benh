@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       Doctor.belongsToMany(models.Position,{through:'Position_doctor', as:'position',foreignKey:'id_doctor'})
       Doctor.belongsToMany(models.Specialty,{through:'Specialty_doctor', as:'specialty',foreignKey:'id_doctor'})
       Doctor.hasMany(models.Schedule,{foreignKey:'id_doctor',as:'doctor'})
+      Doctor.hasMany(models.Appointment,{foreignKey:'id_doctor',as:'appointment'})
     }
   }
   Doctor.init({
