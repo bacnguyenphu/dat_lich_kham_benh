@@ -13,4 +13,8 @@ const getAppointmentOfUser = (idUser) => {
     return axios.get("get-appointment-of-user", { params: { idUser } })
 }
 
-export { getInfoToMakeAppointment, createAppointment,getAppointmentOfUser }
+const updateStatusAppointment = (idAppointment, status) => {
+    return axios.put("update-status-appointment",{}, { params: { idAppointment, status } })
+}
+
+export { getInfoToMakeAppointment, createAppointment, getAppointmentOfUser, updateStatusAppointment }

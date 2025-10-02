@@ -151,25 +151,25 @@ const getAppointmentOfUser = async (idUser) => {
 
         const data = await db.Appointment.findAll({
             where: { id_patient: idUser },
-            attributes: ['id', 'appointment_date', 'time','status'],
+            attributes: ['id', 'appointment_date', 'time', 'status'],
             include: [
-                { 
+                {
                     model: db.Doctor, as: 'doctor', attributes: ['price'],
-                    include:[
+                    include: [
                         { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] } },
                         { model: db.User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'avatar'] },
-                    ] 
+                    ]
                 },
-                { 
+                {
                     model: db.Medical_package, as: 'medical_package', attributes: ['id', 'image', 'price', 'name'],
                 },
             ],
             order: [['createdAt', 'DESC']]
         })
 
-        return{
-            err:0,
-            message:"Get appointment of user success !",
+        return {
+            err: 0,
+            message: "Get appointment of user success !",
             data
         }
 
@@ -182,4 +182,47 @@ const getAppointmentOfUser = async (idUser) => {
     }
 }
 
-export { getInfoToMakeAppointment, createAppointment, getAppointmentOfUser }
+const updateStatusAppointment = async (idAppointment,status) => {
+    try {
+        if (!idAppointment) {
+            return {
+                err: 1,
+                message: "ID appointment required"
+            }
+        }
+
+        const appointment = await db.Appointment.findOne({
+            where: { id: idAppointment }
+        })
+
+        if (!appointment) {
+            return {
+                err: 2,
+                message: "Appointment is not exist"
+            }
+        }
+
+        await db.Appointment.update(
+            {
+                status:status
+            },
+            {
+                where: { id: idAppointment },
+            }
+        )
+
+        return {
+            err: 0,
+            message: "Update status appointment success !"
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở deleteAppointment :", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export { getInfoToMakeAppointment, createAppointment, getAppointmentOfUser, updateStatusAppointment }

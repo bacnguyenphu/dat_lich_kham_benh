@@ -410,9 +410,6 @@ const getDoctorFollowSpecialty = async (id,limit,page) => {
         //     distinct: true,
         // })
 
-        console.log('chedkdkdkd: ',id);
-        
-
         const { count, rows } = await db.Doctor.findAndCountAll({
             include: [
                 {
