@@ -140,7 +140,7 @@ const createAppointment = async (data) => {
     }
 }
 
-const getAppointmentOfUser = async (idUser) => {
+const getAppointmentOfUser = async (idUser, limit, page) => {
     try {
         if (!idUser) {
             return {
@@ -149,7 +149,7 @@ const getAppointmentOfUser = async (idUser) => {
             }
         }
 
-        const data = await db.Appointment.findAll({
+        const { count, rows } = await db.Appointment.findAndCountAll({
             where: { id_patient: idUser },
             attributes: ['id', 'appointment_date', 'time', 'status'],
             include: [
@@ -164,13 +164,29 @@ const getAppointmentOfUser = async (idUser) => {
                     model: db.Medical_package, as: 'medical_package', attributes: ['id', 'image', 'price', 'name'],
                 },
             ],
-            order: [['createdAt', 'DESC']]
+            order: [['createdAt', 'DESC']],
+            offset: (page - 1) * limit,
+            limit: limit,
+            subQuery: false,
         })
+
+        if (rows.length === 0) {
+            return {
+                err: 0,
+                message: "Get appointment of user success !",
+                data: [],
+                page: 1,
+                totalPage: 0,
+            }
+        }
 
         return {
             err: 0,
             message: "Get appointment of user success !",
-            data
+            data: rows,
+            page: page,
+            totalPage: Math.ceil(count / limit),
+            totalData: count
         }
 
     } catch (error) {
@@ -182,7 +198,7 @@ const getAppointmentOfUser = async (idUser) => {
     }
 }
 
-const updateStatusAppointment = async (idAppointment,status) => {
+const updateStatusAppointment = async (idAppointment, status) => {
     try {
         if (!idAppointment) {
             return {
@@ -204,7 +220,7 @@ const updateStatusAppointment = async (idAppointment,status) => {
 
         await db.Appointment.update(
             {
-                status:status
+                status: status
             },
             {
                 where: { id: idAppointment },

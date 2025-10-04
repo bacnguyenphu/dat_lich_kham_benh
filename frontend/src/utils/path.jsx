@@ -7,6 +7,7 @@ export const DOCTORS = '/bac-si'
 export const MAKE_APPOINTMENT = '/dat-lich-kham'
 export const PROFILE = '/thong-tin-ca-nhan'
 export const APPOINTMENT = '/lich-hen'
+export const SEARCH = "/tim-kiem"
 
 // Quản trị viên
 export const ADMIN = '/admin'

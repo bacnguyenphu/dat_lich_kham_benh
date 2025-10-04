@@ -9,12 +9,12 @@ const createAppointment = (payload) => {
     return axios.post("create-appointment", payload)
 }
 
-const getAppointmentOfUser = (idUser) => {
-    return axios.get("get-appointment-of-user", { params: { idUser } })
+const getAppointmentOfUser = (idUser, limit, page) => {
+    return axios.get("get-appointment-of-user", { params: { idUser, limit, page } })
 }
 
 const updateStatusAppointment = (idAppointment, status) => {
-    return axios.put("update-status-appointment",{}, { params: { idAppointment, status } })
+    return axios.put("update-status-appointment", {}, { params: { idAppointment, status } })
 }
 
 export { getInfoToMakeAppointment, createAppointment, getAppointmentOfUser, updateStatusAppointment }

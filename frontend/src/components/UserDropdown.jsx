@@ -46,7 +46,7 @@ function UserDropdown({ auth }) {
 
     return (
         <div ref={modalUser} className="relative">
-            <div className='flex justify-end items-center gap-4 cursor-pointer'
+            <div className='flex justify-end items-center gap-2 cursor-pointer'
                 onClick={() => { setShowModal(!showModal) }}
             >
                 <div className="size-12 rounded-full overflow-hidden">

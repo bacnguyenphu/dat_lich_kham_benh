@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getAppointmentOfUser, updateStatusAppointment } from "../services/appointment";
 import { useState } from "react";
-import { InfoAppointment } from "../components";
+import { InfoAppointment, Pagination } from "../components";
 import { IoClose } from "react-icons/io5";
 import { GiSandsOfTime } from "react-icons/gi";
 import { FaCheck } from "react-icons/fa6";
@@ -21,9 +21,14 @@ function ListAppointmenT() {
     const idUser = useSelector(state => state?.auth?.data?.id)
     const [infoAppointments, setInfoAppointment] = useState([])
 
+    const limit = 10
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(0)
+
     const fetchAppointment = async () => {
-        const res = await getAppointmentOfUser(idUser)
+        const res = await getAppointmentOfUser(idUser, limit, page)
         if (res.err === 0 && res?.data) {
+            setTotalPages(res.totalPage)
             let data = res.data.map(item => {
                 if (item?.doctor) {
                     return {
@@ -56,7 +61,7 @@ function ListAppointmenT() {
             fetchAppointment()
         }
 
-    }, [idUser])
+    }, [idUser, page])
 
     const handleClickCancelAppointment = async (idAppointmemt) => {
         if (idAppointmemt) {
@@ -143,6 +148,9 @@ function ListAppointmenT() {
                     })
                 }
             </div>
+            {infoAppointments.length > limit &&
+                <Pagination setPage={setPage} totalPages={totalPages} />
+            }
         </div >
     );
 }

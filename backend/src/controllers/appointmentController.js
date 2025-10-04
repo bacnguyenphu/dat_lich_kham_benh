@@ -23,27 +23,29 @@ const handleCreateAppointment = async (req, res) => {
     }
 }
 
-const handleGetAppointmentOfUser = async(req,res)=>{
+const handleGetAppointmentOfUser = async (req, res) => {
     try {
         const idUser = req.query.idUser
-        const message = await getAppointmentOfUser(idUser);
+        const limit = req.query.limit
+        const page = req.query.page
+
+        const message = await getAppointmentOfUser(idUser,+limit,+page);
         return res.status(200).json(message)
     } catch (error) {
         console.log(`Lỗi ở handleGetAppointmentOfUser: `, error);
     }
 }
 
-const handleUpdateStatusAppointment= async(req,res)=>{
+const handleUpdateStatusAppointment = async (req, res) => {
     try {
         const idAppointment = req.query.idAppointment
         const status = req.query.status
-        console.log(status);
-        
-        const message = await updateStatusAppointment(idAppointment,+status)
+
+        const message = await updateStatusAppointment(idAppointment, +status)
         return res.status(200).json(message)
     } catch (error) {
         console.log(`Lỗi ở handleDeleteAppointment: `, error);
     }
 }
 
-export { handleGetInfoToMakeAppointment, handleCreateAppointment,handleGetAppointmentOfUser, handleUpdateStatusAppointment}
+export { handleGetInfoToMakeAppointment, handleCreateAppointment, handleGetAppointmentOfUser, handleUpdateStatusAppointment }

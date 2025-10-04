@@ -52,9 +52,6 @@ function DetailSpecialty() {
 
     }, [])
 
-    console.log(doctors);
-
-
     return (
         <>
             <div className="lg:px-40 md:px-20 px-5 py-5">
