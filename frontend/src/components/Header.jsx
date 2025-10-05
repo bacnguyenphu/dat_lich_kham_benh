@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png'
-import { HOMEPAGE, LOGIN, REGISTER, SEARCH } from '../utils/path';
+import { HOMEPAGE, LOGIN, REGISTER } from '../utils/path';
 import { navs } from '../utils/navs';
 import { useSelector } from 'react-redux';
 import UserDropdown from './UserDropdown';

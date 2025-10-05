@@ -15,16 +15,16 @@ function InputSearch() {
             indexRef.current = (indexRef.current + 1) % texts.length;
             setPlaceHolder(texts[indexRef.current]);
         }, 2000); // đổi mỗi 2 giây
-        
+
         return () => clearInterval(interval); // dọn sạch khi component unmount
     }, []);
 
     return (
-        <div className='flex items-center gap-2 border border-gray-400 rounded-2xl px-2 cursor-pointer'
+        <div className='flex items-center gap-2 border border-gray-400 rounded-2xl px-2 cursor-pointer w-1/4'
             onClick={() => { navigate(SEARCH) }}
         >
             <FiSearch size={'1.25rem'} />
-            <input className='outline-none cursor-pointer' placeholder={placeHolder} disabled />
+            <span>{placeHolder}</span>
         </div>
     );
 }

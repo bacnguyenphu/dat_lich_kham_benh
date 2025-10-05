@@ -5,11 +5,11 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useEffect, useState } from 'react';
-import { getSpecialties } from '../services/specialtyService';
 import { FaChevronLeft, FaChevronRight, FaEye, FaHandHoldingMedical, FaUserDoctor  } from "react-icons/fa6";
 import { BiSolidNavigation } from "react-icons/bi";
 import { MEDICAL_PACKAGE, SPECIALTY } from '../utils/path';
 import { getCategoryPackage } from '../services/categoryPackageService';
+import { getSpecialties } from '../services/specialtyService';
 
 function HomePage() {
 
@@ -85,9 +85,9 @@ function HomePage() {
 
     useEffect(() => {
         const fetchSpecialties = async () => {
-            const res = await getSpecialties(8)
-            if (res.err === 0) {
-                setSpecialties(res.data)
+            const res = await getSpecialties()
+            if (res.err===0) {
+                setSpecialties(res?.data)
             }
         }
 
