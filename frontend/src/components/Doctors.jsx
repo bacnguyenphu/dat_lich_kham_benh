@@ -9,7 +9,7 @@ import Pagination from "./Pagination";
 
 function Doctors() {
 
-    const naviagte = useNavigate();
+    const navigate = useNavigate();
     const [doctors, setDoctors] = useState([])
     const limit = 10
     const [page, setPage] = useState(1)
@@ -30,7 +30,7 @@ function Doctors() {
         <div className="lg:px-40 md:px-20 px-5 py-5">
             <div className="flex items-center">
                 <span className="cursor-pointer"
-                    onClick={() => {naviagte(HOMEPAGE) }}
+                    onClick={() => {navigate(HOMEPAGE) }}
                 >
                     <GoHome color="#00A2A1" size={'1.25rem'} />
                 </span>
@@ -43,7 +43,7 @@ function Doctors() {
                     doctors.map((doctor) => {
                         return (
                             <div key={`doctor-${doctor.id}`} className="flex items-center gap-5 border-b border-gray-400 py-5 cursor-pointer"
-                            onClick={()=>{naviagte(`${DOCTORS}/chi-tiet/${doctor.id}`)}}
+                            onClick={()=>{navigate(`${DOCTORS}/chi-tiet/${doctor.id}`)}}
                             >
                                 <div className="size-28">
                                     <img className="object-center object-cover size-full" src={(doctor?.user?.avatar) ? doctor?.user?.avatar : defaultAvatar} />

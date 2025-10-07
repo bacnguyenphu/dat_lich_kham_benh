@@ -20,11 +20,6 @@ const search = async (value, filter) => {
                 whereDoctor = { [Op.or]: [{ firstName: value }, { lastName: value }] }
                 whereSpecialtyAndPackage.name = { [Op.like]: `%${value}%` };
             }
-            else {
-                whereDoctor = {}
-                whereSpecialtyAndPackage = {};
-            }
-
             dataDoctor.name = "doctor"
             dataDoctor.data = await db.Doctor.findAll({
                 attributes: ['id'],
@@ -44,7 +39,7 @@ const search = async (value, filter) => {
             dataSpecialty.name = "specialty"
             dataSpecialty.data = await db.Specialty.findAll({
                 where: whereSpecialtyAndPackage,
-                attributes: ['id', 'name', 'images',],
+                attributes: ['id', 'name', 'images','slug'],
                 limit: 5
             })
 
@@ -53,7 +48,7 @@ const search = async (value, filter) => {
                 where: whereSpecialtyAndPackage,
                 attributes: ['id', 'name', 'image'],
                 include: [
-                    { model: db.Category_package, as: 'category_package', attributes: ['id', 'name'] },
+                    { model: db.Category_package, as: 'category_package', attributes: ['id', 'name','slug'] },
                 ]
             })
 
@@ -71,9 +66,6 @@ const search = async (value, filter) => {
         else if (filter === 'doctor') {
             if (value) {
                 whereDoctor = { [Op.or]: [{ firstName: value }, { lastName: value }] }
-            }
-            else {
-                whereDoctor = {}
             }
             dataDoctor.name = "doctor"
             dataDoctor.data = await db.Doctor.findAll({
@@ -98,13 +90,10 @@ const search = async (value, filter) => {
             if (value) {
                 whereSpecialtyAndPackage.name = { [Op.like]: `%${value}%` };
             }
-            else {
-                whereSpecialtyAndPackage= {};
-            }
             dataSpecialty.name = "specialty"
             dataSpecialty.data = await db.Specialty.findAll({
                 where: whereSpecialtyAndPackage,
-                attributes: ['id', 'name', 'images',],
+                attributes: ['id', 'name', 'images','slug'],
                 limit: 15
             })
 
@@ -124,15 +113,13 @@ const search = async (value, filter) => {
             if (value) {
                 whereSpecialtyAndPackage.name = { [Op.like]: `%${value}%` };
             }
-            else {
-                whereSpecialtyAndPackage.name = {};
-            }
+            
             dataPackage.name = "package"
             dataPackage.data = await db.Medical_package.findAll({
                 where: whereSpecialtyAndPackage,
                 attributes: ['id', 'name', 'image'],
                 include: [
-                    { model: db.Category_package, as: 'category_package', attributes: ['id', 'name'] },
+                    { model: db.Category_package, as: 'category_package', attributes: ['id', 'name','slug'] },
                 ],
                 limit:15
             })

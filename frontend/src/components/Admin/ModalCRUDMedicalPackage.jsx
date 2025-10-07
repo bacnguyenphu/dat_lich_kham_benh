@@ -72,7 +72,7 @@ function ModalCRUDMedicalPackage({ setIsShowModal, type, fetchMedicalPackages })
 
     const handleOnchange = (e) => {
         const { name, value } = e.target
-        setPayload(prev => ({ ...payload, [name]: value }))
+        setPayload(prev => ({ ...prev, [name]: value }))
     }
 
 
