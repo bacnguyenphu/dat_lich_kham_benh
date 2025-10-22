@@ -1,1 +1,6 @@
 export {default as LoginDoctor} from './LoginDoctor'
+export {default as MyAppointment} from './MyAppointment'
+export {default as MyPatient} from './MyPatient'
+export {default as MyInformation} from './MyInformation'
+export {default as MySchedule} from './MySchedule'
+export {default as ChangePassword} from './ChangePassword'

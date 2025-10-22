@@ -24,7 +24,8 @@ function LoginDoctor() {
 
     const handleClickLogin = async()=>{
         const res = await loginDoctor(payload)
-
+        console.log(res);
+        
     }
 
     return (

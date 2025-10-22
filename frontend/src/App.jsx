@@ -1,15 +1,20 @@
 import { Routes, Route } from 'react-router-dom'
 import { Doctor, ListMedicalPackgeFollowCategory, Specialty } from './components'
 import {
-  ADMIN, APPOINTMENT, CATEGORY_PACKAGE, DOCTORS, INFORMATION_DOCTOR, INFORMATION_PAKAGE, LOGIN,
+  ADMIN, APPOINTMENT, CATEGORY_PACKAGE, CHANGE_PASSWORD, DOCTOR, DOCTORS, INFORMATION_DOCTOR, INFORMATION_PAKAGE, LOGIN,
+  LOGIN_DOCTOR,
   MAKE_APPOINTMENT, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
   MANAGE_PACKAGE,
   MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN, MEDICAL_PACKAGE,
+  MY_APPOINTMENT,
+  MY_INFORMATION,
+  MY_PATIENT,
+  MY_SCHEDULE,
   PACKAGE_PLAN,
   PROFILE,
   REGISTER, SEARCH, SPECIALTY, STATISTICAL
 } from './utils/path'
-import { LayoutAdmin, LayoutDefault } from './Layouts'
+import { LayoutAdmin, LayoutDefault, LayoutDoctor } from './Layouts'
 import Category_Package from './components/Category_Package'
 import {
   CategoriesPackage,
@@ -25,7 +30,10 @@ import {
   Search
 } from './pages'
 import AdminRoute from './routes/AdminRoute'
-import { LoginDoctor } from './pages/Doctor'
+import {
+  ChangePassword, LoginDoctor, MyAppointment,
+  MyInformation, MyPatient, MySchedule
+} from './pages/Doctor'
 
 function App() {
 
@@ -69,8 +77,13 @@ function App() {
           <Route path={MANAGE_USERS} element={<ManageUsers />} />
         </Route>
 
-        <Route path={`tu-cach-${DOCTORS}`} element={null}>
-          <Route path={LOGIN} element={<LoginDoctor/>}/>
+        <Route path={LOGIN_DOCTOR} element={<LoginDoctor />} />
+        <Route path={DOCTOR} element={<LayoutDoctor />}>
+          <Route path={MY_APPOINTMENT} element={<MyAppointment />} />
+          <Route path={MY_PATIENT} element={<MyPatient />} />
+          <Route path={MY_INFORMATION} element={<MyInformation />} />
+          <Route path={MY_SCHEDULE} element={<MySchedule />} />
+          <Route path={CHANGE_PASSWORD} element={<ChangePassword />} />
         </Route>
 
       </Routes>

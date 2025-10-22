@@ -132,7 +132,7 @@ const loginDoctor = async (data) => {
             attributes: { exclude: ['createdAt', 'updatedAt'] },
             where: {
                 phone: data.phone
-            }
+            },
         })
 
         if (!user) {
@@ -141,8 +141,9 @@ const loginDoctor = async (data) => {
                 message: "Accout haven't registe"
             }
         }
-
-        if (!user?.role !== "R2") {
+        console.log("check data>>>>",data);
+        
+        if (user.dataValues?.role !== "R2") {
             return {
                 err: -4,
                 message: "Incorrect password account"

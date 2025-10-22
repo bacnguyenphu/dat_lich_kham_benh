@@ -29,3 +29,11 @@ export const MANAGE_APPOINTMENT = 'manage-appointment'
 export const MANAGE_USERS = 'manage-users'
 
 // Bác sĩ
+export const DOCTOR = 'doctor'
+export const MY_APPOINTMENT = "lich-hen-cua-toi"
+export const LOGIN_DOCTOR = "doctor-login"
+export const MY_PATIENT = "benh-nhan-cua-toi"
+export const MY_INFORMATION = "thong-tin-cua-toi"
+export const MY_SCHEDULE = "lich-trinh-cua-toi"
+export const CHANGE_PASSWORD = "doi-mat-khau"
+
