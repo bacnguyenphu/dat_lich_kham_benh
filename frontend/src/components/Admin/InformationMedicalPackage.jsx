@@ -7,6 +7,7 @@ import { FaRegPenToSquare } from "react-icons/fa6"
 import { MdDeleteOutline } from "react-icons/md"
 import Pagination from "../Pagination"
 import { useNavigate } from "react-router-dom"
+import defaultAvatar from '../../assets/defaultAvatar.png'
 
 function InformationMedicalPackage() {
 

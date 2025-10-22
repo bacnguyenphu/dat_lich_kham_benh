@@ -1,9 +1,9 @@
-export const LOGIN = "/login"
+export const LOGIN = "login"
 export const REGISTER = "/register"
 export const SPECIALTY = '/kham-chuyen-khoa'
 export const HOMEPAGE = '/'
 export const MEDICAL_PACKAGE = '/goi-kham'
-export const DOCTORS = '/bac-si'
+export const DOCTORS = 'bac-si'
 export const MAKE_APPOINTMENT = '/dat-lich-kham'
 export const PROFILE = '/thong-tin-ca-nhan'
 export const APPOINTMENT = '/lich-hen'
@@ -27,3 +27,5 @@ export const CATEGORY_PACKAGE = 'category'
 
 export const MANAGE_APPOINTMENT = 'manage-appointment'
 export const MANAGE_USERS = 'manage-users'
+
+// Bác sĩ

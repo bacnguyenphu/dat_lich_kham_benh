@@ -24,6 +24,8 @@ import {
   HomePage, ListAppointment, Login, MakeAppointment, Profile, Register,
   Search
 } from './pages'
+import AdminRoute from './routes/AdminRoute'
+import { LoginDoctor } from './pages/Doctor'
 
 function App() {
 
@@ -41,14 +43,14 @@ function App() {
           <Route path={`${MEDICAL_PACKAGE}/:slug/:id`} element={<DetailMedicalPackage />} />
           <Route path={MAKE_APPOINTMENT} element={<MakeAppointment />} />
           <Route path={PROFILE} element={<Profile />} />
-          <Route path={APPOINTMENT} element={<ListAppointment/>}/>
-          <Route path={SEARCH} element={<Search/>}/>
+          <Route path={APPOINTMENT} element={<ListAppointment />} />
+          <Route path={SEARCH} element={<Search />} />
         </Route>
 
         <Route path={LOGIN} element={<Login />} />
         <Route path={REGISTER} element={<Register />} />
 
-        <Route path={ADMIN} element={<LayoutAdmin />}>
+        <Route path={ADMIN} element={<AdminRoute><LayoutAdmin /></AdminRoute>}>
           <Route path={STATISTICAL} element={<Statistical />} />
           <Route path={MANAGE_DOCTOR} element={null}>
             <Route path={INFORMATION_DOCTOR} element={<InformationDoctor />} />
@@ -65,6 +67,10 @@ function App() {
           </Route>
           <Route path={MANAGE_APPOINTMENT} element={<ManageAppointment />} />
           <Route path={MANAGE_USERS} element={<ManageUsers />} />
+        </Route>
+
+        <Route path={`tu-cach-${DOCTORS}`} element={null}>
+          <Route path={LOGIN} element={<LoginDoctor/>}/>
         </Route>
 
       </Routes>

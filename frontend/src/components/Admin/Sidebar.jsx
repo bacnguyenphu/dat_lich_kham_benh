@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png'
 import {
     FaUserDoctor, FaAngleDown, FaCircleInfo, FaPaperPlane,
@@ -9,6 +9,7 @@ import { RxCountdownTimer } from "react-icons/rx";
 import { BiCategoryAlt } from "react-icons/bi";
 import {
     CATEGORY_PACKAGE,
+    HOMEPAGE,
     INFORMATION_DOCTOR, INFORMATION_PAKAGE, MANAGE_APPOINTMENT, MANAGE_DOCTOR, MANAGE_MEDICAL,
     MANAGE_PACKAGE,
     MANAGE_POSITION, MANAGE_SPECIALTY, MANAGE_USERS, MEDICAL_EXAMINATION_PLAN,
@@ -29,9 +30,13 @@ function Sidebar() {
 
     const pathManage = location.pathname.split('/')[2]
 
+    const navigate = useNavigate()
+
     return (
         <div>
-            <div className="flex gap-4 items-center pl-10 cursor-pointer py-2">
+            <div className="flex gap-4 items-center pl-10 cursor-pointer py-2"
+            onClick={()=>{navigate(HOMEPAGE)}}
+            >
                 <div className='h-[50px] w-[50px]'>
                     <img className='object-center object-cover size-full scale-125' src={logo} />
                 </div>

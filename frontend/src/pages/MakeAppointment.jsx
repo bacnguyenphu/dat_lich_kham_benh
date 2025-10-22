@@ -17,6 +17,7 @@ dayjs.locale('vi')
 function MakeAppointment() {
 
     const auth = useSelector(state => state.auth?.data)
+    
     const [searchParams] = useSearchParams();
     const navigate = useNavigate()
 
@@ -143,7 +144,7 @@ function MakeAppointment() {
                         <CiCalendarDate className="text-[#666666]" />
                     </div>
                     <input type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 outline-none" placeholder="Ngày tháng năm sinh"
-                        value={auth.dateOfBirth ? dayjs(auth.dateOfBirth).format("DD-MM-YYYY") : ""}
+                        value={auth?.dateOfBirth ? dayjs(auth?.dateOfBirth).format("DD-MM-YYYY") : ""}
                         disabled
                     />
                 </div>
@@ -165,7 +166,7 @@ function MakeAppointment() {
                     <div className="bg-[#F6F6F6] rounded-lg p-5">
                         <div className="flex justify-between mb-2">
                             <p>Giá khám</p>
-                            <p>{infoAppointment?.doctor?.price.toLocaleString('vi-VN')} VND</p>
+                            <p>{infoAppointment?.price.toLocaleString('vi-VN')} VND</p>
                         </div>
                         <div className="flex justify-between mb-2">
                             <p>Phí đặt dịch vụ</p>
@@ -174,7 +175,7 @@ function MakeAppointment() {
                         <hr className="border border-gray-400 mb-3" />
                         <div className="flex justify-between mb-2">
                             <p>Tổng cộng</p>
-                            <p className="text-red-600">{infoAppointment?.doctor?.price.toLocaleString('vi-VN')} VND</p>
+                            <p className="text-red-600">{infoAppointment?.price.toLocaleString('vi-VN')} VND</p>
                         </div>
                     </div>
                 </div>

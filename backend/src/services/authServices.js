@@ -2,6 +2,7 @@ import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
 import { randomString } from '../utils/randomString';
+import { createJWT, createRefreshToken } from '../middleware/JWTaction';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
@@ -58,8 +59,6 @@ const register = async (data) => {
 
 const login = async (data) => {
     try {
-        console.log('check>>', data);
-
         if (!data.phone) {
             return {
                 err: -1,
@@ -95,9 +94,13 @@ const login = async (data) => {
 
         let { password, ...other } = user.dataValues
 
+        const token = createJWT(other)
+        const refreshToken = createRefreshToken(other)
         return {
             err: 0,
             data: other,
+            token,
+            refreshToken,
             message: "Log in success!"
         }
 
@@ -111,4 +114,67 @@ const login = async (data) => {
     }
 }
 
-export { register, login }
+const loginDoctor = async (data) => {
+    try {
+        if (!data.phone) {
+            return {
+                err: -1,
+                message: "Phone is required !"
+            }
+        }
+        if (!data.password) {
+            return {
+                err: -2,
+                message: "Password is required !"
+            }
+        }
+        const user = await db.User.findOne({
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            where: {
+                phone: data.phone
+            }
+        })
+
+        if (!user) {
+            return {
+                err: -3,
+                message: "Accout haven't registe"
+            }
+        }
+
+        if (!user?.role !== "R2") {
+            return {
+                err: -4,
+                message: "Incorrect password account"
+            }
+        }
+
+        if (!checkPass(data.password, user.password)) {
+            return {
+                err: -4,
+                message: "Password is not correct !"
+            }
+        }
+
+        let { password, ...other } = user.dataValues
+
+        const token = createJWT(other)
+        const refreshToken = createRefreshToken(other)
+        return {
+            err: 0,
+            data: other,
+            token,
+            refreshToken,
+            message: "Log in success!"
+        }
+    } catch (error) {
+        console.log("Lỗi ở loginDoctor : ", error);
+
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export { register, login, loginDoctor }

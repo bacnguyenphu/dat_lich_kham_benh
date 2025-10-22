@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "../components/Admin";
 import { CiSearch } from "react-icons/ci";
+import UserDropdown from "../components/UserDropdown";
 
 function LayoutAdmin() {
     return (
@@ -16,11 +17,8 @@ function LayoutAdmin() {
                             <CiSearch size={"1.75rem"}/>
                         </span>
                     </div>
-                    <div className="flex gap-2 items-center">
-                        <div className="size-10 rounded-full overflow-hidden border-2 border-white">
-                            <img className="object-center object-cover size-full" src="https://tse2.mm.bing.net/th/id/OIP.Fh1DHVtoCoFAOCuuv9-NcwHaGT?cb=iwp1&rs=1&pid=ImgDetMain" />
-                        </div>
-                        <p className="text-white font-semibold">Bac Nguyen</p>
+                    <div className="flex gap-2 items-center text-white">
+                        <UserDropdown/>
                     </div>
 
                 </div>

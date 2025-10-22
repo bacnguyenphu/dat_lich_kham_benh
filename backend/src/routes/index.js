@@ -13,6 +13,17 @@ import search from './search'
 
 const initRoutes = (app) => {
 
+  // app.use((req, res, next) => {
+  //   // Các route không cần xác thực
+  //   const openRoutes = ["/api/login", "api/register"];
+
+  //   if (openRoutes.includes(req.path)) {
+  //     return next(); // bỏ qua kiểm tra token
+  //   }
+
+  //   checkUserJWT(req,res,next); // áp dụng kiểm tra token cho các route còn lại
+  // });
+
   app.use('/api', auth)
   app.use('/api', specialty)
   app.use('/api', category_package)

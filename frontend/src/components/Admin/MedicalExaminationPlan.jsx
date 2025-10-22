@@ -151,7 +151,7 @@ function MedicalExaminationPlan({ type }) {
             {type === "MEDICAL_PACKAGE" && <h3 className="font-semibold text-2xl text-center text-[#0106B4] border-b border-gray-400 py-5">Kế Hoạch Khám Bệnh Của Gói Khám</h3>}
             <div className="mt-10 flex items-center gap-5">
                 <div className="w-9/12">
-                    <p className="mb-1">Họ tên bác sĩ và chuyên khoa <span className="text-red-500">*</span></p>
+                    <p className="mb-1">Tên gói khám và danh mục <span className="text-red-500">*</span></p>
                     <Select
                         defaultValue={selectedItem}
                         onChange={setSelectedItem}

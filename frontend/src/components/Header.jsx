@@ -36,7 +36,7 @@ function Header() {
             </div>
             {auth && auth?.token ?
                 <div className='w-1/5 hidden xl:block'>
-                    <UserDropdown auth={auth} />
+                    <UserDropdown />
                 </div>
                 :
                 <div className='w-1/5 text-white hidden xl:flex xl:justify-end gap-4'>

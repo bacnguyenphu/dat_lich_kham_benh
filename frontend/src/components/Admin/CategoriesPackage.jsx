@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { LuBadgePlus } from "react-icons/lu";
-import { getSpecialties } from "../../services/specialtyService";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import { MdDeleteOutline } from "react-icons/md";
 import defaultAvatar from '../../assets/defaultAvatar.png'

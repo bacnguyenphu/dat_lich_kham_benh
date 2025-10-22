@@ -1,17 +1,24 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import defaultAvatar from '../assets/defaultAvatar.png'
 import { CiUser } from "react-icons/ci";
 import { IoIosLogOut } from "react-icons/io";
 import { RxCountdownTimer } from "react-icons/rx";
 import { FaCaretDown } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react";
-import { APPOINTMENT, PROFILE } from "../utils/path";
+import { ADMIN, APPOINTMENT, PROFILE, STATISTICAL } from "../utils/path";
+import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
+import { logoutUser } from "../redux/authSlice";
+import { GrUserAdmin } from "react-icons/gr";
+import { requestNavigateAdmin } from "../services/authService";
 
-function UserDropdown({ auth }) {
+function UserDropdown() {
 
-    // const navigate = useNavigate()
     const modalUser = useRef()
     const [showModal, setShowModal] = useState(false)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const auth = useSelector(state => state.auth)
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -37,19 +44,61 @@ function UserDropdown({ auth }) {
             icon: <RxCountdownTimer size={'1.5rem'} />,
             path: APPOINTMENT
         },
-        {
-            title: "Đăng xuất",
-            icon: <IoIosLogOut size={'1.5rem'} />,
-            path: "LOGOUT"
-        },
     ]
+
+    const handleClickLogout = async () => {
+        Swal.fire({
+            title: "Bạn có muốn đăng xuất ?",
+            showDenyButton: true,
+            confirmButtonText: "Đăng xuất",
+            denyButtonText: "Thoát"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const res = await dispatch(logoutUser())
+                if (res.payload.error === 0) {
+                    Swal.fire({
+                        title: "Đăng xuất thành công",
+                        icon: "success"
+                    })
+                }
+                else {
+                    Swal.fire({
+                        title: "Đăng xuất thất bại !",
+                        icon: "error",
+                    });
+                }
+            }
+        });
+    }
+
+    const handleClickNavigateAdmin = async () => {
+        try {
+            const res = await requestNavigateAdmin();
+
+            if (res.err === 0) {
+                navigate(`${ADMIN}/${STATISTICAL}`);
+            } else {
+                Swal.fire({
+                    title: res.message || "Có lỗi xảy ra",
+                    icon: "error",
+                });
+            }
+
+        } catch (error) {
+            // Axios sẽ nhảy vào đây khi lỗi 403, 404, 500,...
+            Swal.fire({
+                title: error.response?.data?.message || "Không có quyền truy cập",
+                icon: "error",
+            });
+        }
+    }
 
     return (
         <div ref={modalUser} className="relative">
             <div className='flex justify-end items-center gap-2 cursor-pointer'
                 onClick={() => { setShowModal(!showModal) }}
             >
-                <div className="size-12 rounded-full overflow-hidden">
+                <div className="size-12 rounded-full overflow-hidden  border border-white">
                     <img src={(auth?.data?.avatar) ? auth?.data?.avatar : defaultAvatar} className="size-full object-center object-cover" />
                 </div>
                 <p className='font-semibold'>{auth?.data?.firstName} {auth?.data?.lastName}</p>
@@ -59,7 +108,7 @@ function UserDropdown({ auth }) {
                 <div className="w-[250px] rounded-xl absolute right-0 bg-white shadow-[0px_8px_10px_-2px_rgba(0,_0,_0,_0.4)] z-[100] p-5 text-black mt-2">
                     <div className="flex gap-4 cursor-pointer"
                     >
-                        <div className="size-14 border p-1 rounded-full overflow-hidden cursor-pointer">
+                        <div className="size-14 p-1 rounded-full overflow-hidden cursor-pointer">
                             <img
                                 className="object-cover object-center size-full rounded-full"
                                 alt="Ảnh lỗi" src={auth?.data?.avatar || defaultAvatar}
@@ -86,15 +135,21 @@ function UserDropdown({ auth }) {
                                 </Link>
                             )
                         })}
+                        <li className="flex mt-3 gap-2 cursor-pointer"
+                            onClick={() => { handleClickLogout() }}
+                        >
+                            <span><IoIosLogOut size={'1.5rem'} /></span>
+                            <span>Đăng xuất</span>
+                        </li>
                     </ul>
-                    {/* {auth && auth.role === 'R2' &&
+                    {auth && auth?.data?.role === 'R1' &&
                         <div className="flex mt-3 gap-2 cursor-pointer items-center"
-                            onClick={() => { navigate(ADMIN_MANAGE_POSTS) }}
+                            onClick={() => { handleClickNavigateAdmin() }}
                         >
                             <span><GrUserAdmin /></span>
                             <span>Quản trị viên</span>
                         </div>
-                    } */}
+                    }
                 </div>
             }
         </div>

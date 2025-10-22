@@ -6,13 +6,16 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 import { useNavigate } from "react-router-dom";
-import { MAKE_APPOINTMENT } from "../utils/path";
+import { LOGIN, MAKE_APPOINTMENT } from "../utils/path";
+import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
 dayjs.locale('vi')
 
 function Schedules({ idDoctor, idMedicalPackage }) {
 
     const days = []
     const navigate = useNavigate()
+    const auth = useSelector(state => state?.auth?.data)
 
     for (let i = 0; i < 7; i++) {
         const date = {
@@ -56,12 +59,20 @@ function Schedules({ idDoctor, idMedicalPackage }) {
     }, [selectedDate])
 
     const handleNavigateMakeAppointment = (idTimeFrame) => {
-        if (idDoctor) {
-            navigate(`${MAKE_APPOINTMENT}?idDoctor=${idDoctor}&date=${selectedDate?.value}&tf=${idTimeFrame}`)
+        if (auth) {
+            if (idDoctor) {
+                navigate(`${MAKE_APPOINTMENT}?idDoctor=${idDoctor}&date=${selectedDate?.value}&tf=${idTimeFrame}`)
+            }
+            if (idMedicalPackage) {
+                navigate(`${MAKE_APPOINTMENT}?idMedicalPackage=${idMedicalPackage}&date=${selectedDate?.value}&tf=${idTimeFrame}`)
+            }
+        } else {
+            Swal.fire({
+                title: "Bạn cần đăng nhập trước khi đặt lịch khám !",
+                icon:"warning"
+            })
         }
-        if (idMedicalPackage) {
-            navigate(`${MAKE_APPOINTMENT}?idMedicalPackage=${idMedicalPackage}&date=${selectedDate?.value}&tf=${idTimeFrame}`)
-        }
+
     }
 
     const handleCloseModal = () => {
