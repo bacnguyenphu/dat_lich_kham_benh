@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         appointment_date: DataTypes.DATE,
         time: DataTypes.STRING,
         status: DataTypes.INTEGER,
+        payment_status:DataTypes.BOOLEAN
     }, {
         sequelize,
         modelName: 'Appointment',

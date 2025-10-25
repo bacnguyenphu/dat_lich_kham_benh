@@ -9,6 +9,7 @@ import { InfoAppointment, Pagination } from "../components";
 import { IoClose } from "react-icons/io5";
 import { GiSandsOfTime } from "react-icons/gi";
 import { FaCheck } from "react-icons/fa6";
+import { PiWarningCircleLight } from "react-icons/pi";
 import { FaRegCheckCircle, FaRegTrashAlt } from "react-icons/fa";
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
@@ -39,6 +40,7 @@ function ListAppointmenT() {
                         image: item?.doctor?.user?.avatar,
                         time_frame: item?.time,
                         appointment_date: item?.appointment_date,
+                        payment_status: item?.payment_status
                     }
                 }
                 if (item?.medical_package) {
@@ -50,6 +52,7 @@ function ListAppointmenT() {
                         image: item?.medical_package?.image,
                         time_frame: item?.time,
                         appointment_date: item?.appointment_date,
+                        payment_status: item?.payment_status
                     }
                 }
             })
@@ -103,8 +106,9 @@ function ListAppointmenT() {
             <div className=" lg:px-40 md:px-20 px-4 mt-10">
                 {infoAppointments.length > 0 &&
                     infoAppointments.map(item => {
-                        const { id, status, ...other } = item
-
+                        const { id, status, payment_status, ...other } = item
+                        console.log(payment_status);
+                        
                         return (
                             <div key={id} className="border border-gray-400 rounded-xl px-5 py-10 mb-5">
                                 <div className="flex items-center justify-between">
@@ -119,30 +123,44 @@ function ListAppointmenT() {
                                         </Tippy>
                                     }
                                 </div>
-                                {status === 1 &&
-                                    <span className="text-yellow-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-yellow-500 w-fit mt-5 ml-32" >
-                                        <GiSandsOfTime />
-                                        <label className="text-sm">Chờ xác nhận</label>
-                                    </span>
-                                }
-                                {status === 2 &&
-                                    <span className="text-blue-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-blue-500 w-fit mt-5 ml-32" >
-                                        <FaCheck />
-                                        <label className="text-sm">Xác nhận</label>
-                                    </span>
-                                }
-                                {status === 3 &&
-                                    <span className="text-green-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-green-500 w-fit mt-5 ml-32" >
-                                        <FaRegCheckCircle />
-                                        <label className="text-sm">Đã khám xong</label>
-                                    </span>
-                                }
-                                {status === 0 &&
-                                    <span className="text-red-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-red-500 w-fit mt-5 ml-32" >
-                                        <FaRegTrashAlt />
-                                        <label className="text-sm">Đã hủy</label>
-                                    </span>
-                                }
+                                <div className="flex items-center">
+                                    {status === 1 &&
+                                        <span className="text-yellow-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-yellow-500 w-fit mt-5 ml-32" >
+                                            <GiSandsOfTime />
+                                            <label className="text-sm">Chờ xác nhận</label>
+                                        </span>
+                                    }
+                                    {status === 2 &&
+                                        <span className="text-blue-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-blue-500 w-fit mt-5 ml-32" >
+                                            <FaCheck />
+                                            <label className="text-sm">Xác nhận</label>
+                                        </span>
+                                    }
+                                    {status === 3 &&
+                                        <span className="text-green-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-green-500 w-fit mt-5 ml-32" >
+                                            <FaRegCheckCircle />
+                                            <label className="text-sm">Đã khám xong</label>
+                                        </span>
+                                    }
+                                    {status === 0 &&
+                                        <span className="text-red-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-red-500 w-fit mt-5 ml-32" >
+                                            <FaRegTrashAlt />
+                                            <label className="text-sm">Đã hủy</label>
+                                        </span>
+                                    }
+                                    {!payment_status ?
+                                        <span className="text-red-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-red-500 w-fit mt-5 ml-5" >
+                                            <PiWarningCircleLight />
+                                            <label className="text-sm">Chưa thanh toán</label>
+                                        </span>
+                                        :
+                                        <span className="text-green-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-green-500 w-fit mt-5 ml-5" >
+                                            <FaRegCheckCircle />
+                                            <label className="text-sm">Đã thanh toán</label>
+                                        </span>
+                                    }
+                                </div>
+
                             </div>
                         )
                     })

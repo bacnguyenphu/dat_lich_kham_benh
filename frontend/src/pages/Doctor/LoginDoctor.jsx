@@ -3,9 +3,16 @@ import { HiOutlineUserCircle } from "react-icons/hi2";
 import { ImUser } from "react-icons/im";
 import { FaLock } from "react-icons/fa";
 import { useState } from 'react';
-import { loginDoctor } from '../../services/authService';
+import { useDispatch } from 'react-redux';
+import { loginDoctorRedux } from '../../redux/authDoctorSlice';
+import { useNavigate } from 'react-router-dom';
+import { DOCTOR, MY_APPOINTMENT } from '../../utils/path';
+import Swal from 'sweetalert2';
 
 function LoginDoctor() {
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [payload, setPayload] = useState({
         phone: '',
@@ -22,10 +29,28 @@ function LoginDoctor() {
         })
     }
 
-    const handleClickLogin = async()=>{
-        const res = await loginDoctor(payload)
-        console.log(res);
-        
+    const handleClickLogin = async () => {
+
+        if (payload.phone === '' || payload.password === '') {
+            Swal.fire({
+                title: "Đăng nhập thất bại",
+                text: "Bạn phải nhập đủ dữ liệu",
+                icon: "warning"
+            });
+            return
+        }
+
+        const res = await dispatch(loginDoctorRedux(payload))
+        if (res.payload?.error === 0) {
+            navigate(`/${DOCTOR}/${MY_APPOINTMENT}`)
+        }
+        else {
+            Swal.fire({
+                title: "Đăng nhập thất bại",
+                text: res.payload?.error,
+                icon: "error"
+            })
+        }
     }
 
     return (
@@ -60,7 +85,7 @@ function LoginDoctor() {
                     </div>
                 </div>
                 <button className='w-[410px] bg-[#1F8ACC] rounded-lg py-1 text-white font-semibold cursor-pointer mt-4'
-                onClick={()=>{handleClickLogin()}}
+                    onClick={() => { handleClickLogin() }}
                 >
                     Đăng nhập
                 </button>

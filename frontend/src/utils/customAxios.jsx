@@ -1,8 +1,11 @@
 import axios from 'axios'
+import Swal from 'sweetalert2'
 
 const instance = axios.create({
   baseURL: 'http://localhost:3001/api/',
 });
+
+let isLoggingOut = false;
 
 // Add a request interceptor
 instance.interceptors.request.use(function (config) {
@@ -26,10 +29,22 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (response) {
   // Any status code that lie within the range of 2xx cause this function to trigger
   // Do something with response data
+
   return response.data;
-}, function (error) {
+}, async function (error) {
   // Any status codes that falls outside the range of 2xx cause this function to trigger
   // Do something with response error
+  if (error.response && error.response.status === 401 && !isLoggingOut) {
+    await Swal.fire({
+      title: "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+
+    // Chỉ chạy sau khi người dùng bấm OK
+    window.location.href = "/login";
+    localStorage.removeItem("persist:authUser");
+  }
   return Promise.reject(error);
 });
 

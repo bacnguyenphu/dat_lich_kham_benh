@@ -21,8 +21,8 @@ function Login() {
     const handleLogin = async () => {
         if (payload.phone === '' || payload.password === '') {
             Swal.fire({
-                title: "Log in fasle!",
-                text: "Fields cannot be left blank",
+                title: "Đăng nhập thất bại",
+                text: "Bạn phải nhập đủ dữ liệu",
                 icon: "warning"
             });
             return

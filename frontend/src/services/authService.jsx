@@ -17,8 +17,6 @@ const requestNavigateAdmin = () => {
 }
 
 const loginDoctor = (data) => {
-    console.log('check data: ',data);
-    
     return axios.post('login-doctor', data)
 }
 

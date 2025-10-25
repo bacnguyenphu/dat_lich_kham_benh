@@ -34,6 +34,10 @@ module.exports = {
                 allowNull:false,
                 defaultValue:1
             },
+            payment_status:{
+                type:Sequelize.BOOLEAN,
+                allowNull:true
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

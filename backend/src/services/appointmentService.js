@@ -151,7 +151,7 @@ const getAppointmentOfUser = async (idUser, limit, page) => {
 
         const { count, rows } = await db.Appointment.findAndCountAll({
             where: { id_patient: idUser },
-            attributes: ['id', 'appointment_date', 'time', 'status'],
+            attributes: ['id', 'appointment_date', 'time', 'status','payment_status'],
             include: [
                 {
                     model: db.Doctor, as: 'doctor', attributes: ['price'],

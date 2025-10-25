@@ -22,8 +22,8 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (data, { rejec
 export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
     try {
         const res = await logout()
-        console.log('chekc res lgout: ',res);
-        
+        console.log('chekc res lgout: ', res);
+
         if (res.err === 0) {
             return {
                 data: null,
@@ -37,6 +37,7 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
         console.log(error.response?.data || 'Logout failed');
     }
 })
+
 
 export const getUserRedux = createAsyncThunk('auth/getUserRedux', async (idUser, { rejectWithValue }) => {
     try {
@@ -106,23 +107,23 @@ const authSlice = createSlice({
                 state.message = action.payload?.message;
             })
 
-        //logout
-        .addCase(logoutUser.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(logoutUser.fulfilled,(state, action) => {
-            state.error = action.error;
-            state.loading = false;
-            state.data = action.payload?.data;
-            state.message = action.payload?.message;
-            state.token = action.payload?.token;
-        })
-        .addCase(logoutUser.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.error;
-            state.message = action.payload?.message;
-        })
+            //logout
+            .addCase(logoutUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(logoutUser.fulfilled, (state, action) => {
+                state.error = action.error;
+                state.loading = false;
+                state.data = action.payload?.data;
+                state.message = action.payload?.message;
+                state.token = action.payload?.token;
+            })
+            .addCase(logoutUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
+                state.message = action.payload?.message;
+            })
     },
 })
 

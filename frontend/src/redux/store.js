@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer from './authSlice'
+import authDoctorReducer from './authDoctorSlice'
 import specialty from './specialtySlice'
 import storage from 'redux-persist/lib/storage'
 import hardSet from 'redux-persist/lib/stateReconciler/hardSet'
@@ -7,6 +8,13 @@ import { persistStore, persistReducer } from "redux-persist";
 
 const authConfig = {
     key: 'authUser',
+    storage,
+    stateReconciler: hardSet,
+    whitelist: ["token","data"]
+}
+
+const authDoctorConfig = {
+    key: 'authDoctor',
     storage,
     stateReconciler: hardSet,
     whitelist: ["token","data"]
@@ -22,6 +30,7 @@ const specialtyConfig = {
 export const store = configureStore({
     reducer: {
         auth: persistReducer(authConfig, authReducer),
+        authDoctor: persistReducer(authDoctorConfig,authDoctorReducer),
         specialties: persistReducer(specialtyConfig,specialty) 
     },
     middleware: (getDefaultMiddleware) =>
