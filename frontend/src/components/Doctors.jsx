@@ -43,7 +43,7 @@ function Doctors() {
                     doctors.map((doctor) => {
                         return (
                             <div key={`doctor-${doctor.id}`} className="flex items-center gap-5 border-b border-gray-400 py-5 cursor-pointer"
-                            onClick={()=>{navigate(`${DOCTORS}/chi-tiet/${doctor.id}`)}}
+                            onClick={()=>{navigate(`/${DOCTORS}/chi-tiet/${doctor.id}`)}}
                             >
                                 <div className="size-28">
                                     <img className="object-center object-cover size-full" src={(doctor?.user?.avatar) ? doctor?.user?.avatar : defaultAvatar} />

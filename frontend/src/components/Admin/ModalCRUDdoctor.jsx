@@ -170,7 +170,9 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     }
 
     const handleClickUpdate = async () => {
-        if (Validation(payload, setErrors)) {
+        // eslint-disable-next-line no-unused-vars
+        const {password,...other} = payload
+        if (Validation(other, setErrors)) {
             setIsLoading(true)
             let linkImg = payload?.linkImg
             if (imgUpload) {

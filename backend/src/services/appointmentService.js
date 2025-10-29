@@ -151,7 +151,7 @@ const getAppointmentOfUser = async (idUser, limit, page) => {
 
         const { count, rows } = await db.Appointment.findAndCountAll({
             where: { id_patient: idUser },
-            attributes: ['id', 'appointment_date', 'time', 'status','payment_status'],
+            attributes: ['id', 'appointment_date', 'time', 'status', 'payment_status'],
             include: [
                 {
                     model: db.Doctor, as: 'doctor', attributes: ['price'],
@@ -241,4 +241,77 @@ const updateStatusAppointment = async (idAppointment, status) => {
     }
 }
 
-export { getInfoToMakeAppointment, createAppointment, getAppointmentOfUser, updateStatusAppointment }
+const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
+    try {
+        if (!idDoctor) {
+            return {
+                err: 1,
+                message: "ID doctor required"
+            }
+        }
+        if (!filter) {
+            return {
+                err: 1,
+                message: "Filter is required"
+            }
+        }
+        let wherePhoneOrName = {}
+        let whereAppointment = {
+            id_doctor: idDoctor
+        }
+        if (+filter !== 99) {
+            whereAppointment.status = +filter
+        }
+        if (value) {
+            wherePhoneOrName = { [Op.or]: [{ firstName: value }, { lastName: value }, { phone: value }] }
+        }
+
+        const { count, rows } = await db.Appointment.findAndCountAll({
+            where: whereAppointment,
+            attributes: ['id', 'appointment_date', 'time', 'status', 'payment_status'],
+            include: [
+                {
+                    model: db.User, 
+                    as: 'user', 
+                    attributes: ['id', 'firstName', 'lastName', 'phone'],
+                    where:wherePhoneOrName
+                },
+            ],
+            order: [['createdAt', 'DESC']],
+            offset: (page - 1) * limit,
+            limit: limit,
+            subQuery: false,
+        })
+
+        if (rows.length === 0) {
+            return {
+                err: 0,
+                message: "No appointments found for this doctor.",
+                data: [],
+                page: 1,
+                totalPage: 0,
+            }
+        }
+
+        return {
+            err: 0,
+            message: "Get appointment of doctor success !",
+            data: rows,
+            page: page,
+            totalPage: Math.ceil(count / limit),
+            totalData: count
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getAppointmentOfDoctor :", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export {
+    getInfoToMakeAppointment, createAppointment, getAppointmentOfUser,
+    updateStatusAppointment, getAppointmentOfDoctor
+}

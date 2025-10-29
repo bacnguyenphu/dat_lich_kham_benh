@@ -16,7 +16,7 @@ function InformationDoctor() {
     const [doctors, setDoctors] = useState([])
     const [type, setType] = useState('')
     const [totalPages, setTotalPages] = useState(0)
-    const limit = 7
+    const limit = 4
     const [page, setPage] = useState(1)
 
 

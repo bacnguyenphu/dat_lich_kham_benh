@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createAppointment, getInfoToMakeAppointment } from "../services/appointment";
 import { useState } from "react";
-import dayjs from 'dayjs';
 import { FaPhone } from "react-icons/fa6";
 import { ImUser } from "react-icons/im";
 import { FaTransgender } from "react-icons/fa";
@@ -12,6 +11,7 @@ import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { APPOINTMENT } from "../utils/path";
 import { InfoAppointment } from "../components";
+import dayjs from 'dayjs';
 dayjs.locale('vi')
 
 function MakeAppointment() {

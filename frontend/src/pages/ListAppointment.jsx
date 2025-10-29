@@ -35,7 +35,7 @@ function ListAppointmenT() {
                     return {
                         id: item.id,
                         status: item.status,
-                        name: item?.doctor?.position.map(item => item.name).join(" ") + " " + item?.doctor?.user?.firstName + item?.doctor?.user?.lastName,
+                        name: item?.doctor?.position.map(item => item.name).join(" ") + " " + item?.doctor?.user?.firstName +" "+ item?.doctor?.user?.lastName,
                         price: item?.doctor?.price.toLocaleString('vi-VN'),
                         image: item?.doctor?.user?.avatar,
                         time_frame: item?.time,
@@ -107,8 +107,6 @@ function ListAppointmenT() {
                 {infoAppointments.length > 0 &&
                     infoAppointments.map(item => {
                         const { id, status, payment_status, ...other } = item
-                        console.log(payment_status);
-                        
                         return (
                             <div key={id} className="border border-gray-400 rounded-xl px-5 py-10 mb-5">
                                 <div className="flex items-center justify-between">
@@ -160,7 +158,6 @@ function ListAppointmenT() {
                                         </span>
                                     }
                                 </div>
-
                             </div>
                         )
                     })

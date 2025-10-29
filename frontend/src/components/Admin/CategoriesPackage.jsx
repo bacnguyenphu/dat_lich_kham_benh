@@ -13,7 +13,7 @@ function CategoriesPackage() {
     const [type, setType] = useState('')
     const [isShowModal, setIsShowModal] = useState(false)
     const [totalPages, setTotalPages] = useState(0)
-    const limit = 7
+    const limit = 4
     const [page, setPage] = useState(1)
 
     const location = useLocation()

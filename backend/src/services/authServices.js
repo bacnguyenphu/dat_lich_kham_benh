@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
 import { randomString } from '../utils/randomString';
 import { createJWT, createRefreshToken } from '../middleware/JWTaction';
+import { where } from 'sequelize';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
@@ -141,7 +142,7 @@ const loginDoctor = async (data) => {
                 message: "Accout haven't registe"
             }
         }
-        console.log("check data>>>>",data);
+        // console.log("check user>>>>",user.dataValues);
         
         if (user.dataValues?.role !== "R2") {
             return {
@@ -157,8 +158,15 @@ const loginDoctor = async (data) => {
             }
         }
 
+        const doctor =await db.Doctor.findOne({
+            where:{id_user:user.dataValues.id},
+            attributes:['id']
+        })
+        
         let { password, ...other } = user.dataValues
-
+        if(doctor){
+            other.id = doctor.dataValues.id
+        }
         const token = createJWT(other)
         const refreshToken = createRefreshToken(other)
         return {

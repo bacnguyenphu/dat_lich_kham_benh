@@ -18,7 +18,7 @@ function ManageUsers() {
     const [users, setUsers] = useState([])
 
     const [totalPages, setTotalPages] = useState(0)
-    const limit = 7
+    const limit = 4
     const [page, setPage] = useState(1)
 
     const handleClickAdd = () => {

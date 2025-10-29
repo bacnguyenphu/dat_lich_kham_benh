@@ -1,4 +1,4 @@
-import { createAppointment, updateStatusAppointment, getAppointmentOfUser, getInfoToMakeAppointment } from "../services/appointmentService";
+import { createAppointment, updateStatusAppointment, getAppointmentOfUser, getInfoToMakeAppointment, getAppointmentOfDoctor } from "../services/appointmentService";
 
 const handleGetInfoToMakeAppointment = async (req, res) => {
     try {
@@ -48,4 +48,20 @@ const handleUpdateStatusAppointment = async (req, res) => {
     }
 }
 
-export { handleGetInfoToMakeAppointment, handleCreateAppointment, handleGetAppointmentOfUser, handleUpdateStatusAppointment }
+const handleGetAppointmentOfDoctor = async (req, res) => {
+    try {
+        const idDoctor = req.query.idDoctor
+        const limit = req.query.limit
+        const page = req.query.page
+        const value = req.query.value
+        const filter = req.query.filter
+
+        const message = await getAppointmentOfDoctor(idDoctor,+limit,+page,value,filter);
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log(`Lỗi ở handleGetAppointmentOfDoctor: `, error);
+    }
+}
+
+export { handleGetInfoToMakeAppointment, handleCreateAppointment, handleGetAppointmentOfUser, 
+    handleUpdateStatusAppointment, handleGetAppointmentOfDoctor}

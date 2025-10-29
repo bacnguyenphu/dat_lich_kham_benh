@@ -1,6 +1,10 @@
 import logo from '../../assets/logo.png'
+import{useSelector} from 'react-redux'
 
 function Header() {
+
+    const authDoctor = useSelector(state => state?.authDoctor?.data)
+
     return (
         <div className=''>
             <div className='px-20 py-4 bg-[#D1DFC4] flex justify-between items-center'>
@@ -10,7 +14,7 @@ function Header() {
                     </div>
                     <p className='text-2xl font-semibold font-Lobster'>Nger Doctor</p>
                 </div>
-                <p>Xin chào bác sĩ, Nguyễn Phú Bắc!</p>
+                <p>Xin chào bác sĩ, <span>{authDoctor?.firstName} {authDoctor?.lastName}</span> !</p>
             </div>
         </div>
     );

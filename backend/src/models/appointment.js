@@ -11,8 +11,9 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
-            Appointment.belongsTo(models.Doctor,{foreignKey:'id_doctor', as:'doctor'})
-            Appointment.belongsTo(models.Medical_package,{foreignKey:'id_medical_package', as:'medical_package'})
+            Appointment.belongsTo(models.Doctor, { foreignKey: 'id_doctor', as: 'doctor' })
+            Appointment.belongsTo(models.Medical_package, { foreignKey: 'id_medical_package', as: 'medical_package' })
+            Appointment.belongsTo(models.User, { foreignKey: 'id_patient', as: 'user' })
         }
     }
     Appointment.init({
@@ -30,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
         appointment_date: DataTypes.DATE,
         time: DataTypes.STRING,
         status: DataTypes.INTEGER,
-        payment_status:DataTypes.BOOLEAN
+        payment_status: DataTypes.BOOLEAN
     }, {
         sequelize,
         modelName: 'Appointment',

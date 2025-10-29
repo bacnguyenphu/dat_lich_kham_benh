@@ -5,7 +5,7 @@ function LayoutDoctor() {
     return ( 
         <div>
             <Header/>
-            <div className="px-20 flex mt-10 gap-20">
+            <div className="px-20 flex mt-4 gap-20">
                 <div className="w-3/12">
                     <SideBar/>
                 </div>
