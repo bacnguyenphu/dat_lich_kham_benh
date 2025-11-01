@@ -1,3 +1,5 @@
+import { getPatientOfDoctor } from "../services/appointmentService";
+
 const { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor, getDoctorFollowSpecialty } = require("../services/doctorService");
 
 const handleCreateDoctor = async (req, res) => {
@@ -68,4 +70,20 @@ const handleGetDoctorFollowSpecialty = async(req,res)=>{
     }
 }
 
-export { handleCreateDoctor, handleGetDoctors, handleGetDoctorById, handleDeleteDoctorById, handleUpdateDoctor,handleGetDoctorFollowSpecialty }
+const handleGetPatientOfDoctor = async(req,res)=>{
+    try {
+        const idDoctor = req.query.idDoctor
+        const limit = req.query.limit
+        const page = req.query.page
+
+        const message = await getPatientOfDoctor(idDoctor,+limit,+page)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handleGetPatientOfDoctor: ",error);
+    }
+}
+
+export { handleCreateDoctor, handleGetDoctors, handleGetDoctorById, 
+    handleDeleteDoctorById, handleUpdateDoctor,handleGetDoctorFollowSpecialty, 
+    handleGetPatientOfDoctor
+}

@@ -1,3 +1,6 @@
+import { handleCheckAdmin } from '../controllers/authController'
+import { checkUserJWT } from '../middleware/JWTaction'
+
 const express = require('express')
 const { handleCreateMedicalPackage, handleGetMedicalPackage, 
     handleGetMedicalPackageById, 
@@ -6,11 +9,11 @@ const { handleCreateMedicalPackage, handleGetMedicalPackage,
     handleGetMedicalPackageFollowCategory} = require('../controllers/medicalPackageController')
 const router = express.Router()
 
-router.post('/create-medical-package',handleCreateMedicalPackage)
+router.post('/create-medical-package',checkUserJWT,handleCheckAdmin,handleCreateMedicalPackage)
 router.put('/update-medical-package',handleUpdateMedicalPackage)
 router.get('/get-medical-package',handleGetMedicalPackage)
 router.get('/get-medical-package-by-id',handleGetMedicalPackageById)
-router.delete('/delete-medical-package',handleDeleteMedicalPackage)
+router.delete('/delete-medical-package',checkUserJWT,handleCheckAdmin,handleDeleteMedicalPackage)
 router.get('/get-medical-package-follow-category',handleGetMedicalPackageFollowCategory)
 
 export default router

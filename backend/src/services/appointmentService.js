@@ -1,4 +1,4 @@
-import { col, fn, Op, where } from 'sequelize';
+import { col, fn, Op, Sequelize, where } from 'sequelize';
 import db from '../models/index'
 import time_frame from '../models/time_frame'
 import { v4 as uuidv4 } from 'uuid';
@@ -281,6 +281,7 @@ const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
             offset: (page - 1) * limit,
             limit: limit,
             subQuery: false,
+            distinct: true,
         })
 
         if (rows.length === 0) {
@@ -311,7 +312,67 @@ const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
     }
 }
 
+const getPatientOfDoctor = async(idDoctor,limit=7,page=1)=>{
+    try {
+        if (!idDoctor) {
+            return {
+                err: 1,
+                message: "ID doctor required"
+            }
+        }
+
+        const { count, rows } = await db.Appointment.findAndCountAll({
+            where:{
+                [Op.and]: [{ id_doctor: idDoctor }, { status:3 }]
+            },
+            attributes:[
+                'id_patient',
+                [Sequelize.fn('COUNT',Sequelize.col('Appointment.id')),'visitCount']
+            ],
+            include:[
+                {
+                    model:db.User,
+                    as:'user',
+                    attributes:['firstName','lastName','address','phone']
+                }
+            ],
+            group:['id_patient'],
+            order: [['createdAt', 'DESC']],
+            offset: (page - 1) * limit,
+            limit: limit,
+            subQuery: false,
+            
+        })
+
+        if (rows.length === 0) {
+            return {
+                err: 0,
+                message: "No patients found for this doctor.",
+                data: [],
+                page: 1,
+                totalPage: 0,
+            }
+        }
+
+        return {
+            err: 0,
+            message: "Get patients of doctor success !",
+            data: rows,
+            page: page,
+            totalPage: Math.ceil(count.length / limit),
+            totalData: count.length
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getPatientOfDoctor :", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
 export {
     getInfoToMakeAppointment, createAppointment, getAppointmentOfUser,
-    updateStatusAppointment, getAppointmentOfDoctor
+    updateStatusAppointment, getAppointmentOfDoctor,getPatientOfDoctor
 }

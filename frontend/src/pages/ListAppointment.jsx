@@ -71,7 +71,7 @@ function ListAppointmenT() {
             Swal.fire({
                 title: "Bạn chắc muốn hủy lịch khám ?",
                 showDenyButton: true,
-                confirmButtonText: "Hủy",
+                confirmButtonText: "OK",
                 denyButtonText: "Thoát"
             }).then(async (result) => {
                 if (result.isConfirmed) {
@@ -131,7 +131,7 @@ function ListAppointmenT() {
                                     {status === 2 &&
                                         <span className="text-blue-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-blue-500 w-fit mt-5 ml-32" >
                                             <FaCheck />
-                                            <label className="text-sm">Xác nhận</label>
+                                            <label className="text-sm">Chờ khám</label>
                                         </span>
                                     }
                                     {status === 3 &&

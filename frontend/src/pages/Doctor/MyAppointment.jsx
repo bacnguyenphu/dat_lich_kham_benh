@@ -5,15 +5,18 @@ import { IoIosSearch } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
 import { useSelector } from "react-redux";
 import Pagination from "../../components/Pagination";
-import { getAppointmentOfDoctor } from "../../services/appointment";
+import { getAppointmentOfDoctor, updateStatusAppointment } from "../../services/appointment";
 
 import dayjs from 'dayjs';
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 import { GiSandsOfTime } from "react-icons/gi";
 import { FaRegCheckCircle, FaRegTrashAlt } from "react-icons/fa";
 import { PiWarningCircleLight } from "react-icons/pi";
+import { MdCheckBox } from "react-icons/md";
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 dayjs.locale('vi')
 
 function MyAppointment() {
@@ -36,14 +39,15 @@ function MyAppointment() {
     const [value, setValue] = useState('')
     const [debouncedValue, setDebouncedValue] = useState('')
 
-    useEffect(() => {
-        const fetchAppointment = async () => {
-            const res = await getAppointmentOfDoctor(authDoctor?.id, limit, page, value, filter)
-            if (res.err === 0) {
-                setTotalPages(res?.totalPage)
-                setAppointments(res?.data)
-            }
+    const fetchAppointment = async () => {
+        const res = await getAppointmentOfDoctor(authDoctor?.id, limit, page, value, filter)
+        if (res.err === 0) {
+            setTotalPages(res?.totalPage)
+            setAppointments(res?.data)
         }
+    }
+
+    useEffect(() => {
         fetchAppointment()
     }, [page, filter, debouncedValue])
 
@@ -55,7 +59,76 @@ function MyAppointment() {
         return () => clearTimeout(handler);
     }, [value])
 
-    console.log(appointments);
+    const handleUpdateStatusAppointment = async (idAppointmemt, status) => {
+        if (idAppointmemt) {
+            if (status === DA_HUY) {
+                Swal.fire({
+                    title: "Bạn chắc muốn hủy lịch khám ?",
+                    showDenyButton: true,
+                    confirmButtonText: "OK",
+                    denyButtonText: "Thoát"
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const res = await updateStatusAppointment(idAppointmemt, status)
+                        if (res.err === 0) {
+                            toast.success("Hủy thành công !")
+                            await fetchAppointment()
+                        }
+                        else {
+                            Swal.fire({
+                                title: "Hủy lịch hẹn không thành công !",
+                                icon: "error",
+                            });
+                        }
+                    }
+                });
+            }
+            else if (status === 2) {
+                Swal.fire({
+                    title: "Bạn muốn xác nhận lịch khám ?",
+                    showDenyButton: true,
+                    confirmButtonText: "OK",
+                    denyButtonText: "Thoát"
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const res = await updateStatusAppointment(idAppointmemt, status)
+                        if (res.err === 0) {
+                            toast.success("Xác nhận khám thành công !")
+                            await fetchAppointment()
+                        }
+                        else {
+                            Swal.fire({
+                                title: "Xác nhận khám không thành công !",
+                                icon: "error",
+                            });
+                        }
+                    }
+                });
+            }
+            else if (status === 3) {
+                Swal.fire({
+                    title: "Xác nhận khám xong cho bệnh nhân ?",
+                    showDenyButton: true,
+                    confirmButtonText: "OK",
+                    denyButtonText: "Thoát"
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const res = await updateStatusAppointment(idAppointmemt, status)
+                        if (res.err === 0) {
+                            toast.success("Xác nhận khám xong thành công !")
+                            await fetchAppointment()
+                        }
+                        else {
+                            Swal.fire({
+                                title: "Xác nhận khám xong không thành công !",
+                                icon: "error",
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }
 
     return (
         <div>
@@ -121,7 +194,7 @@ function MyAppointment() {
                                                     {appointment?.status === 2 &&
                                                         <span className="text-blue-500 flex items-center justify-center py-1 px-2 rounded-xl gap-2 border border-blue-500 w-fit mt-5" >
                                                             <FaCheck />
-                                                            <label className="text-sm">Xác nhận</label>
+                                                            <label className="text-sm">Chờ khám</label>
                                                         </span>
                                                     }
                                                     {appointment?.status === 3 &&
@@ -152,17 +225,29 @@ function MyAppointment() {
                                         </td>
                                         <td className="p-3">
                                             <div className="flex items-center gap-4">
-                                                <Tippy content="Xem lịch khám">
+                                                {/* <Tippy content="Xem chi tiết">
                                                     <span className="cursor-pointer"><FaRegEye size={"1.25rem"} color="green" /></span>
-                                                </Tippy>
-                                                {(appointment?.status === 1 || appointment?.status === 2) &&
+                                                </Tippy> */}
+                                                {(appointment?.status === 2 && appointment?.status !== 3) &&
                                                     <Tippy content="Xác nhận khám xong">
-                                                        <span className="cursor-pointer"><IoCheckmarkCircleSharp size={"1.25rem"} color="#2ecc71" /></span>
+                                                        <span className="cursor-pointer"
+                                                            onClick={() => { handleUpdateStatusAppointment(appointment.id, DA_XONG) }}>
+                                                            <IoCheckmarkCircleSharp size={"1.25rem"} color="#2ecc71" />
+                                                        </span>
+                                                    </Tippy>
+                                                }
+                                                {(appointment?.status === 1 && appointment?.status !== 2) &&
+                                                    <Tippy content="Xác nhận chờ khám">
+                                                        <span className="cursor-pointer"
+                                                            onClick={() => { handleUpdateStatusAppointment(appointment.id, XAC_NHAN) }}>
+                                                            <MdCheckBox size={"1.25rem"} color="#3498db" />
+                                                        </span>
                                                     </Tippy>
                                                 }
                                                 {(appointment?.status === 1 || appointment?.status === 2) &&
                                                     <Tippy content="Hủy lịch khám">
-                                                        <span>
+                                                        <span className="cursor-pointer"
+                                                            onClick={() => { handleUpdateStatusAppointment(appointment.id, DA_HUY) }}>
                                                             <MdDeleteOutline size={"1.5rem"} color="red" />
                                                         </span>
                                                     </Tippy>
