@@ -1,6 +1,7 @@
 import db from '../models/index'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
+import { Op } from 'sequelize';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
@@ -383,7 +384,7 @@ const updateDoctor = async (data) => {
     }
 }
 
-const getDoctorFollowSpecialty = async (id,limit,page) => {
+const getDoctorFollowSpecialty = async (id, limit, page) => {
     try {
         if (!id) {
             return {
@@ -420,8 +421,8 @@ const getDoctorFollowSpecialty = async (id,limit,page) => {
                     where: { id: id },
                     required: true
                 },
-                { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'avatar', 'address'],required: true },
-                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] },required: true },
+                { model: db.User, as: 'user', attributes: ['firstName', 'lastName', 'avatar', 'address'], required: true },
+                { model: db.Position, as: 'position', attributes: ['name', 'id'], through: { attributes: [] }, required: true },
             ],
             offset: (page - 1) * limit,
             limit: limit,
@@ -446,5 +447,43 @@ const getDoctorFollowSpecialty = async (id,limit,page) => {
     }
 }
 
+const getAppointmentOfUserFollowDoctor = async (idUser, idDoctor) => {
+    try {
+        if (!idDoctor) {
+            return {
+                err: 1,
+                message: 'ID doctor is required'
+            }
+        }
+        if (!idUser) {
+            return {
+                err: 2,
+                message: 'ID user is required'
+            }
+        }
 
-export { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor, getDoctorFollowSpecialty }
+        const data = await db.Appointment.findAll({
+            where:{ [Op.and]: [{ id_patient: idUser }, { id_doctor: idDoctor },{status:3}] },
+            attributes:['appointment_date','time','id']
+        })
+
+        return{
+            err:0,
+            message:"Get appointment of user follow doctor",
+            data:data
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở getAppointmentOfUserFollowDoctor: ", error);
+        return {
+            err: -999,
+            message: `Server error: ${error}`
+        }
+    }
+}
+
+export {
+    createDoctor, getDoctors, getDoctorById,
+    deleteDoctorById, updateDoctor, getDoctorFollowSpecialty,
+    getAppointmentOfUserFollowDoctor
+}

@@ -271,10 +271,10 @@ const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
             attributes: ['id', 'appointment_date', 'time', 'status', 'payment_status'],
             include: [
                 {
-                    model: db.User, 
-                    as: 'user', 
+                    model: db.User,
+                    as: 'user',
                     attributes: ['id', 'firstName', 'lastName', 'phone'],
-                    where:wherePhoneOrName
+                    where: wherePhoneOrName
                 },
             ],
             order: [['createdAt', 'DESC']],
@@ -312,7 +312,7 @@ const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
     }
 }
 
-const getPatientOfDoctor = async(idDoctor,limit=7,page=1)=>{
+const getPatientOfDoctor = async (idDoctor, limit = 7, page = 1, value = null) => {
     try {
         if (!idDoctor) {
             return {
@@ -321,27 +321,33 @@ const getPatientOfDoctor = async(idDoctor,limit=7,page=1)=>{
             }
         }
 
+        let whereUser = {}
+        if (value) {
+            whereUser = { [Op.or]: [{ firstName: value }, { lastName: value }] }
+        }
+
         const { count, rows } = await db.Appointment.findAndCountAll({
-            where:{
-                [Op.and]: [{ id_doctor: idDoctor }, { status:3 }]
+            where: {
+                [Op.and]: [{ id_doctor: idDoctor }, { status: 3 }]
             },
-            attributes:[
+            attributes: [
                 'id_patient',
-                [Sequelize.fn('COUNT',Sequelize.col('Appointment.id')),'visitCount']
+                [Sequelize.fn('COUNT', Sequelize.col('Appointment.id')), 'visitCount']
             ],
-            include:[
+            include: [
                 {
-                    model:db.User,
-                    as:'user',
-                    attributes:['firstName','lastName','address','phone']
+                    model: db.User,
+                    as: 'user',
+                    attributes: ['firstName', 'lastName', 'address', 'phone'],
+                    where: whereUser
                 }
             ],
-            group:['id_patient'],
+            group: ['id_patient'],
             order: [['createdAt', 'DESC']],
             offset: (page - 1) * limit,
             limit: limit,
             subQuery: false,
-            
+
         })
 
         if (rows.length === 0) {
@@ -374,5 +380,5 @@ const getPatientOfDoctor = async(idDoctor,limit=7,page=1)=>{
 
 export {
     getInfoToMakeAppointment, createAppointment, getAppointmentOfUser,
-    updateStatusAppointment, getAppointmentOfDoctor,getPatientOfDoctor
+    updateStatusAppointment, getAppointmentOfDoctor, getPatientOfDoctor
 }

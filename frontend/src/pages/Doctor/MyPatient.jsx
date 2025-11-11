@@ -11,7 +11,8 @@ import { useNavigate } from "react-router-dom";
 
 function MyPatient() {
     const navigate = useNavigate()
-    const [value, setValue] = useState('')
+    const [value, setValue] = useState("")
+    const [debouncedValue, setDebouncedValue] = useState("")
     const [patients, setPatients] = useState([])
     const [totalPages, setTotalPages] = useState(0)
     const limit = 5
@@ -22,18 +23,25 @@ function MyPatient() {
     const authDoctor = useSelector(state => state?.authDoctor?.data)
 
     useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, 500); // chờ 0.5s sau khi ngừng gõ
+
+        return () => clearTimeout(handler);
+    }, [value])
+
+    useEffect(() => {
         const fetchPatients = async () => {
-            const res = await getPatientOfDoctor(authDoctor?.id, limit, 1)
-            console.log("check res:  ", res);
+            const res = await getPatientOfDoctor(authDoctor?.id, limit, 1, debouncedValue.trim())
             if (res.err === 0) {
                 setPatients(res?.data)
                 setTotalPages(res?.totalPage)
             }
         }
         fetchPatients()
-    }, [page])
+    }, [page, debouncedValue])
 
-    const handleShowAppointmentOfPatient = async(id_patient)=>{
+    const handleShowAppointmentOfPatient = async (id_patient) => {
         navigate(`?id_patient=${id_patient}`)
         setIsShow(true)
     }
@@ -49,6 +57,7 @@ function MyPatient() {
                     </div>
                 </div>
                 <div className="mt-5">
+                    {patients.length>0?
                     <table className="w-full text-left table-auto min-w-max">
                         <thead>
                             <tr className="border-b border-slate-300 bg-slate-50">
@@ -82,7 +91,7 @@ function MyPatient() {
                                                 <p className="text-slate-500 flex">
                                                     <Tippy content="Xem chi tiết">
                                                         <span className="cursor-pointer"
-                                                            onClick={() => {handleShowAppointmentOfPatient(patient?.id_patient)}}
+                                                            onClick={() => { handleShowAppointmentOfPatient(patient?.id_patient) }}
                                                         >
                                                             <FaRegEye size={"1.25rem"} color="green" />
                                                         </span>
@@ -95,6 +104,12 @@ function MyPatient() {
                             }
                         </tbody>
                     </table>
+                    :
+                    <div className="font-semibold">
+                        Không có bệnh nhân nào !
+                    </div>
+                }
+                    
                 </div>
                 {patients.length > 5 &&
                     <div>
@@ -102,7 +117,7 @@ function MyPatient() {
                     </div>
                 }
             </div>
-            {isShow && <AppointmentsOfPatient setIsShow={setIsShow}/>}
+            {isShow && <AppointmentsOfPatient setIsShow={setIsShow} />}
         </>
 
     );

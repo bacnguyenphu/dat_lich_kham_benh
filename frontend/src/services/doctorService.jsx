@@ -24,11 +24,16 @@ const getDoctorFollowSpecialty = (id, limit, page) => {
     return axios.get("get-doctor-follow-specialty", { params: { id, limit, page } })
 }
 
-const getPatientOfDoctor = (idDoctor, limit, page) => {
-    return axios.get("get-patient-of-doctor", { params: { idDoctor, limit, page } })
+const getPatientOfDoctor = (idDoctor, limit, page, value) => {
+    return axios.get("get-patient-of-doctor", { params: { idDoctor, limit, page, value } })
+}
+
+const getAppointmentOfUserFollowDoctor = (idUser, idDoctor) => {
+    return axios.get('get-appointment-of-user-follow-doctor', { params: { idDoctor, idUser } })
 }
 
 export {
     createDoctor, getDoctors, getDoctorById, deleteDoctorById,
-    updateDoctor, getDoctorFollowSpecialty, getPatientOfDoctor
+    updateDoctor, getDoctorFollowSpecialty, getPatientOfDoctor,
+    getAppointmentOfUserFollowDoctor
 }

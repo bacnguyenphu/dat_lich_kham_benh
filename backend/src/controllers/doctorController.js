@@ -1,6 +1,6 @@
 import { getPatientOfDoctor } from "../services/appointmentService";
 
-const { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor, getDoctorFollowSpecialty } = require("../services/doctorService");
+const { createDoctor, getDoctors, getDoctorById, deleteDoctorById, updateDoctor, getDoctorFollowSpecialty, getAppointmentOfUserFollowDoctor } = require("../services/doctorService");
 
 const handleCreateDoctor = async (req, res) => {
     try {
@@ -75,15 +75,28 @@ const handleGetPatientOfDoctor = async(req,res)=>{
         const idDoctor = req.query.idDoctor
         const limit = req.query.limit
         const page = req.query.page
+        const value = req.query.value
 
-        const message = await getPatientOfDoctor(idDoctor,+limit,+page)
+        const message = await getPatientOfDoctor(idDoctor,+limit,+page,value)
         return res.status(200).json(message)
     } catch (error) {
         console.log("Lỗi ở handleGetPatientOfDoctor: ",error);
     }
 }
 
+const handleGetAppointmentOfUserFollowDoctor = async(req,res)=>{
+    try {
+        const idDoctor = req.query.idDoctor
+        const idUser = req.query.idUser
+
+        const message = await getAppointmentOfUserFollowDoctor(idUser,idDoctor)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handleGetAppointmentOfUserFollowDoctor: ",error);
+    }
+}
+
 export { handleCreateDoctor, handleGetDoctors, handleGetDoctorById, 
     handleDeleteDoctorById, handleUpdateDoctor,handleGetDoctorFollowSpecialty, 
-    handleGetPatientOfDoctor
+    handleGetPatientOfDoctor,handleGetAppointmentOfUserFollowDoctor
 }

@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { getScheduleFollowDate } from "../services/scheduleService";
-import dayjs from 'dayjs';
-import 'dayjs/locale/vi';
 import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 import { useNavigate } from "react-router-dom";
 import { LOGIN, MAKE_APPOINTMENT } from "../utils/path";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
 dayjs.locale('vi')
 
 function Schedules({ idDoctor, idMedicalPackage }) {
