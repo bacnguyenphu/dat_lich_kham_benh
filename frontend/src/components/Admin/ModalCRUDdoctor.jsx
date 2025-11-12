@@ -11,8 +11,6 @@ import { createDoctor, deleteDoctorById, getDoctorById, updateDoctor } from "../
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Validation } from "../../utils/validation";
-import { getScheduleOfDoctor } from "../../services/scheduleService";
-import dayjs from "dayjs";
 
 function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
@@ -20,7 +18,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     const [specialties, setSpecialties] = useState([])
     const [errors, setErrors] = useState({})
     const [isLoading, setIsLoading] = useState(false)
-    const [scheduleOfDoctor, setScheduleOfDoctor] = useState([])
+    // const [scheduleOfDoctor, setScheduleOfDoctor] = useState([])
 
     const [payload, setPayload] = useState({
         firstName: "",
@@ -67,7 +65,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
     }, [])
 
     useEffect(() => {
-        if (type !== "ADD") {
+        if (idDoctor) {
             if (postions.length > 0 && specialties.length > 0) {
                 const fetchDataDoctor = async () => {
                     const res = await getDoctorById(idDoctor)
@@ -97,17 +95,17 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
     }, [postions, specialties])
 
-    useEffect(() => {
-        if (type === "VIEW" && idDoctor) {
-            const fetchScheduleOfDoctor = async () => {
-                const res = await getScheduleOfDoctor(idDoctor)
-                if (res.err === 0) {
-                    setScheduleOfDoctor(res.data)
-                }
-            }
-            fetchScheduleOfDoctor()
-        }
-    }, [idDoctor])
+    // useEffect(() => {
+    //     if (type === "VIEW" && idDoctor) {
+    //         const fetchScheduleOfDoctor = async () => {
+    //             const res = await getScheduleOfDoctor(idDoctor)
+    //             if (res.err === 0) {
+    //                 setScheduleOfDoctor(res.data)
+    //             }
+    //         }
+    //         fetchScheduleOfDoctor()
+    //     }
+    // }, [idDoctor])
 
     const handleCheckbox = (e, type) => {
         const value = e.target.value
@@ -171,7 +169,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
 
     const handleClickUpdate = async () => {
         // eslint-disable-next-line no-unused-vars
-        const {password,...other} = payload
+        const { password, ...other } = payload
         if (Validation(other, setErrors)) {
             setIsLoading(true)
             let linkImg = payload?.linkImg
@@ -275,9 +273,11 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                     onChange={(e) => { setPayload({ ...payload, email: e.target.value }) }} />
                                 {errors.email && <small className="text-red-500 absolute -bottom-5">{errors.email}</small>}
                             </div>
-                            <div className={`w-1/2 mt-4 flex flex-col relative ${type!=="ADD"?'opacity-60 cursor-not-allowed':''}`}>
-                                <label>Mật khẩu<span className="text-red-500">*</span></label>
-                                <input disabled={type === "VIEW" ||type==="UPDATE"} type="password" className="border border-gray-500 rounded-md p-1"
+                            <div className={`w-1/2 mt-4 flex flex-col relative ${type !== "ADD" ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                {(type !== "VIEW" && type !== "UPDATE") &&
+                                    <label>Mật khẩu<span className="text-red-500">*</span></label>
+                                }
+                                <input hidden={type === "VIEW" || type === "UPDATE"} type="password" className="border border-gray-500 rounded-md p-1"
                                     onChange={(e) => { setPayload({ ...payload, password: e.target.value }) }} />
                                 {errors.password && <small className="text-red-500 absolute -bottom-5">{errors.password}</small>}
                             </div>
@@ -310,7 +310,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                             </div>
                             {errors.price && <small className="text-red-500 absolute -bottom-5">{errors.price}</small>}
                         </div>
-                        {type === "VIEW" &&
+                        {/* {type === "VIEW" &&
                             <div className="mt-4 flex flex-col">
                                 <label className="font-semibold">Lịch khám</label>
                                 <div className="mt-4 flex flex-col gap-5">
@@ -336,7 +336,7 @@ function ModalCRUDdoctor({ type, setIsShowModal, fectDoctors }) {
                                     }
                                 </div>
                             </div>
-                        }
+                        } */}
                         <div className="mt-8 flex flex-col ">
                             <p className="font-semibold">Chức vụ<span className="text-red-500 font-medium">*</span></p>
                             <div className="grid grid-cols-5 gap-x-6 gap-y-3">

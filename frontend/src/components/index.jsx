@@ -7,3 +7,4 @@ export { default as ListMedicalPackgeFollowCategory } from './ListMedicalPackgeF
 export { default as UserDropdown } from './UserDropdown'
 export { default as Pagination } from './Pagination'
 export { default as InfoAppointment } from './InfoAppointment'
+export { default as FormInfoDoctor } from './FormInfoDoctor'
