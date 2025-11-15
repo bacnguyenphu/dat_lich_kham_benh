@@ -3,12 +3,14 @@ import { useState } from "react";
 import { getTimeFrames } from "../../services/timeFrameService";
 import _ from 'lodash'
 import Select from 'react-select';
-import { getDoctors } from "../../services/doctorService";
+import { getDoctorById, getDoctors } from "../../services/doctorService";
 import { createOrUpdateSchedule } from "../../services/scheduleService";
 import { getScheduleFollowDate } from "../../services/scheduleService";
 import { toast } from "react-toastify";
 import { getMedicalPackage } from "../../services/medicalPackageService";
+import { useSelector } from 'react-redux'
 
+// type có 3 loại DOCTOR, MEDICAL_PACKAGE, DOCTOR_ONLY=> cái DOCTOR_ONLY mình dành cho trang quản lý của riêng bác sĩ 
 function MedicalExaminationPlan({ type }) {
 
     const [timeFrames, setTimeFrames] = useState([])
@@ -16,8 +18,10 @@ function MedicalExaminationPlan({ type }) {
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
 
-    const classNormal = "px-12 py-2.5 border rounded-lg text-center cursor-pointer"
-    const classActive = "px-12 py-2.5 border font-semibold text-white bg-primary-100 rounded-lg text-center cursor-pointer"
+    const classNormal = "px-10 py-2.5 border rounded-lg text-center cursor-pointer"
+    const classActive = "px-10 py-2.5 border font-semibold text-white bg-primary-100 rounded-lg text-center cursor-pointer"
+
+    const idDoctor = useSelector(state => state?.authDoctor?.data?.id) // dành cho trang quản lý của riêng bác sĩ 
 
     useEffect(() => {
         const fetchTimeFrames = async () => {
@@ -52,9 +56,7 @@ function MedicalExaminationPlan({ type }) {
                     setListItems(temp)
                 }
             }
-            if (timeFrames.length > 0) {
-                fetchDoctors()
-            }
+            fetchDoctors()
         }
 
         if (type === "MEDICAL_PACKAGE") {
@@ -70,13 +72,24 @@ function MedicalExaminationPlan({ type }) {
                     setListItems(temp)
                 }
             }
-            if (timeFrames.length > 0) {
-                fetchMedicalPackage()
-            }
+            fetchMedicalPackage()
         }
 
-    }, [timeFrames, type])
+        if (type === "DOCTOR_ONLY" && idDoctor) {
+            const fetchDoctor = async () => {
+                const item = await getDoctorById(idDoctor)
+                let temp = [{
+                    value: item?.data?.id,
+                    label: `${item?.data?.user?.firstName} ${item?.data?.user?.lastName} - Chuyên khoa: ${item?.data?.specialty.map(spe => spe?.name)}`
+                }]
+                setListItems(temp)
+            }
+            fetchDoctor()
+        }
 
+    }, [type])
+
+    // cái này để load các timeFrame được select
     useEffect(() => {
         if (selectedItem != null) {
             const tses = {
@@ -88,7 +101,7 @@ function MedicalExaminationPlan({ type }) {
 
             const fetchScheduleFollowDate = async () => {
                 const res = await getScheduleFollowDate({
-                    [type === "DOCTOR" ? "id_doctor" : "idMedicalPackage"]: selectedItem.value,
+                    [type === "MEDICAL_PACKAGE" ? "idMedicalPackage" : "id_doctor"]: selectedItem.value,
                     appointment_date: selectedDate
                 })
                 // console.log('check res:   ', res);
@@ -146,12 +159,13 @@ function MedicalExaminationPlan({ type }) {
     }
 
     return (
-        <div className="mt-10 w-6xl mx-auto shadow-item px-4 pb-5">
-            {type === "DOCTOR" && <h3 className="font-semibold text-2xl text-center text-[#0106B4] border-b border-gray-400 py-5">Kế Hoạch Khám Bệnh Của Bác Sĩ</h3>}
+        <div className="mt-10 w-5xl mx-auto shadow-item px-4 pb-5">
+            {(type === "DOCTOR" || type === "DOCTOR_ONLY") && <h3 className="font-semibold text-2xl text-center text-[#0106B4] border-b border-gray-400 py-5">Kế Hoạch Khám Bệnh Của Bác Sĩ</h3>}
             {type === "MEDICAL_PACKAGE" && <h3 className="font-semibold text-2xl text-center text-[#0106B4] border-b border-gray-400 py-5">Kế Hoạch Khám Bệnh Của Gói Khám</h3>}
             <div className="mt-10 flex items-center gap-5">
                 <div className="w-9/12">
-                    <p className="mb-1">Tên gói khám và danh mục <span className="text-red-500">*</span></p>
+                    {type === "MEDICAL_PACKAGE" && <p className="mb-1">Tên gói khám và danh mục <span className="text-red-500">*</span></p>}
+                    {(type === "DOCTOR" || type === "DOCTOR_ONLY") && <p className="mb-1">Tên bác sĩ và chuyên khoa <span className="text-red-500">*</span></p>}
                     <Select
                         defaultValue={selectedItem}
                         onChange={setSelectedItem}

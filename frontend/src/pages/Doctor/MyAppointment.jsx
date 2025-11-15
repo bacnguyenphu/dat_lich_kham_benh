@@ -132,7 +132,7 @@ function MyAppointment() {
 
     return (
         <div>
-            <h3 className="text-xl">Lịch khám của bác sĩ <span className="text-blue-800">Nguyễn Phú Bắc</span></h3>
+            <h3 className="text-xl">Lịch khám của bác sĩ <span className="text-blue-800">{authDoctor?.firstName} {authDoctor?.lastName}</span></h3>
             <div className="flex gap-7 items-center mt-5">
                 <div className="flex items-center border border-gray-400 rounded-md grow overflow-hidden">
                     <input className="grow outline-none px-1" placeholder="Tìm kiếm bệnh nhân theo tên hoặc số điện thoại "

@@ -75,13 +75,14 @@ const handleLogout = async (req, res) => {
     }
 }
 
-const handleCheckAdmin = async (req, res) => {
+const handleCheckAdmin = async (req, res,next) => {
     try {
         if (req?.user?.role === "R1") {
-            return res.status(200).json({
-                err: 0,
-                message: "You are admin"
-            })
+            next()
+            // return res.status(200).json({
+            //     err: 0,
+            //     message: "You are admin"
+            // })
         }
         else {
             return res.status(403).json({

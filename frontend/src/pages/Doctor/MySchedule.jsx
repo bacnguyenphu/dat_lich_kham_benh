@@ -1,7 +1,9 @@
+import { MedicalExaminationPlan } from "../../components/Admin";
+
 function MySchedule() {
     return ( 
         <div>
-            My schedule
+            <MedicalExaminationPlan type={"DOCTOR_ONLY"}/>
         </div>
      );
 }
