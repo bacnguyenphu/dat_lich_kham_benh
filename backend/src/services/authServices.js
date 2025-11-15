@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
 import { randomString } from '../utils/randomString';
 import { createJWT, createRefreshToken } from '../middleware/JWTaction';
-import { where } from 'sequelize';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
