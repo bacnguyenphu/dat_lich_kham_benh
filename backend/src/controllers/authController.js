@@ -1,5 +1,5 @@
 import { createJWT, createRefreshToken } from '../middleware/JWTaction'
-import { register, login, loginDoctor } from '../services/authServices'
+import { register, login, loginDoctor, changePasswordDoctor } from '../services/authServices'
 import jwt from 'jsonwebtoken'
 require('dotenv').config()
 
@@ -75,7 +75,7 @@ const handleLogout = async (req, res) => {
     }
 }
 
-const handleCheckAdmin = async (req, res,next) => {
+const handleCheckAdmin = async (req, res, next) => {
     try {
         if (req?.user?.role === "R1") {
             next()
@@ -121,5 +121,18 @@ const handleLoginDoctor = async (req, res) => {
     }
 }
 
+const handleChangePasswordDoctor = async (req, res) => {
+    try {
+        const { idDoctor, oldPassword, newPassword } = req.body
+        const message = await changePasswordDoctor(idDoctor, oldPassword, newPassword)
+        return res.status(200).json(message)
+    } catch (error) {
+        console.log("Lỗi ở handleChangePasswordDoctor", error);
+    }
+}
 
-export { handleRegister, handleLogin, requestRefreshToken, handleLogout, handleCheckAdmin, handleLoginDoctor }
+
+export {
+    handleRegister, handleLogin, requestRefreshToken, handleLogout,
+    handleCheckAdmin, handleLoginDoctor, handleChangePasswordDoctor
+}

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-import { handleLogin, handleLogout, handleRegister, handleCheckAdmin, requestRefreshToken, handleLoginDoctor } from '../controllers/authController'
+import { handleLogin, handleLogout, handleRegister, handleCheckAdmin, requestRefreshToken, handleLoginDoctor, handleChangePasswordDoctor } from '../controllers/authController'
 import { checkUserJWT } from '../middleware/JWTaction'
 
 router.post('/register', handleRegister)
@@ -18,5 +18,6 @@ router.get("/navigate-admin", checkUserJWT, handleCheckAdmin,
 )
 
 router.post("/login-doctor", handleLoginDoctor)
+router.post("/change-password-doctor",handleChangePasswordDoctor)
 
 export default router

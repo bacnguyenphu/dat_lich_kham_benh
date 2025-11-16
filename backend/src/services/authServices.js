@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
 import { randomString } from '../utils/randomString';
 import { createJWT, createRefreshToken } from '../middleware/JWTaction';
+import { where } from 'sequelize';
 
 const hashPass = (password) => {
     return bcrypt.hashSync(password, 12);
@@ -142,7 +143,7 @@ const loginDoctor = async (data) => {
             }
         }
         // console.log("check user>>>>",user.dataValues);
-        
+
         if (user.dataValues?.role !== "R2") {
             return {
                 err: -4,
@@ -157,13 +158,13 @@ const loginDoctor = async (data) => {
             }
         }
 
-        const doctor =await db.Doctor.findOne({
-            where:{id_user:user.dataValues.id},
-            attributes:['id']
+        const doctor = await db.Doctor.findOne({
+            where: { id_user: user.dataValues.id },
+            attributes: ['id']
         })
-        
+
         let { password, ...other } = user.dataValues
-        if(doctor){
+        if (doctor) {
             other.id = doctor.dataValues.id
         }
         const token = createJWT(other)
@@ -177,7 +178,6 @@ const loginDoctor = async (data) => {
         }
     } catch (error) {
         console.log("Lỗi ở loginDoctor : ", error);
-
         return {
             err: -999,
             message: `Error server: ${error}`
@@ -185,4 +185,81 @@ const loginDoctor = async (data) => {
     }
 }
 
-export { register, login, loginDoctor }
+const changePasswordDoctor = async (idDoctor, oldPassword, newPassword) => {
+    try {
+        if (!idDoctor) {
+            return {
+                err: 1,
+                message: `Id doctor is required`
+            }
+        }
+
+        if (!oldPassword) {
+            return {
+                err: 2,
+                message: `Old password is required`
+            }
+        }
+
+        if (!newPassword) {
+            return {
+                err: 3,
+                message: `New password is required`
+            }
+        }
+
+        const doctor = await db.Doctor.findOne({
+            where: { id: idDoctor },
+            attributes: ["id_user"]
+        })
+
+        if (!doctor) {
+            return {
+                err: 4,
+                message: `Doctor is not exist`
+            }
+        }
+
+        const user = await db.User.findOne({
+            where: { id: doctor?.id_user },
+            attributes: ['password']
+        })
+
+        if (!user) {
+            return {
+                err: 5,
+                message: `Account is not exist`
+            }
+        }
+
+        if (!checkPass(oldPassword, user.password)) {
+            return {
+                err: 6,
+                message: "Password is not correct !"
+            }
+        }
+
+        await db.User.update(
+            {
+                password:hashPass(newPassword)
+            },
+            {
+                where: { id: doctor?.id_user },
+            },
+        )
+
+        return{
+            err:0,
+            message:"Change password doctor success !"
+        }
+
+    } catch (error) {
+        console.log("Lỗi ở changePasswordDoctor : ", error);
+        return {
+            err: -999,
+            message: `Error server: ${error}`
+        }
+    }
+}
+
+export { register, login, loginDoctor, changePasswordDoctor }

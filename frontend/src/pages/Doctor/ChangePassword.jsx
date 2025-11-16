@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IoMdSave } from "react-icons/io";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import { changePasswordDoctor } from "../../services/authService";
 
 function ChangePassword() {
 
@@ -12,17 +13,43 @@ function ChangePassword() {
     const handleSubmit = async () => {
         if (!oldPassword.trim() || !newPassword.trim()) {
             Swal.fire({
-                title:"Bạn cần nhập đủ dữ liệu !",
-                icon:'warning'
+                title: "Bạn cần nhập đủ dữ liệu !",
+                icon: 'warning'
             })
         } else {
             Swal.fire({
                 title: "Bạn có muốn đổi mật khẩu ?",
                 showDenyButton: true,
-                confirmButtonText: "Đăng xuất",
+                confirmButtonText: "Đổi mật khẩu",
                 denyButtonText: "Thoát"
             }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const res = await changePasswordDoctor({
+                        idDoctor: authDoctor.id,
+                        oldPassword,
+                        newPassword
+                    })
 
+                    if(res.err===6){
+                        Swal.fire({
+                            title:'Mật khẩu không chính xác',
+                            icon:'error'
+                        })
+                    }
+                    else if(res.err===0){
+                        Swal.fire({
+                            title:'Đổi mật khẩu thành công',
+                            icon:'success'
+                        })
+                    }
+                    else{
+                        Swal.fire({
+                            title:'Có lỗi xảy ra không thể đổi mật khẩu!',
+                            icon:'error'
+                        })
+                    }
+                    
+                }
             });
         }
 

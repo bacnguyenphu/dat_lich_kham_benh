@@ -20,4 +20,11 @@ const loginDoctor = (data) => {
     return axios.post('login-doctor', data)
 }
 
-export { login, register, logout, requestNavigateAdmin, loginDoctor }
+const changePasswordDoctor = (data) => {
+    return axios.post('change-password-doctor', data)
+}
+
+export {
+    login, register, logout, requestNavigateAdmin,
+    loginDoctor, changePasswordDoctor
+}
