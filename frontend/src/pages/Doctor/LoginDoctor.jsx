@@ -47,7 +47,7 @@ function LoginDoctor() {
         else {
             Swal.fire({
                 title: "Đăng nhập thất bại",
-                text: res.payload?.error,
+                text: res.payload?.message,
                 icon: "error"
             })
         }

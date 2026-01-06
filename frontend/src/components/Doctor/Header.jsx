@@ -1,5 +1,5 @@
 import logo from '../../assets/logo.png'
-import{useSelector} from 'react-redux'
+import { useSelector } from 'react-redux'
 
 function Header() {
 

@@ -22,7 +22,6 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (data, { rejec
 export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
     try {
         const res = await logout()
-        console.log('chekc res lgout: ', res);
 
         if (res.err === 0) {
             return {

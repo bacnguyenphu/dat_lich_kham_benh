@@ -97,8 +97,6 @@ function MedicalExaminationPlan({ type }) {
                 appointment_date: selectedDate
             }
 
-            console.log(tses);
-
             const fetchScheduleFollowDate = async () => {
                 const res = await getScheduleFollowDate({
                     [type === "MEDICAL_PACKAGE" ? "idMedicalPackage" : "id_doctor"]: selectedItem.value,
@@ -142,7 +140,7 @@ function MedicalExaminationPlan({ type }) {
     const handleClickSave = async () => {
         if (selectedDate && selectedItem && timeFrames.length > 0) {
             let payload = {
-                [type === "DOCTOR" ? "idDoctor" : "idMedicalPackage"]: selectedItem.value,
+                [type === "MEDICAL_PACKAGE" ? "idMedicalPackage" : "idDoctor"]: selectedItem.value,
                 appointment_date: selectedDate,
                 time_frame: timeFrames.filter(item => item.selected === true).map(item => item.id)
             }

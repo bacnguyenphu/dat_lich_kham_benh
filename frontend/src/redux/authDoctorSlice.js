@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginDoctor } from '../services/authService';
+import { loginDoctor, logout } from '../services/authService';
 
 export const loginDoctorRedux = createAsyncThunk('authDoctor/loginDoctorRedux', async (data, { rejectWithValue }) => {
     try {
@@ -20,6 +20,24 @@ export const loginDoctorRedux = createAsyncThunk('authDoctor/loginDoctorRedux', 
         }
     } catch (error) {
         return rejectWithValue(error.response?.data || 'Login failed');
+    }
+})
+
+export const logoutDoctor = createAsyncThunk('auth/logoutDoctor', async () => {
+    try {
+        const res = await logout()
+
+        if (res.err === 0) {
+            return {
+                data: null,
+                token: null,
+                loading: false,
+                error: res.err,
+                message: ''
+            }
+        }
+    } catch (error) {
+        console.log(error.response?.data || 'Logout failed');
     }
 })
 
@@ -53,6 +71,24 @@ const authDoctorSlice = createSlice({
                 state.error = action.error;
                 state.message = action.payload?.message;
                 state.token = null;
+            })
+
+            //logout doctor
+            .addCase(logoutDoctor.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(logoutDoctor.fulfilled, (state, action) => {
+                state.error = action.error;
+                state.loading = false;
+                state.data = action.payload?.data;
+                state.message = action.payload?.message;
+                state.token = action.payload?.token;
+            })
+            .addCase(logoutDoctor.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
+                state.message = action.payload?.message;
             })
     },
 })

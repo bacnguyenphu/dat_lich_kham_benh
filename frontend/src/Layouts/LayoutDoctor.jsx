@@ -2,19 +2,19 @@ import { Outlet } from "react-router-dom";
 import { Header, SideBar } from "../components/Doctor";
 
 function LayoutDoctor() {
-    return ( 
+    return (
         <div>
-            <Header/>
-            <div className="px-20 flex mt-4 gap-20">
-                <div className="w-3/12">
-                    <SideBar/>
+            <Header />
+            <div className="px-20 flex mt-4 gap-10">
+                <div className="w-3/12 shrink-0">
+                    <SideBar />
                 </div>
                 <div className="w-9/12">
-                    <Outlet/>
+                    <Outlet />
                 </div>
             </div>
         </div>
-     );
+    );
 }
 
 export default LayoutDoctor;

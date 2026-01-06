@@ -34,6 +34,7 @@ import {
   ChangePassword, LoginDoctor, MyAppointment,
   MyInformation, MyPatient, MySchedule
 } from './pages/Doctor'
+import DoctorRoute from './routes/DoctorRoute'
 
 function App() {
 
@@ -78,7 +79,7 @@ function App() {
         </Route>
 
         <Route path={LOGIN_DOCTOR} element={<LoginDoctor />} />
-        <Route path={DOCTOR} element={<LayoutDoctor />}>
+        <Route path={DOCTOR} element={<DoctorRoute><LayoutDoctor /></DoctorRoute>}>
           <Route path={MY_APPOINTMENT} element={<MyAppointment />} />
           <Route path={MY_PATIENT} element={<MyPatient />} />
           <Route path={MY_INFORMATION} element={<MyInformation />} />
