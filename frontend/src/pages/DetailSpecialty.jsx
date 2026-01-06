@@ -8,6 +8,7 @@ import { getDoctorFollowSpecialty } from "../services/doctorService";
 import defaultAvatar from '../assets/defaultAvatar.png'
 import { GiPositionMarker } from "react-icons/gi";
 import { Pagination, Schedules } from "../components";
+import { scrollToTop } from "../utils/scrollToTop";
 
 function DetailSpecialty() {
 
@@ -45,12 +46,8 @@ function DetailSpecialty() {
         }
 
         fetchData()
-
+        scrollToTop()
     }, [page])
-
-    useEffect(() => {
-
-    }, [])
 
     return (
         <>
@@ -82,7 +79,7 @@ function DetailSpecialty() {
                                 return (
                                     <div key={doctor.id} className="bg-white rounded-xl shadow-item flex gap-10 px-3 py-7 mt-5">
                                         <div className="w-1/2 flex gap-7">
-                                            <div className="cursor-pointer" onClick={() => { naviagte(`${DOCTORS}/chi-tiet/${doctor.id}`) }}>
+                                            <div className="cursor-pointer" onClick={() => { naviagte(`/${DOCTORS}/chi-tiet/${doctor.id}`) }}>
                                                 <div className="rounded-full size-20 overflow-hidden">
                                                     <img className="object-center object-cover size-full" src={(doctor?.user?.avatar) ? doctor?.user?.avatar : defaultAvatar} />
                                                 </div>
@@ -91,7 +88,7 @@ function DetailSpecialty() {
                                             <div>
                                                 <div className="flex">
                                                     <div className="flex items-center gap-2 text-primary-50 text-lg font-semibold cursor-pointer"
-                                                        onClick={() => { naviagte(`${DOCTORS}/chi-tiet/${doctor.id}`) }}
+                                                        onClick={() => { naviagte(`/${DOCTORS}/chi-tiet/${doctor.id}`) }}
                                                     >
                                                         {doctor?.position.map((item, index) => {
                                                             return (

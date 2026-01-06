@@ -6,6 +6,7 @@ import { getDoctorById } from "../services/doctorService";
 import { GiPositionMarker } from "react-icons/gi";
 import defaultAvatar from '../assets/defaultAvatar.png'
 import Schedules from "../components/Schedules";
+import { scrollToTop } from "../utils/scrollToTop";
 
 
 function DetailDoctor() {
@@ -23,6 +24,7 @@ function DetailDoctor() {
             }
         }
         fetchDoctor()
+        scrollToTop()
     }, [idDoctor])
 
     return (

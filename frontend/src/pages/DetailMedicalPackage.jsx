@@ -5,6 +5,7 @@ import { GoHome } from "react-icons/go";
 import { HOMEPAGE, MEDICAL_PACKAGE } from "../utils/path";
 import defaultAvatar from '../assets/default_image.webp'
 import Schedules from "../components/Schedules";
+import { scrollToTop } from "../utils/scrollToTop";
 
 function DetailMedicalPackage() {
     const [medicalPackage, setMedicalPackage] = useState(null)
@@ -20,6 +21,7 @@ function DetailMedicalPackage() {
             }
         }
         fetchMedicalPackage()
+        scrollToTop()
     }, [id])
 
     return (
