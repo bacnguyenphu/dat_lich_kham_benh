@@ -41,8 +41,17 @@ instance.interceptors.response.use(function (response) {
       confirmButtonText: "OK",
     });
 
+    const persistedAuth = localStorage.getItem('persist:authUser');
+    const parsed = JSON.parse(persistedAuth);
+    const data = JSON.parse(parsed.data);
+    const roleUser = data?.role
     // Chỉ chạy sau khi người dùng bấm OK
-    window.location.href = "/login";
+    if (roleUser === "R3") {
+      window.location.href = "/login";
+    }
+    else if (roleUser === "R2") {
+      window.location.href = "/doctor-login";
+    }
     localStorage.removeItem("persist:authUser");
   }
   return Promise.reject(error);

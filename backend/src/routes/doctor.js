@@ -5,17 +5,17 @@ import {
     handleUpdateDoctor
 } from '../controllers/doctorController'
 import { checkUserJWT } from '../middleware/JWTaction'
+import { CREATE_DOCTOR, DELETE_DOCTORS_BY_ID, GET_APPOINTMENT_OF_USER_FOLLOW_DOCTOR, GET_DOCTOR_FOLLOW_SPECIALTY, GET_DOCTORS, GET_DOCTORS_BY_ID, GET_PATIENT_OF_DOCTOR, UPDATE_DOCTOR } from '../utils/routeUrlApi'
 
 const express = require('express')
 const router = express.Router()
-
-router.post('/create-doctor', checkUserJWT, handleCheckAdmin, handleCreateDoctor)
-router.get('/get-doctors', handleGetDoctors)
-router.get('/get-doctors-by-id', handleGetDoctorById)
-router.delete('/delete-doctor-by-id', checkUserJWT, handleCheckAdmin, handleDeleteDoctorById)
-router.put('/update-doctor', handleUpdateDoctor)
-router.get('/get-doctor-follow-specialty', handleGetDoctorFollowSpecialty)
-router.get('/get-patient-of-doctor', handleGetPatientOfDoctor)
-router.get('/get-appointment-of-user-follow-doctor',handleGetAppointmentOfUserFollowDoctor)
+router.post(CREATE_DOCTOR, checkUserJWT, handleCheckAdmin, handleCreateDoctor)
+router.get(GET_DOCTORS, handleGetDoctors)
+router.get(GET_DOCTORS_BY_ID, handleGetDoctorById)
+router.delete(DELETE_DOCTORS_BY_ID, checkUserJWT, handleCheckAdmin, handleDeleteDoctorById)
+router.put(UPDATE_DOCTOR, handleUpdateDoctor)
+router.get(GET_DOCTOR_FOLLOW_SPECIALTY, handleGetDoctorFollowSpecialty)
+router.get(GET_PATIENT_OF_DOCTOR, handleGetPatientOfDoctor)
+router.get(GET_APPOINTMENT_OF_USER_FOLLOW_DOCTOR, handleGetAppointmentOfUserFollowDoctor)
 
 export default router

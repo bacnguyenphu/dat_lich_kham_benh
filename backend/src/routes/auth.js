@@ -3,12 +3,13 @@ const router = express.Router()
 
 import { handleLogin, handleLogout, handleRegister, handleCheckAdmin, requestRefreshToken, handleLoginDoctor, handleChangePasswordDoctor } from '../controllers/authController'
 import { checkUserJWT } from '../middleware/JWTaction'
+import { CHANGE_PASSWORD_DOCTOR, LOGIN, LOGIN_DOCTOR, LOGOUT, NAVIGATE_ADMIN, REFRESH_TOKEN, REGISTER } from '../utils/routeUrlApi'
 
-router.post('/register', handleRegister)
-router.post('/login', handleLogin)
-router.post("/refresh-token", requestRefreshToken)
-router.post("/logout", handleLogout)
-router.get("/navigate-admin", checkUserJWT, handleCheckAdmin,
+router.post(REGISTER, handleRegister)
+router.post(LOGIN, handleLogin)
+router.post(REFRESH_TOKEN, requestRefreshToken)
+router.post(LOGOUT, handleLogout)
+router.get(NAVIGATE_ADMIN, checkUserJWT, handleCheckAdmin,
     async (req, res) => {
         return res.status(200).json({
             err: 0,
@@ -17,7 +18,7 @@ router.get("/navigate-admin", checkUserJWT, handleCheckAdmin,
     }
 )
 
-router.post("/login-doctor", handleLoginDoctor)
-router.post("/change-password-doctor",handleChangePasswordDoctor)
+router.post(LOGIN_DOCTOR, handleLoginDoctor)
+router.post(CHANGE_PASSWORD_DOCTOR, handleChangePasswordDoctor)
 
 export default router

@@ -44,7 +44,7 @@ const requestRefreshToken = async (req, res) => {
             let { iat, exp, ...data } = decode
             const newAccessToken = createJWT(data)
             const newRefreshToken = createRefreshToken(data)
-            console.log('check decode:  ', data);
+            // console.log('check decode:  ', data);
             res.cookie("refreshToken", newRefreshToken, {
                 httpOnly: true,
                 sameSite: 'none',

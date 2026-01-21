@@ -10,33 +10,33 @@ const authConfig = {
     key: 'authUser',
     storage,
     stateReconciler: hardSet,
-    whitelist: ["token","data"]
+    whitelist: ["token", "data"]
 }
 
-const authDoctorConfig = {
-    key: 'authDoctor',
-    storage,
-    stateReconciler: hardSet,
-    whitelist: ["token","data"]
-}
+// const authDoctorConfig = {
+//     key: 'authDoctor',
+//     storage,
+//     stateReconciler: hardSet,
+//     whitelist: ["token", "data"]
+// }
 
 const specialtyConfig = {
-    key:'specialties',
+    key: 'specialties',
     storage,
-    stateReconciler:hardSet,
-    whitelist:["data"]
+    stateReconciler: hardSet,
+    whitelist: ["data"]
 }
 
 export const store = configureStore({
     reducer: {
         auth: persistReducer(authConfig, authReducer),
-        authDoctor: persistReducer(authDoctorConfig,authDoctorReducer),
-        specialties: persistReducer(specialtyConfig,specialty) 
+        authDoctor: persistReducer(authConfig, authDoctorReducer),
+        specialties: persistReducer(specialtyConfig, specialty)
     },
     middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false, // 👈 tắt check toàn bộ
-    }),
+        getDefaultMiddleware({
+            serializableCheck: false, // 👈 tắt check toàn bộ
+        }),
 })
 
 export const persistor = persistStore(store);
