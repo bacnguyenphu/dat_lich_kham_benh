@@ -1,7 +1,9 @@
+import { SEARCH } from '../utils/routeUrlApi'
+
 const express = require('express')
 const { handleSearch } = require('../controllers/searchController')
 const router = express.Router()
 
-router.get("/search",handleSearch)
+router.get(SEARCH, handleSearch)
 
 export default router
