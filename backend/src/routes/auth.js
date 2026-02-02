@@ -9,7 +9,7 @@ router.post(REGISTER, handleRegister)
 router.post(LOGIN, handleLogin)
 router.post(REFRESH_TOKEN, requestRefreshToken)
 router.post(LOGOUT, handleLogout)
-router.get(NAVIGATE_ADMIN, checkUserJWT, handleCheckAdmin,
+router.get(NAVIGATE_ADMIN, handleCheckAdmin,
     async (req, res) => {
         return res.status(200).json({
             err: 0,

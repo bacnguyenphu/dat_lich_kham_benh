@@ -38,7 +38,7 @@ export const checkUserJWT = (req, res, next) => {
         const decode = verifyJWT(authHeader.split(" ")[1])
         if (decode) {
             req.user = decode
-            next()
+            return next()
         }
         else {
             return res.status(401).json({

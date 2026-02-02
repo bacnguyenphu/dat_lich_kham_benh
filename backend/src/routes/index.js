@@ -10,6 +10,7 @@ import medical_package from './medicalPackage'
 import user from './user'
 import appointment from './appointment'
 import search from './search'
+import { checkUserPermission } from '../middleware/checkPermissions'
 
 const initRoutes = (app) => {
 
@@ -23,6 +24,7 @@ const initRoutes = (app) => {
 
   //   checkUserJWT(req,res,next); // áp dụng kiểm tra token cho các route còn lại
   // });
+  app.use(checkUserPermission)
 
   app.use('/api', auth)
   app.use('/api', specialty)
