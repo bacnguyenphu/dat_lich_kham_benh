@@ -7,7 +7,7 @@ import {
     GET_MEDICAL_PACKAGE_FOLLOW_CATEGORY, GET_PATIENT_OF_DOCTOR, GET_POSITION_BY_ID, GET_POSITIONS, GET_SCHEDULE_FOLLOW_DATE, GET_SCHEDULE_OF_DOCTOR, GET_SPECIALTIES,
     GET_SPECIALTY_BY_ID, GET_TIMEFRAMES, GET_USER_BY_ID, LOGIN, LOGIN_DOCTOR, LOGOUT, REFRESH_TOKEN, REGISTER, SEARCH, UPDATE_STATUS_APPOINTMENT
 } from "../utils/routeUrlApi";
-import { checkUserJWT } from "./JWTaction";
+import { checkUserJWT, verifyJWT } from "./JWTaction";
 
 // R1:admin, R2:doctor, R3:user, R4:staff
 const ROLE_PERMISSIONS = {
@@ -40,41 +40,56 @@ export const checkUserPermission = async (req, res, next) => {
     // 2. Kiểm tra JWT
     // LƯU Ý: Nếu checkUserJWT bị lỗi và đã gửi response (res.json), 
     // code bên dưới vẫn có thể chạy. Nên cần kiểm tra headersSent.
-    await checkUserJWT(req, res, next);
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        const decode = verifyJWT(authHeader.split(" ")[1])
+        if (decode) {
+            req.user = decode
+            const role = decode?.role;
 
-    if (res.headersSent) {
-        return; // Dừng lại nếu checkUserJWT đã gửi lỗi (ví dụ 401)
-    }
+            // 3. Kiểm tra Role
+            if (role === "R1") {
+                return next(); // <--- QUAN TRỌNG: Phải có return
+            }
 
-    const role = req.user?.role;
+            if (role === "R2") {
+                if (ROLE_PERMISSIONS.R2.includes(apiRequest)) {
+                    return next();
+                }
+            }
 
-    // 3. Kiểm tra Role
-    if (role === "R1") {
-        return next(); // <--- QUAN TRỌNG: Phải có return
-    }
+            else if (role === "R4") {
+                if (ROLE_PERMISSIONS.R4.includes(apiRequest)) {
+                    return next();
+                }
+            }
 
-    if (role === "R2") {
-        if (ROLE_PERMISSIONS.R2.includes(apiRequest)) {
-            return next();
+            else if (role === "R3") {
+                if (ROLE_PERMISSIONS.R3.includes(apiRequest)) {
+                    return next();
+                }
+            }
+
+            // 4. Nếu không lọt vào các case trên thì chặn
+            return res.status(403).json({
+                err: 403,
+                message: "You don't have permission to access!"
+            });
+        }
+        else {
+            return res.status(401).json({
+                err: 401,
+                message: "Token is not valid"
+            })
         }
     }
-
-    else if (role === "R4") {
-        if (ROLE_PERMISSIONS.R4.includes(apiRequest)) {
-            return next();
-        }
+    else {
+        return res.status(401).json({
+            err: 401,
+            message: "Not authenticated the user"
+        })
     }
 
-    else if (role === "R3") {
-        if (ROLE_PERMISSIONS.R3.includes(apiRequest)) {
-            return next();
-        }
-    }
 
-    // 4. Nếu không lọt vào các case trên thì chặn
-    return res.status(403).json({
-        err: 403,
-        message: "You don't have permission to access!"
-    });
 }
 

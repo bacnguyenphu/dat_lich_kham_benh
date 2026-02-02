@@ -46,7 +46,7 @@ instance.interceptors.response.use(function (response) {
     const data = JSON.parse(parsed.data);
     const roleUser = data?.role
     // Chỉ chạy sau khi người dùng bấm OK
-    if (roleUser === "R3") {
+    if (roleUser === "R3" || roleUser === "R1") {
       window.location.href = "/login";
     }
     else if (roleUser === "R2") {

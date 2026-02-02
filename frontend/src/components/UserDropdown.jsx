@@ -59,7 +59,7 @@ function UserDropdown() {
                     Swal.fire({
                         title: "Đăng xuất thành công",
                         icon: "success"
-                    })
+                    }).then(() => { navigate("/") })
                 }
                 else {
                     Swal.fire({
@@ -150,6 +150,7 @@ function UserDropdown() {
                             <span>Quản trị viên</span>
                         </div>
                     }
+
                 </div>
             }
         </div>
