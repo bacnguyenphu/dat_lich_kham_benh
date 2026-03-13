@@ -108,7 +108,7 @@ function InputSearch() {
                                 const length = doctors.length
                                 return (
                                     <div key={item.id} className="cursor-pointer"
-                                        onClick={() => { navigate(`${DOCTORS}/chi-tiet/${item.id}`) }}
+                                        onClick={() => { navigate(`/${DOCTORS}/chi-tiet/${item.id}`) }}
                                     >
                                         <div className="flex items-center gap-4 py-3">
                                             <img className="size-9 object-center object-cover" src={(item?.user?.avatar) ? item?.user?.avatar : defaultAvatar} />
@@ -130,7 +130,7 @@ function InputSearch() {
                                 const length = packages.length
                                 return (
                                     <div key={item.id} className="cursor-pointer"
-                                        onClick={() => { navigate(`${MEDICAL_PACKAGE}/${item?.category_medical?.slug}/${item.id}`) }}
+                                        onClick={() => { navigate(`${MEDICAL_PACKAGE}/${item?.category_package?.slug}/${item.id}`) }}
                                     >
                                         <div className="flex items-center gap-4 py-3">
                                             <img className="size-9 object-center object-cover" src={(item?.image) ? item?.image : default_image} />
