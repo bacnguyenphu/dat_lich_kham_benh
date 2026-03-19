@@ -75,3 +75,4 @@ export const DELETE_USER = "/delete-user";
 // Route comment
 export const CREATE_COMMENT = "/create-comment";
 export const GET_COMMENTS = "/get-comments";
+export const GET_COMMENTS_BY_APPOINTMENT_ID = "/get-comments-by-appointment-id";

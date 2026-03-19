@@ -1,4 +1,8 @@
-import { createComment, getCommentsByTarget } from "../services/commentService";
+import {
+  createComment,
+  getCommentsByAppointmentId,
+  getCommentsByTarget,
+} from "../services/commentService";
 
 const handleCreateComment = async (req, res) => {
   try {
@@ -41,4 +45,22 @@ const handleGetCommentsByTarget = async (req, res) => {
   }
 };
 
-export { handleCreateComment, handleGetCommentsByTarget };
+const handleGetCommentsByAppointmentId = async (req, res) => {
+  try {
+    const appointmentId = req.query.appointmentId;
+
+    const message = await getCommentsByAppointmentId(appointmentId);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log("Lỗi ở handleGetCommentsByAppointmentId: ", error);
+    return res
+      .status(500)
+      .json({ err: -999, message: `Error server: ${error}` });
+  }
+};
+
+export {
+  handleCreateComment,
+  handleGetCommentsByTarget,
+  handleGetCommentsByAppointmentId,
+};

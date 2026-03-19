@@ -87,4 +87,32 @@ const getCommentsByTarget = async (targetId, targetType) => {
   }
 };
 
-export { createComment, getCommentsByTarget };
+const getCommentsByAppointmentId = async (appointmentId) => {
+  try {
+    if (!appointmentId) {
+      return {
+        err: 1,
+        message: "Appointment ID is required!",
+      };
+    }
+
+    const comments = await db.Comment.findOne({
+      where: { appointmentId },
+      order: [["createdAt", "DESC"]],
+    });
+
+    return {
+      err: 0,
+      message: "Get comments success!",
+      data: comments,
+    };
+  } catch (error) {
+    console.log("Lỗi ở getCommentsByAppointmentId:", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
+export { createComment, getCommentsByTarget, getCommentsByAppointmentId };

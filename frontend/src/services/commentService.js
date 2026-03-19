@@ -4,4 +4,10 @@ const postComment = (data) => {
   return axios.post("create-comment", data);
 };
 
-export { postComment };
+const getCommentsbyAppointmentId = (appointmentId) => {
+  return axios.get(
+    `get-comments-by-appointment-id?appointmentId=${appointmentId}`,
+  );
+};
+
+export { postComment, getCommentsbyAppointmentId };

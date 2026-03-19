@@ -35,7 +35,6 @@ function ListAppointmenT() {
 
   const fetchAppointment = async () => {
     const res = await getAppointmentOfUser(idUser, limit, page);
-    console.log("check resL ", res);
 
     if (res.err === 0 && res?.data) {
       setTotalPages(res.totalPage);
