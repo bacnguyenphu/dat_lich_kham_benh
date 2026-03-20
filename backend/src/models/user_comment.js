@@ -19,6 +19,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "User_Comment",
+      tableName: "user_comment",
+      freezeTableName: true,
     },
   );
   return User_Comment;

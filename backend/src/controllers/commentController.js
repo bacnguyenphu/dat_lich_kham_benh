@@ -1,7 +1,9 @@
 import {
   createComment,
+  deleteComment,
   getCommentsByAppointmentId,
   getCommentsByTarget,
+  updateComment,
 } from "../services/commentService";
 
 const handleCreateComment = async (req, res) => {
@@ -24,6 +26,24 @@ const handleCreateComment = async (req, res) => {
     return res.status(200).json(message);
   } catch (error) {
     console.log("Lỗi ở handleCreateComment: ", error);
+    return res
+      .status(500)
+      .json({ err: -999, message: `Error server: ${error}` });
+  }
+};
+
+const handleUpdateComment = async (req, res) => {
+  try {
+    const commentId = req.body?.id;
+    const content = req.body?.content;
+
+    const message = await updateComment({
+      id: commentId,
+      content,
+    });
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log("Lỗi ở handleUpdateComment: ", error);
     return res
       .status(500)
       .json({ err: -999, message: `Error server: ${error}` });
@@ -59,8 +79,24 @@ const handleGetCommentsByAppointmentId = async (req, res) => {
   }
 };
 
+const handleDeleteComment = async (req, res) => {
+  try {
+    const commentId = req.query?.id;
+
+    const message = await deleteComment(commentId);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log("Lỗi ở handleDeleteComment: ", error);
+    return res
+      .status(500)
+      .json({ err: -999, message: `Error server: ${error}` });
+  }
+};
+
 export {
   handleCreateComment,
   handleGetCommentsByTarget,
   handleGetCommentsByAppointmentId,
+  handleUpdateComment,
+  handleDeleteComment,
 };

@@ -21,10 +21,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "appointmentId",
         constraints: false,
       });
-      Comment.belongsToMany(models.User, {
-        through: models.User_Comment,
-        foreignKey: "commentId",
-        as: "users",
+      Comment.belongsTo(models.User, {
+        foreignKey: "userId",
+        as: "user",
+        constraints: false,
       });
     }
   }

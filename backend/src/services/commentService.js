@@ -59,6 +59,60 @@ const createComment = async (data) => {
   }
 };
 
+const updateComment = async (data) => {
+  try {
+    if (!data?.id) {
+      return {
+        err: 1,
+        message: "Comment ID is required!",
+      };
+    }
+
+    if (!data?.content) {
+      return {
+        err: 2,
+        message: "Content is required!",
+      };
+    }
+
+    const comment = await db.Comment.findOne({
+      where: { id: data.id },
+    });
+
+    if (!comment) {
+      return {
+        err: 3,
+        message: "Comment not found!",
+      };
+    }
+
+    await db.Comment.update(
+      {
+        content: data.content,
+      },
+      {
+        where: { id: data.id },
+      },
+    );
+
+    const updatedComment = await db.Comment.findOne({
+      where: { id: data.id },
+    });
+
+    return {
+      err: 0,
+      message: "Comment updated successfully!",
+      data: updatedComment,
+    };
+  } catch (error) {
+    console.log("Lỗi ở updateComment:", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 const getCommentsByTarget = async (targetId, targetType) => {
   try {
     if (!targetId || !targetType) {
@@ -70,6 +124,18 @@ const getCommentsByTarget = async (targetId, targetType) => {
 
     const comments = await db.Comment.findAll({
       where: { targetId, targetType },
+      include: [
+        {
+          model: db.User,
+          as: "user",
+          attributes: ["firstName", "lastName", "email"],
+        },
+        {
+          model: db.Appointment,
+          as: "Appointment",
+          attributes: ["appointment_date"],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
@@ -115,4 +181,47 @@ const getCommentsByAppointmentId = async (appointmentId) => {
   }
 };
 
-export { createComment, getCommentsByTarget, getCommentsByAppointmentId };
+const deleteComment = async (commentId) => {
+  try {
+    if (!commentId) {
+      return {
+        err: 1,
+        message: "Comment ID is required!",
+      };
+    }
+
+    const comment = await db.Comment.findOne({
+      where: { id: commentId },
+    });
+
+    if (!comment) {
+      return {
+        err: 2,
+        message: "Comment not found!",
+      };
+    }
+
+    await db.Comment.destroy({
+      where: { id: commentId },
+    });
+
+    return {
+      err: 0,
+      message: "Comment deleted successfully!",
+    };
+  } catch (error) {
+    console.log("Lỗi ở deleteComment:", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
+export {
+  createComment,
+  getCommentsByTarget,
+  getCommentsByAppointmentId,
+  updateComment,
+  deleteComment,
+};

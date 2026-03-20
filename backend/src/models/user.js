@@ -14,8 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "id_patient",
         as: "appointment",
       });
-      User.belongsToMany(models.Comment, {
-        through: models.User_Comment,
+      User.hasMany(models.Comment, {
         foreignKey: "userId",
         as: "comments",
       });

@@ -4,19 +4,22 @@ import { IoSend } from "react-icons/io5";
 import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import {
+  deleteComment,
   getCommentsbyAppointmentId,
   postComment,
+  updateComment,
 } from "../services/commentService";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
 
 function ModalComment({ infoAppointmentCmt, setIsShowModalCmt }) {
   const authId = useSelector((state) => state?.auth?.data?.id);
 
   const [contentCmt, setContentCmt] = useState("");
   const [contentCmtUpdate, setContentCmtUpdate] = useState("");
-  const [commentsBefore, setCommentsBefore] = useState("");
+  const [commentsBefore, setCommentsBefore] = useState(null);
   const [isLoadingPostCmt, setIsLoadingPostCmt] = useState(false);
   const [isUpdateCmt, setIsUpdateCmt] = useState(false);
 
@@ -24,9 +27,8 @@ function ModalComment({ infoAppointmentCmt, setIsShowModalCmt }) {
     const fetchCmtOfAppointment = async () => {
       try {
         const res = await getCommentsbyAppointmentId(infoAppointmentCmt?.id);
-        console.log("res comments: ", res);
         if (res.err === 0 && res.data) {
-          setCommentsBefore(res.data.content);
+          setCommentsBefore({ id: res.data.id, content: res.data.content });
           setContentCmtUpdate(res.data.content);
         }
       } catch (error) {
@@ -56,7 +58,7 @@ function ModalComment({ infoAppointmentCmt, setIsShowModalCmt }) {
       });
       if (res.err === 0) {
         setContentCmt("");
-        setCommentsBefore(res.data.content);
+        setCommentsBefore({ id: res.data.id, content: res.data.content });
         setContentCmtUpdate(res.data.content);
         toast.success("Đăng nhận xét thành công!");
       } else {
@@ -67,6 +69,55 @@ function ModalComment({ infoAppointmentCmt, setIsShowModalCmt }) {
       toast.error("Đăng nhận xét thất bại!");
       setIsLoadingPostCmt(false);
     }
+  };
+
+  const handleClickUpdateComment = async () => {
+    if (!contentCmtUpdate.trim()) {
+      return;
+    }
+    // Logic to update the comment
+    setIsLoadingPostCmt(true);
+    try {
+      const res = await updateComment({
+        id: commentsBefore?.id,
+        content: contentCmtUpdate,
+      });
+      if (res.err === 0) {
+        setCommentsBefore({ id: res.data.id, content: res.data.content });
+        toast.success("Sửa nhận xét thành công!");
+      } else {
+        toast.error(res.message || "Sửa nhận xét thất bại!");
+      }
+      setIsLoadingPostCmt(false);
+      setIsUpdateCmt(false);
+    } catch (error) {
+      toast.error("Sửa nhận xét thất bại!");
+      setIsLoadingPostCmt(false);
+    }
+  };
+
+  const handleClickDeleteComment = async () => {
+    Swal.fire({
+      title: "Bạn có muốn xóa nhận xét ?",
+      showDenyButton: true,
+      confirmButtonText: "Xóa",
+      denyButtonText: "Thoát",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await deleteComment(commentsBefore?.id);
+          if (res.err === 0) {
+            setCommentsBefore(null);
+            setContentCmtUpdate("");
+            toast.success("Xóa nhận xét thành công!");
+          } else {
+            toast.error(res.message || "Xóa nhận xét thất bại!");
+          }
+        } catch (error) {
+          toast.error("Xóa nhận xét thất bại!");
+        }
+      }
+    });
   };
 
   return (
@@ -90,7 +141,15 @@ function ModalComment({ infoAppointmentCmt, setIsShowModalCmt }) {
             {!commentsBefore ? (
               <p className="text-gray-500">Bạn chưa có nhận xét!</p>
             ) : (
-              <p className="text-gray-700">{commentsBefore}</p>
+              <div className="flex gap-3">
+                <p className="text-gray-700">{commentsBefore.content}</p>{" "}
+                <span
+                  className="text-red-500 cursor-pointer italic hover:underline"
+                  onClick={() => handleClickDeleteComment()}
+                >
+                  Xóa
+                </span>
+              </div>
             )}
           </div>
         </div>
@@ -105,18 +164,20 @@ function ModalComment({ infoAppointmentCmt, setIsShowModalCmt }) {
                 value={contentCmt}
                 onChange={(e) => setContentCmt(e.target.value)}
               />
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                onClick={handleClickPostComment}
-              >
+              <div>
                 {isLoadingPostCmt ? (
-                  <span className="animate-rotate-center inline-block">
+                  <button className="animate-rotate-center inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                     <AiOutlineLoading3Quarters />
-                  </span>
+                  </button>
                 ) : (
-                  <IoSend />
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                    onClick={handleClickPostComment}
+                  >
+                    <IoSend />
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           ) : !isUpdateCmt ? (
             <button
@@ -140,15 +201,20 @@ function ModalComment({ infoAppointmentCmt, setIsShowModalCmt }) {
               >
                 Hủy
               </button>
-              <button className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600">
+              <div>
                 {isLoadingPostCmt ? (
-                  <span className="animate-rotate-center inline-block">
+                  <button className="animate-rotate-center inline-block bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600">
                     <AiOutlineLoading3Quarters />
-                  </span>
+                  </button>
                 ) : (
-                  <span>Sửa</span>
+                  <button
+                    className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600"
+                    onClick={handleClickUpdateComment}
+                  >
+                    Sửa
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           )}
         </div>

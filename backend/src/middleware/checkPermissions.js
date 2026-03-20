@@ -34,6 +34,8 @@ import {
   CREATE_COMMENT,
   GET_COMMENTS,
   GET_COMMENTS_BY_APPOINTMENT_ID,
+  UPDATE_COMMENT,
+  DELETE_COMMENT,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -51,6 +53,8 @@ const ROLE_PERMISSIONS = {
     CREATE_COMMENT,
     GET_COMMENTS,
     GET_COMMENTS_BY_APPOINTMENT_ID,
+    UPDATE_COMMENT,
+    DELETE_COMMENT,
   ], // bác sĩ
   R4: [
     GET_APPOINTMENT_OF_DOCTOR,
@@ -60,6 +64,8 @@ const ROLE_PERMISSIONS = {
     CREATE_COMMENT,
     GET_COMMENTS,
     GET_COMMENTS_BY_APPOINTMENT_ID,
+    UPDATE_COMMENT,
+    DELETE_COMMENT,
   ], // nhân viên
   R3: [
     CREATE_APPOINTMENT,
@@ -67,6 +73,8 @@ const ROLE_PERMISSIONS = {
     CREATE_COMMENT,
     GET_COMMENTS,
     GET_COMMENTS_BY_APPOINTMENT_ID,
+    UPDATE_COMMENT,
+    DELETE_COMMENT,
   ], // User thường không có quyền quản trị
 };
 
