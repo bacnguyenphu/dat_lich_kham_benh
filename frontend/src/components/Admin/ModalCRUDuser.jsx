@@ -14,7 +14,7 @@ import {
   updateUser,
 } from "../../services/userService";
 
-function ModalCRUDuser({ type, setIsShowModal, fetchUsers }) {
+function ModalCRUDuser({ type, setIsShowModal, fetchUsers, role }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +35,7 @@ function ModalCRUDuser({ type, setIsShowModal, fetchUsers }) {
     gender: "male",
     address: "",
     avatar: null,
+    role: role || "R3",
   });
 
   useEffect(() => {

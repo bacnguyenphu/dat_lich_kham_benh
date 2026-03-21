@@ -1,19 +1,19 @@
-import axios from '../utils/customAxios'
+import axios from "../utils/customAxios";
 
-const getUsers = (limit, page) => {
-    return axios.get('get-users', { params: { limit, page } })
-}
+const getUsers = (limit, page, role) => {
+  return axios.get("get-users", { params: { limit, page, role } });
+};
 
 const getUserById = (idUser) => {
-    return axios.get("get-user-by-id", { params: { idUser } })
-}
+  return axios.get("get-user-by-id", { params: { idUser } });
+};
 
 const updateUser = (payload) => {
-    return axios.post("update-user", payload)
-}
+  return axios.post("update-user", payload);
+};
 
 const deleteUserById = (idUser) => {
-    return axios.delete("delete-user", { params: { idUser } })
-}
+  return axios.delete("delete-user", { params: { idUser } });
+};
 
-export { getUsers, getUserById, updateUser, deleteUserById }
+export { getUsers, getUserById, updateUser, deleteUserById };

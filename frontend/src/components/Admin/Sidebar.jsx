@@ -11,6 +11,7 @@ import {
   FaHouse,
   FaUserGroup,
 } from "react-icons/fa6";
+import { GrUserManager } from "react-icons/gr";
 import { FaChartLine } from "react-icons/fa";
 import { FaFileMedicalAlt } from "react-icons/fa";
 // import { RxCountdownTimer } from "react-icons/rx";
@@ -25,6 +26,7 @@ import {
   MANAGE_MEDICAL,
   MANAGE_PACKAGE,
   MANAGE_POSITION,
+  MANAGE_RECEPTIONIST,
   MANAGE_SPECIALTY,
   MANAGE_USERS,
   MEDICAL_EXAMINATION_PLAN,
@@ -266,6 +268,19 @@ function Sidebar() {
                         <p>Lịch hẹn</p>
                     </div>
                 </NavLink> */}
+        <NavLink
+          to={MANAGE_RECEPTIONIST}
+          className={({ isActive }) => {
+            return isActive ? classActive : "";
+          }}
+        >
+          <div className="flex items-center h-12 gap-3 pl-10  ">
+            <span>
+              <GrUserManager color="#00A2A1" size={"1.25rem"} />
+            </span>
+            <p>Quản lý lễ tân</p>
+          </div>
+        </NavLink>
         <NavLink
           to={MANAGE_USERS}
           className={({ isActive }) => {

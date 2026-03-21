@@ -8,7 +8,7 @@ import { getUsers } from "../../services/userService";
 import Pagination from "../Pagination";
 import { useNavigate } from "react-router-dom";
 
-function ManageUsers() {
+function ManageReceptionist() {
   const navigate = useNavigate();
 
   const [isShowModal, setIsShowModal] = useState(false);
@@ -36,7 +36,7 @@ function ManageUsers() {
   };
 
   const fetchUsers = async () => {
-    const res = await getUsers(limit, page);
+    const res = await getUsers(limit, page, "R4");
     if (res.err === 0) {
       setUsers(res.data);
       setTotalPages(res?.totalPage);
@@ -51,14 +51,14 @@ function ManageUsers() {
     <>
       <div className="mt-2 w-6xl mx-auto shadow-item px-4 py-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Danh sách người dùng</h2>
+          <h2 className="text-xl font-semibold">Danh sách lễ tân</h2>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-lg cursor-pointer flex items-center gap-3"
             onClick={() => {
               handleClickAdd();
             }}
           >
-            <span>Thêm tài khoản</span>
+            <span>Thêm tài khoản lễ tân</span>
             <span>
               <LuBadgePlus size={"1.25rem"} />
             </span>
@@ -157,14 +157,14 @@ function ManageUsers() {
           )}
           {users.length === 0 && (
             <div className="flex flex-col items-center gap-3 py-10">
-              <p className="text-sm text-gray-500">Không có người dùng nào</p>
+              <p className="text-sm text-gray-500">Chưa có lễ tân nào</p>
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-lg cursor-pointer flex items-center gap-3"
                 onClick={() => {
                   handleClickAdd();
                 }}
               >
-                <span>Thêm người dùng</span>
+                <span>Thêm tài khoản lễ tân</span>
                 <span>
                   <LuBadgePlus size={"1.25rem"} />
                 </span>
@@ -183,10 +183,11 @@ function ManageUsers() {
           type={type}
           setIsShowModal={setIsShowModal}
           fetchUsers={fetchUsers}
+          role={"R4"}
         />
       )}
     </>
   );
 }
 
-export default ManageUsers;
+export default ManageReceptionist;
