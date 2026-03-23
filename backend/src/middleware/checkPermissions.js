@@ -51,8 +51,6 @@ const ROLE_PERMISSIONS = {
     CHANGE_PASSWORD_DOCTOR,
     UPDATE_DOCTOR,
     CREATE_COMMENT,
-    GET_COMMENTS,
-    GET_COMMENTS_BY_APPOINTMENT_ID,
     UPDATE_COMMENT,
     DELETE_COMMENT,
   ], // bác sĩ
@@ -62,8 +60,6 @@ const ROLE_PERMISSIONS = {
     GET_APPOINTMENT_OF_USER_FOLLOW_DOCTOR,
     CREATE_OR_UPDATE_SCHEDULE,
     CREATE_COMMENT,
-    GET_COMMENTS,
-    GET_COMMENTS_BY_APPOINTMENT_ID,
     UPDATE_COMMENT,
     DELETE_COMMENT,
   ], // nhân viên
@@ -71,8 +67,6 @@ const ROLE_PERMISSIONS = {
     CREATE_APPOINTMENT,
     GET_APPOINTMENT_OF_USER,
     CREATE_COMMENT,
-    GET_COMMENTS,
-    GET_COMMENTS_BY_APPOINTMENT_ID,
     UPDATE_COMMENT,
     DELETE_COMMENT,
   ], // User thường không có quyền quản trị
@@ -103,6 +97,8 @@ const BLACKIST = [
   GET_SPECIALTY_BY_ID,
   GET_TIMEFRAMES,
   GET_USER_BY_ID,
+  GET_COMMENTS,
+  GET_COMMENTS_BY_APPOINTMENT_ID,
 ]; // những route nào có trong đây không cần đăng nhập vẫn truy cập được
 
 export const checkUserPermission = async (req, res, next) => {

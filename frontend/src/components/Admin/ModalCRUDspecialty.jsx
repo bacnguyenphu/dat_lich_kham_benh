@@ -1,204 +1,320 @@
 import { IoMdClose } from "react-icons/io";
-import imageAvatarDefault from '../../assets/defaultAvatar.png'
-import { CiCirclePlus } from "react-icons/ci";
-import { useState } from "react";
+import imageAvatarDefault from "../../assets/defaultAvatar.png";
+import { useState, useEffect } from "react";
 import DescriptionDetail from "./DescriptionDetail";
 import { uploadImgCloudinary } from "../../services/uploadImgCloudinary";
-import { createSpecialty, deleteSpecialty, getSpecialtyById, updateSpecialty } from "../../services/specialtyService";
+import {
+  createSpecialty,
+  deleteSpecialty,
+  getSpecialtyById,
+  updateSpecialty,
+} from "../../services/specialtyService";
 import { Validation } from "../../utils/validation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { TbCameraPlus } from "react-icons/tb";
 
 function ModalCRUDspecialty({ setIsShowModal, type, fetchSpecialties }) {
+  const [payload, setPayload] = useState({
+    name: "",
+    linkImg: null, // Giữ nguyên tên biến linkImg của bạn
+    description_detail: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [imgUpload, setImgUpload] = useState();
 
-    const [payload, setPayload] = useState({
-        name: '',
-        linkImg: null,
-        description_detail: ''
-    })
-    const [errors, setErrors] = useState({})
-    const [isLoading, setIsLoading] = useState(false)
-    const [imgUpload, setImgUpload] = useState()
+  const navigate = useNavigate();
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const id = query.get("id");
 
-    const navigate = useNavigate()
-    const location = useLocation()
-    const query = new URLSearchParams(location.search)
-    const id = query.get("id")
-
-    useEffect(() => {
-        if (type !== "ADD" && id !== null) {
-            const fetchSpecialty = async () => {
-                const res = await getSpecialtyById(id)
-                if (res.err === 0) {
-                    setPayload({
-                        name: res?.data?.name,
-                        linkImg: res?.data?.images,
-                        description_detail: res?.data?.description_detail?.description
-                    })
-                }
-            }
-            fetchSpecialty()
+  useEffect(() => {
+    if (type !== "ADD" && id !== null) {
+      const fetchSpecialty = async () => {
+        const res = await getSpecialtyById(id);
+        if (res.err === 0 && res.data) {
+          setPayload({
+            name: res.data.name,
+            // Quan trọng: Gán ảnh từ API vào đúng biến linkImg để hiển thị
+            linkImg: res.data.image || res.data.images,
+            description_detail:
+              res?.data?.description_detail?.description || "",
+          });
         }
-    }, [id])
-
-    const handleClickClose = () => {
-        setIsShowModal(false)
-        if (type !== "ADD") {
-            navigate(location.pathname)
-        }
+      };
+      fetchSpecialty();
     }
+  }, [id, type]);
 
-    const handleImg = (e) => {
-        const file = e.target.files[0]
-        setPayload(prev => {
-            return { ...prev, linkImg: URL.createObjectURL(file) }
-        })
-        setImgUpload(file)
+  const handleClickClose = () => {
+    setIsShowModal(false);
+    if (type !== "ADD") {
+      navigate(location.pathname);
     }
+  };
 
-    const handleClickAdd = async () => {
-        if (Validation(payload, setErrors)) {
-            setIsLoading(true)
-            let linkImg = null
-            if (imgUpload) {
-                let formData = new FormData()
-                formData.append("file", imgUpload)
-                formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
-                const res = await uploadImgCloudinary(formData)
-                linkImg = res.data.url
-            }
-            const res = await createSpecialty({ ...payload, linkImg: linkImg })
-            if (res.err === 0) {
-                fetchSpecialties()
-                setIsShowModal(false)
-                toast.success(res.message)
-                setIsLoading(false)
-            }
-            else {
-                toast.error(res.message)
-                setIsLoading(false)
-            }
-        }
+  const handleImg = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Tạo URL tạm thời để xem trước (Preview)
+      setPayload((prev) => ({ ...prev, linkImg: URL.createObjectURL(file) }));
+      setImgUpload(file);
     }
+  };
 
-    const handleClickDelete = async () => {
-        const res = await deleteSpecialty(id)
-        if (res.err == 0) {
-            toast.success(res.message)
-            setIsShowModal(false)
-            navigate(location.pathname)
-            fetchSpecialties()
-        }
-        else {
-            toast.error(res.message)
-        }
+  const handleClickAdd = async () => {
+    if (Validation(payload, setErrors)) {
+      setIsLoading(true);
+      let finalLinkImg = null;
+      if (imgUpload) {
+        let formData = new FormData();
+        formData.append("file", imgUpload);
+        formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET);
+        const res = await uploadImgCloudinary(formData);
+        finalLinkImg = res.data.url;
+      }
+      const res = await createSpecialty({ ...payload, linkImg: finalLinkImg });
+      if (res.err === 0) {
+        fetchSpecialties();
+        setIsShowModal(false);
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+      setIsLoading(false);
     }
+  };
 
-    const handleClickUpdate = async () => {
-        if (Validation(payload, setErrors)) {
-            setIsLoading(true)
-            let linkImg = payload?.linkImg
-            if (imgUpload) {
-                let formData = new FormData()
-                formData.append("file", imgUpload)
-                formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET)
-                const res = await uploadImgCloudinary(formData)
-                linkImg = res.data.url
-            }
-            const res = await updateSpecialty({ ...payload, linkImg: linkImg, id: id })
-            if (res.err === 0) {
-                fetchSpecialties()
-                setIsShowModal(false)
-                toast.success(res.message)
-                setIsLoading(false)
-            }
-            else {
-                toast.error(res.message)
-                setIsLoading(false)
-            }
-        }
+  const handleClickUpdate = async () => {
+    if (Validation(payload, setErrors)) {
+      setIsLoading(true);
+      // Nếu có ảnh mới (imgUpload) thì up lên Cloudinary, nếu không lấy lại ảnh cũ (payload.linkImg)
+      let finalLinkImg = payload.linkImg;
+      if (imgUpload) {
+        let formData = new FormData();
+        formData.append("file", imgUpload);
+        formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET);
+        const res = await uploadImgCloudinary(formData);
+        finalLinkImg = res.data.url;
+      }
+      const res = await updateSpecialty({
+        ...payload,
+        linkImg: finalLinkImg,
+        id: id,
+      });
+      if (res.err === 0) {
+        fetchSpecialties();
+        setIsShowModal(false);
+        toast.success(res.message);
+        navigate(location.pathname);
+      } else {
+        toast.error(res.message);
+      }
+      setIsLoading(false);
     }
+  };
 
+  const handleClickDelete = async () => {
+    setIsLoading(true);
+    const res = await deleteSpecialty(id);
+    if (res.err === 0) {
+      toast.success(res.message);
+      setIsShowModal(false);
+      navigate(location.pathname);
+      fetchSpecialties();
+    } else {
+      toast.error(res.message);
+    }
+    setIsLoading(false);
+  };
+
+  // Giao diện MODAL XÓA
+  if (type === "DELETE") {
     return (
-        <div className="fixed left-0 right-0 top-0 bottom-0 bg-black/40">
-            {(type !== "DELETE") &&
-                <div className="w-5xl bg-white min-h-6 rounded-2xl mx-auto mt-10 px-5">
-                    <div className="flex justify-between py-3 border-b">
-                        {type === "ADD" && <p className="text-xl font-semibold">Thêm chuyên khoa</p>}
-                        {type === "UPDATE" && <p className="text-xl font-semibold">Chỉnh sửa chuyên khoa</p>}
-                        <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
-                    </div>
-                    <div className="mt-5 pb-5 h-[550px] overflow-y-auto">
-                        <div className="flex flex-col relative w-1/2">
-                            <label>Tên chuyên khoa<span className="text-red-500">*</span></label>
-                            <input className="border border-gray-500 rounded-md p-1" value={payload.name} onChange={(e) => { setPayload({ ...payload, name: e.target.value }) }} />
-                            {errors.name && <small className="text-red-500 absolute -bottom-5">{errors.name}</small>}
-                        </div>
-                        <div className="mt-5">
-                            <p>Hình ảnh</p>
-                            <div className="flex justify-center">
-                                <img className="size-24 object-cover object-center rounded-full"
-                                    alt="Avatar" src={(payload?.linkImg == null) ? imageAvatarDefault : payload?.linkImg}
-                                    onError={(e) => {
-                                        e.target.onerror = null; // Ngăn lặp vô hạn
-                                        e.target.src = imageAvatarDefault; // Đổi sang ảnh mặc định
-                                    }}
-                                />
-                            </div>
-                            <div className="flex justify-center mt-2">
-                                <label className="flex items-center text-white gap-3 bg-green-500 rounded-lg px-2 py-1" htmlFor="uploadAvatar">
-                                    <p className="cursor-pointer">Tải ảnh lên</p>
-                                    <span><CiCirclePlus size={"1.25rem"} /></span>
-                                </label>
-                                <input type="file" hidden id="uploadAvatar" onChange={(e) => { handleImg(e) }} />
-                            </div>
-                        </div>
-                        <div className="mt-8 flex flex-col ">
-                            <p className="font-semibold">Mô tả chi tiết<span className="text-red-500 font-medium">*</span></p>
-                            <div className="w-full">
-                                <DescriptionDetail type={type} payload={payload} setPayload={setPayload} />
-                            </div>
-                        </div>
-                        <div className="flex gap-6 justify-end py-5 pr-5">
-                            <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
-                            {type === "ADD" && <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickAdd() }}>
-                                {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Thêm</span>}
-                            </button>}
-                            {type === "UPDATE" && <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickUpdate() }}>
-                                {isLoading ? <span className="animate-rotate-center inline-block"><AiOutlineLoading3Quarters /></span> : <span>Sửa</span>}
-                            </button>}
-                        </div>
-                    </div>
-                </div>
-            }
-            {type === "DELETE" &&
-                <div className="w-2xl bg-white min-h-6 rounded-xl mx-auto px-5 mt-10">
-                    <div className="flex justify-between py-3 border-b">
-                        <p className="text-xl font-semibold">Xóa chuyên khoa</p>
-                        <span className="cursor-pointer" onClick={() => handleClickClose()}><IoMdClose size={'1.5rem'} /></span>
-                    </div>
-                    <div className="p-5 h-48">
-                        <p className="font-semibold">Bạn chắc có muốn xóa chuyên khoa: {payload.name} ?</p>
-                        <div className="flex justify-center mt-10">
-                            <img className="size-28 object-cover object-center rounded-full"
-                                alt="Avatar" src={(payload?.linkImg == null) ? imageAvatarDefault : payload?.linkImg}
-                                onError={(e) => {
-                                    e.target.onerror = null; // Ngăn lặp vô hạn
-                                    e.target.src = imageAvatarDefault; // Đổi sang ảnh mặc định
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-6 justify-end py-5 pr-5">
-                        <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => handleClickClose()}>Thoát</button>
-                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer" onClick={() => { handleClickDelete() }}>Xóa</button>
-                    </div>
-                </div>
-            }
+      <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-white w-full max-w-md rounded-2xl shadow-xl flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <p className="text-xl font-bold text-slate-800">Xóa chuyên khoa</p>
+            <span
+              className="cursor-pointer text-slate-400 hover:text-red-500"
+              onClick={handleClickClose}
+            >
+              <IoMdClose size={"1.5rem"} />
+            </span>
+          </div>
+          <div className="p-8 flex flex-col items-center text-center gap-4">
+            <div className="w-28 h-28 rounded-2xl overflow-hidden border-4 border-slate-50 shadow-md">
+              <img
+                className="w-full h-full object-cover"
+                alt="Avatar"
+                src={payload.linkImg ? payload.linkImg : imageAvatarDefault}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = imageAvatarDefault;
+                }}
+              />
+            </div>
+            <p className="font-medium text-slate-600">
+              Bạn chắc chắn muốn xóa chuyên khoa: <br />
+              <span className="text-slate-800 font-bold text-lg">
+                {payload.name}
+              </span>
+              ?
+            </p>
+          </div>
+          <div className="flex gap-3 justify-end px-6 py-4 bg-slate-50 border-t">
+            <button
+              className="bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-2 px-6 rounded-xl transition-colors"
+              onClick={handleClickClose}
+            >
+              Thoát
+            </button>
+            <button
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-colors"
+              onClick={handleClickDelete}
+            >
+              {isLoading ? (
+                <AiOutlineLoading3Quarters className="animate-spin" />
+              ) : (
+                "Xóa ngay"
+              )}
+            </button>
+          </div>
         </div>
+      </div>
     );
+  }
+
+  // Giao diện MODAL THÊM / SỬA
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex justify-between items-center px-8 py-5 border-b border-slate-100 bg-slate-50 shrink-0">
+          <p className="text-2xl font-bold text-slate-800">
+            {type === "ADD" ? "Thêm chuyên khoa mới" : "Chỉnh sửa chuyên khoa"}
+          </p>
+          <span
+            className="cursor-pointer text-slate-400 hover:text-red-500 transition-colors"
+            onClick={handleClickClose}
+          >
+            <IoMdClose size={"1.8rem"} />
+          </span>
+        </div>
+
+        {/* Body (Scrollable) */}
+        <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+          <div className="flex flex-col md:flex-row gap-8 mb-8">
+            {/* Tên chuyên khoa */}
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-bold text-slate-700">
+                Tên chuyên khoa <span className="text-red-500">*</span>
+              </label>
+              <input
+                className={`border ${errors.name ? "border-red-400 bg-red-50" : "border-slate-200 bg-slate-50"} rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all`}
+                value={payload.name}
+                placeholder="Nhập tên chuyên khoa..."
+                onChange={(e) => {
+                  setPayload({ ...payload, name: e.target.value });
+                  setErrors({ ...errors, name: "" });
+                }}
+              />
+              {errors.name && (
+                <small className="text-red-500">{errors.name}</small>
+              )}
+            </div>
+
+            {/* Hình ảnh */}
+            <div className="shrink-0 flex flex-col items-center">
+              <label className="text-sm font-bold text-slate-700 mb-2">
+                Hình đại diện
+              </label>
+              <div className="relative group">
+                <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-slate-100 shadow-sm bg-white flex items-center justify-center p-2">
+                  <img
+                    className="w-full h-full object-contain mix-blend-multiply"
+                    alt="Specialty Icon"
+                    src={payload.linkImg ? payload.linkImg : imageAvatarDefault}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = imageAvatarDefault;
+                    }}
+                  />
+                </div>
+                <label
+                  htmlFor="uploadAvatar"
+                  className="absolute -bottom-2 -right-2 bg-white text-blue-600 p-2 rounded-full border border-slate-200 shadow-md cursor-pointer hover:bg-blue-50 transition-colors"
+                >
+                  <TbCameraPlus size="1.2rem" />
+                </label>
+                <input
+                  type="file"
+                  hidden
+                  id="uploadAvatar"
+                  onChange={handleImg}
+                  accept="image/*"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* CKEditor Mô tả */}
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-bold text-slate-700">
+              Mô tả chi tiết <span className="text-red-500">*</span>
+            </p>
+            <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <DescriptionDetail
+                type={type}
+                payload={payload}
+                setPayload={setPayload}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-4 justify-end px-8 py-5 border-t border-slate-100 bg-slate-50 shrink-0">
+          <button
+            className="px-6 py-2.5 font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors"
+            onClick={handleClickClose}
+          >
+            Thoát
+          </button>
+
+          {type === "ADD" && (
+            <button
+              className="flex items-center gap-2 px-8 py-2.5 font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-md transition-colors"
+              onClick={handleClickAdd}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <AiOutlineLoading3Quarters className="animate-spin" />
+              ) : (
+                "Thêm chuyên khoa"
+              )}
+            </button>
+          )}
+
+          {type === "UPDATE" && (
+            <button
+              className="flex items-center gap-2 px-8 py-2.5 font-bold text-white bg-amber-500 rounded-xl hover:bg-amber-600 shadow-md transition-colors"
+              onClick={handleClickUpdate}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <AiOutlineLoading3Quarters className="animate-spin" />
+              ) : (
+                "Lưu thay đổi"
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default ModalCRUDspecialty;

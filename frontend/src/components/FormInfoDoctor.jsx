@@ -2,259 +2,369 @@ import { useEffect, useState } from "react";
 import { getPostions } from "../services/positionService";
 import { getSpecialties } from "../services/specialtyService";
 import { getDoctorById } from "../services/doctorService";
-import imageAvatarDefault from '../assets/defaultAvatar.png'
+import imageAvatarDefault from "../assets/defaultAvatar.png";
 import DescriptionDetail from "./Admin/DescriptionDetail";
-import { CiCirclePlus } from "react-icons/ci";
+import { TbCameraPlus } from "react-icons/tb";
+import {
+  FaUserMd,
+  FaIdCard,
+  FaStethoscope,
+  FaBriefcaseMedical,
+} from "react-icons/fa";
 
-function FormInfoDoctor({ payload, setPayload, idDoctor, setImgUpload, type = "UPDATE", errors }) {
+function FormInfoDoctor({
+  payload,
+  setPayload,
+  idDoctor,
+  setImgUpload,
+  type = "UPDATE",
+  errors,
+}) {
+  const [postions, setPositions] = useState([]);
+  const [specialties, setSpecialties] = useState([]);
 
-    const [postions, setPositions] = useState([])
-    const [specialties, setSpecialties] = useState([])
+  useEffect(() => {
+    const fetchData = async () => {
+      const [resPos, resSpec] = await Promise.all([
+        getPostions(),
+        getSpecialties(),
+      ]);
+      if (resPos.err === 0) setPositions(resPos.data);
+      if (resSpec.err === 0) setSpecialties(resSpec.data);
+    };
+    fetchData();
+  }, []);
 
-    useEffect(() => {
-        const fetchPostions = async () => {
-            const res = await getPostions()
-            if (res.err === 0) {
-                setPositions(res.data)
-            }
+  useEffect(() => {
+    if (idDoctor && postions.length > 0 && specialties.length > 0) {
+      const fetchDataDoctor = async () => {
+        const res = await getDoctorById(idDoctor);
+        if (res.err === 0) {
+          setPayload({
+            firstName: res?.data?.user?.firstName,
+            lastName: res?.data?.user?.lastName,
+            role: "R2",
+            phone: res?.data?.user?.phone,
+            email: res?.data?.user?.email,
+            password: "",
+            dateOfBirth: res?.data?.user?.dateOfBirth?.split("T")[0],
+            gender: res?.data?.user?.gender,
+            address: res?.data?.user?.address,
+            avatar: res?.data?.user?.avatar,
+            price: res?.data?.price,
+            description: res?.data?.description,
+            id_specialty: res?.data?.specialty.map((item) => item.id),
+            id_position: res?.data?.position.map((item) => item.id),
+            description_detail:
+              res?.data?.description_detail?.description || "",
+          });
         }
-        const fetchSpecialties = async () => {
-            const res = await getSpecialties()
-            if (res.err === 0) {
-                setSpecialties(res.data)
-            }
-        }
-        const fetchData = async () => {
-            await Promise.all([fetchPostions(), fetchSpecialties()])
-        }
-        fetchData()
-    }, [])
-
-    useEffect(() => {
-        if (idDoctor) {
-            if (postions.length > 0 && specialties.length > 0) {
-                const fetchDataDoctor = async () => {
-                    const res = await getDoctorById(idDoctor)
-                    if (res.err === 0) {
-                        setPayload({
-                            firstName: res?.data?.user?.firstName,
-                            lastName: res?.data?.user?.lastName,
-                            role: 'R2',
-                            phone: res?.data?.user?.phone,
-                            email: res?.data?.user?.email,
-                            password: '',
-                            dateOfBirth: res?.data?.user?.dateOfBirth?.split("T")[0],
-                            gender: res?.data?.user?.gender,
-                            address: res?.data?.user?.address,
-                            avatar: res?.data?.user?.avatar,
-                            price: res?.data?.price,
-                            description: res?.data?.description,
-                            id_specialty: res?.data?.specialty.map(item => item.id),
-                            id_position: res?.data?.position.map(item => item.id),
-                            description_detail: res?.data?.description_detail?.description || '',
-                        })
-                    }
-                }
-                fetchDataDoctor()
-            }
-        }
-
-    }, [postions, specialties])
-
-    const handleCheckbox = (e, type) => {
-        const value = e.target.value
-        if (type === "POSITION") {
-            setPayload(prev => {
-                return { ...prev, id_position: prev.id_position.includes(+value) ? prev.id_position.filter(item => item !== +value) : [...prev.id_position, +value] }
-            })
-        }
-        if (type === "SPECIALTY") {
-            setPayload(prev => {
-                return { ...prev, id_specialty: prev.id_specialty.includes(value) ? prev.id_specialty.filter(item => item !== value) : [...prev.id_specialty, value] }
-            })
-        }
+      };
+      fetchDataDoctor();
     }
+  }, [idDoctor, postions, specialties]);
 
-    const handleImg = (e) => {
-        const file = e.target.files[0]
-        setPayload(prev => {
-            return { ...prev, avatar: URL.createObjectURL(file) }
-        })
-        setImgUpload(file)
+  const handleCheckbox = (value, category) => {
+    if (type === "VIEW") return;
+    const key = category === "POSITION" ? "id_position" : "id_specialty";
+    const numericValue = category === "POSITION" ? +value : value;
+
+    setPayload((prev) => ({
+      ...prev,
+      [key]: prev[key].includes(numericValue)
+        ? prev[key].filter((item) => item !== numericValue)
+        : [...prev[key], numericValue],
+    }));
+  };
+
+  const handleImg = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPayload((prev) => ({ ...prev, avatar: URL.createObjectURL(file) }));
+      setImgUpload(file);
     }
+  };
 
-    return (
-        <div className={`mt-5 pb-5 h-[500px] overflow-y-auto`} >
-            <div className="flex gap-6">
-                <div className="flex flex-col relative">
-                    <label className="">
-                        Họ<span className="text-red-500">*</span>
-                    </label>
-                    <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.firstName || ''}
-                        onChange={(e) => { setPayload({ ...payload, firstName: e.target.value }) }}
-                    />
-                    {errors.firstName && <small className="text-red-500 absolute -bottom-5">{errors.firstName}</small>}
-                </div>
-                <div className="flex flex-col relative">
-                    <label>Tên<span className="text-red-500">*</span></label>
-                    <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.lastName || ''}
-                        onChange={(e) => { setPayload({ ...payload, lastName: e.target.value }) }} />
-                    {errors.lastName && <small className="text-red-500 absolute -bottom-5">{errors.lastName}</small>}
-                </div>
-                <div className="flex flex-col relative">
-                    <label>Số điện thoại<span className="text-red-500">*</span></label>
-                    <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.phone || ''}
-                        onChange={(e) => { setPayload({ ...payload, phone: e.target.value }) }} />
-                    {errors.phone && <small className="text-red-500 absolute -bottom-5">{errors.phone}</small>}
-                </div>
-                <div className="flex flex-col relative">
-                    <label>Giới tính<span className="text-red-500">*</span></label>
-                    <div className="flex items-center gap-5">
-                        <div className="flex gap-1">
-                            <input disabled={type === "VIEW"} id="male" type="radio" name="gender" value={"male"} checked={payload.gender === "male"}
-                                onChange={(e) => { setPayload({ ...payload, gender: e.target.value }) }} />
-                            <label className="cursor-pointer" htmlFor="male">Nam</label>
-                        </div>
-                        <div className="flex gap-1">
-                            <input disabled={type === "VIEW"} id="female" type="radio" name="gender" value={"female"} checked={payload.gender === "female"}
-                                onChange={(e) => { setPayload({ ...payload, gender: e.target.value }) }} />
-                            <label className="cursor-pointer" htmlFor="female">Nữ</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="flex gap-5 mt-6">
-                <div className="flex flex-col relative w-1/2">
-                    <label>Địa chỉ<span className="text-red-500">*</span></label>
-                    <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1 " value={payload.address || ''}
-                        onChange={(e) => { setPayload({ ...payload, address: e.target.value }) }} />
-                    {errors.address && <small className="text-red-500 absolute -bottom-5">{errors.address}</small>}
-                </div>
-                <div className="flex flex-col relative w-1/2">
-                    <label>Ngày sinh<span className="text-red-500">*</span></label>
-                    <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1 w-1/2" type="date"
-                        value={payload.dateOfBirth}
-                        onChange={(e) => { setPayload({ ...payload, dateOfBirth: e.target.value }) }}
-                    />
-                </div>
-            </div>
+  const inputClass = (error) => `
+        w-full border rounded-xl p-2.5 transition-all outline-none
+        ${type === "VIEW" ? "bg-slate-50 border-transparent text-slate-800 font-medium" : "bg-white border-slate-300 focus:ring-2 focus:ring-blue-500"}
+        ${error ? "border-red-400 bg-red-50" : ""}
+    `;
 
-            <div className="flex gap-5 mt-6">
-                <div className="w-1/2 mt-4 flex flex-col relative ">
-                    <label>Email<span className="text-red-500">*</span></label>
-                    <input disabled={type === "VIEW"} className="border border-gray-500 rounded-md p-1" value={payload.email || ''}
-                        onChange={(e) => { setPayload({ ...payload, email: e.target.value }) }} />
-                    {errors.email && <small className="text-red-500 absolute -bottom-5">{errors.email}</small>}
-                </div>
-                <div className={`w-1/2 mt-4 flex flex-col relative ${type !== "ADD" ? 'opacity-60 cursor-not-allowed' : ''}`}>
-                    {(type !== "VIEW" && type !== "UPDATE") &&
-                        <label>Mật khẩu<span className="text-red-500">*</span></label>
-                    }
-                    <input hidden={type === "VIEW" || type === "UPDATE"} type="password" className="border border-gray-500 rounded-md p-1"
-                        onChange={(e) => { setPayload({ ...payload, password: e.target.value }) }} />
-                    {errors.password && <small className="text-red-500 absolute -bottom-5">{errors.password}</small>}
-                </div>
+  return (
+    <div className="flex flex-col gap-10 pb-10">
+      {/* SECTION 1: AVATAR & BASIC INFO */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative group">
+            <div className="size-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-slate-100">
+              <img
+                className="w-full h-full object-cover"
+                alt="Doctor Avatar"
+                src={payload?.avatar || imageAvatarDefault}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = imageAvatarDefault;
+                }}
+              />
             </div>
-            <div className="mt-5">
-                <p>Hình ảnh</p>
-                <div className="flex justify-center">
-                    <img className="size-24 object-cover object-center rounded-full"
-                        alt="Avatar" src={(payload?.avatar == null) ? imageAvatarDefault : payload?.avatar}
-                        onError={(e) => {
-                            e.target.onerror = null; // Ngăn lặp vô hạn
-                            e.target.src = imageAvatarDefault; // Đổi sang ảnh mặc định
-                        }}
-                    />
-                </div>
-                <div className="flex justify-center mt-2">
-                    <label className="flex items-center text-white gap-3 bg-green-500 rounded-lg px-2 py-1" htmlFor="uploadAvatar">
-                        <p className="cursor-pointer">Tải ảnh lên</p>
-                        <span><CiCirclePlus size={"1.25rem"} /></span>
-                    </label>
-                    <input disabled={type === "VIEW"} type="file" hidden id="uploadAvatar" onChange={(e) => { handleImg(e) }} />
-                </div>
-            </div>
-            <div className="mt-4 flex flex-col relative ">
-                <label>Giá khám<span className="text-red-500">*</span></label>
-                <div className="w-2/5 border border-gray-500 rounded-md p-1 flex items-center">
-                    <input disabled={type === "VIEW"} className="outline-none w-[85%]" value={payload.price || ''}
-                        onChange={(e) => { setPayload({ ...payload, price: e.target.value }) }} />
-                    <span className="w-[15%] text-center border-l text-gray-400">VND</span>
-                </div>
-                {errors.price && <small className="text-red-500 absolute -bottom-5">{errors.price}</small>}
-            </div>
-            {/* {type === "VIEW" &&
-                <div className="mt-4 flex flex-col">
-                    <label className="font-semibold">Lịch khám</label>
-                    <div className="mt-4 flex flex-col gap-5">
-                        {scheduleOfDoctor.length > 0 &&
-                            scheduleOfDoctor.map(schedule => {
-                                return (
-                                    <div className="flex flex-col gap-2">
-                                        <p className="text-blue-700 font-semibold text-xl">{dayjs(schedule?.appointment_date).format("DD/MM/YYYY")}</p>
-                                        <div key={schedule.item} className=" grid grid-cols-5 gap-3">
-                                            {schedule?.time_frame && schedule?.time_frame.length > 0 &&
-                                                schedule.time_frame.map(item => {
-                                                    return (
-                                                        <div key={item?.id} className="bg-gray-200 text-center py-2 font-semibold text-sm cursor-pointer border-2 border-gray-200 duration-300">{item?.time_frame}</div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        {scheduleOfDoctor.length === 0 &&
-                            <p className="text-blue-700 font-semibold text-xl">Bác sĩ chưa có lịch khám !</p>
-                        }
-                    </div>
-                </div>
-            } */}
-            <div className="mt-8 flex flex-col ">
-                <p className="font-semibold">Chức vụ<span className="text-red-500 font-medium">*</span></p>
-                <div className="grid grid-cols-5 gap-x-6 gap-y-3">
-                    {postions.length > 0 &&
-                        postions.map(item => {
-                            return (
-                                <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                    <input disabled={type === "VIEW"} id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_position.some(i => i === item.id)}
-                                        onChange={(e) => { handleCheckbox(e, "POSITION") }} />
-                                    <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
-                                </div>
-                            )
-                        })}
-                </div>
-            </div>
-            <div className="mt-8 flex flex-col ">
-                <p className="font-semibold">Chuyên khoa<span className="text-red-500 font-medium">*</span></p>
-                <div className="grid grid-cols-5 gap-x-6 gap-y-3">
-                    {specialties.length > 0 &&
-                        specialties.map(item => {
-                            return (
-                                <div key={`position-checkbox-${item.id}`} className="flex items-center gap-2 ">
-                                    <input disabled={type === "VIEW"} id={`position-checkbox-${item.id}`} className="cursor-pointer" type="checkbox" value={item.id} checked={payload.id_specialty.some(i => i === item.id)}
-                                        onChange={(e) => { handleCheckbox(e, "SPECIALTY") }} />
-                                    <label htmlFor={`position-checkbox-${item.id}`} className="cursor-pointer">{item.name}</label>
-                                </div>
-                            )
-                        })}
-                </div>
-            </div>
-            <div className="mt-8 flex flex-col ">
-                <p className="font-semibold">Giới thiệu</p>
-                <div className="">
-                    <textarea disabled={type === "VIEW"} className="outline-none border border-gray-400 rounded-md w-3/4 h-72 p-2" value={payload.description || ''}
-                        onChange={(e) => { setPayload({ ...payload, description: e.target.value }) }}></textarea>
-                </div>
-            </div>
-            <div className="mt-8 flex flex-col ">
-                <p className="font-semibold">Mô tả chi tiết<span className="text-red-500 font-medium">*</span></p>
-                <div className="">
-                    <DescriptionDetail type={type} payload={payload} setPayload={setPayload} />
-                </div>
-            </div>
+            {type !== "VIEW" && (
+              <label
+                htmlFor="uploadAvatar"
+                className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-md cursor-pointer hover:bg-blue-700 transition-all"
+              >
+                <TbCameraPlus size="1.2rem" />
+              </label>
+            )}
+            <input type="file" hidden id="uploadAvatar" onChange={handleImg} />
+          </div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            Ảnh đại diện
+          </p>
         </div>
-    );
+
+        <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <FaIdCard className="text-blue-500" /> Họ{" "}
+              <span className="text-red-500">*</span>
+            </label>
+            <input
+              disabled={type === "VIEW"}
+              className={inputClass(errors.firstName)}
+              value={payload.firstName || ""}
+              onChange={(e) =>
+                setPayload({ ...payload, firstName: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-slate-700">
+              Tên <span className="text-red-500">*</span>
+            </label>
+            <input
+              disabled={type === "VIEW"}
+              className={inputClass(errors.lastName)}
+              value={payload.lastName || ""}
+              onChange={(e) =>
+                setPayload({ ...payload, lastName: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-slate-700">
+              Số điện thoại <span className="text-red-500">*</span>
+            </label>
+            <input
+              disabled={type === "VIEW"}
+              className={inputClass(errors.phone)}
+              value={payload.phone || ""}
+              onChange={(e) =>
+                setPayload({ ...payload, phone: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-slate-700">
+              Giới tính <span className="text-red-500">*</span>
+            </label>
+            <div
+              className={`flex items-center gap-6 p-2.5 rounded-xl ${type === "VIEW" ? "bg-slate-50" : "bg-white border border-slate-300"}`}
+            >
+              <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-600">
+                <input
+                  disabled={type === "VIEW"}
+                  type="radio"
+                  name="gender"
+                  value="male"
+                  checked={payload.gender === "male"}
+                  onChange={(e) =>
+                    setPayload({ ...prev, gender: e.target.value })
+                  }
+                />{" "}
+                Nam
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-600">
+                <input
+                  disabled={type === "VIEW"}
+                  type="radio"
+                  name="gender"
+                  value="female"
+                  checked={payload.gender === "female"}
+                  onChange={(e) =>
+                    setPayload({ ...prev, gender: e.target.value })
+                  }
+                />{" "}
+                Nữ
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 2: ACCOUNT & PRICE */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-slate-700">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              disabled={type === "VIEW"}
+              className={inputClass(errors.email)}
+              value={payload.email || ""}
+              onChange={(e) =>
+                setPayload({ ...payload, email: e.target.value })
+              }
+            />
+          </div>
+          {type === "ADD" && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-bold text-slate-700">
+                Mật khẩu <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                className={inputClass(errors.password)}
+                onChange={(e) =>
+                  setPayload({ ...payload, password: e.target.value })
+                }
+              />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-slate-700">
+              Giá khám (VNĐ) <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                disabled={type === "VIEW"}
+                className={`${inputClass(errors.price)} pr-12`}
+                value={payload.price || ""}
+                onChange={(e) =>
+                  setPayload({ ...payload, price: e.target.value })
+                }
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs uppercase">
+                VNĐ
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-slate-700">
+              Ngày sinh <span className="text-red-500">*</span>
+            </label>
+            <input
+              disabled={type === "VIEW"}
+              type="date"
+              className={inputClass()}
+              value={payload.dateOfBirth || ""}
+              onChange={(e) =>
+                setPayload({ ...payload, dateOfBirth: e.target.value })
+              }
+            />
+          </div>
+        </div>
+        <div className="md:col-span-2 flex flex-col gap-1.5">
+          <label className="text-sm font-bold text-slate-700">
+            Địa chỉ cư trú <span className="text-red-500">*</span>
+          </label>
+          <input
+            disabled={type === "VIEW"}
+            className={inputClass(errors.address)}
+            value={payload.address || ""}
+            onChange={(e) =>
+              setPayload({ ...payload, address: e.target.value })
+            }
+          />
+        </div>
+      </div>
+
+      {/* SECTION 3: PROFESSIONAL INFO (CHECKBOXES AS TAGS) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Positions */}
+        <div className="flex flex-col gap-4">
+          <h3 className="font-bold text-slate-800 flex items-center gap-2 border-l-4 border-blue-500 pl-3">
+            <FaUserMd /> Chức vụ chuyên môn
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {postions.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => handleCheckbox(item.id, "POSITION")}
+                className={`px-4 py-2 rounded-full border text-sm font-bold transition-all select-none cursor-pointer
+                                    ${
+                                      payload.id_position.includes(item.id)
+                                        ? "bg-blue-600 border-blue-600 text-white shadow-md"
+                                        : "bg-white border-slate-200 text-slate-500 hover:border-blue-400"
+                                    } ${type === "VIEW" ? "cursor-default" : "active:scale-95"}`}
+              >
+                {item.name}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Specialties */}
+        <div className="flex flex-col gap-4">
+          <h3 className="font-bold text-slate-800 flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
+            <FaStethoscope /> Chuyên khoa đảm nhận
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {specialties.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => handleCheckbox(item.id, "SPECIALTY")}
+                className={`px-4 py-2 rounded-full border text-sm font-bold transition-all select-none cursor-pointer
+                                    ${
+                                      payload.id_specialty.includes(item.id)
+                                        ? "bg-emerald-600 border-emerald-600 text-white shadow-md"
+                                        : "bg-white border-slate-200 text-slate-500 hover:border-emerald-400"
+                                    } ${type === "VIEW" ? "cursor-default" : "active:scale-95"}`}
+              >
+                {item.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 4: INTRO & DETAIL */}
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-2">
+          <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <FaBriefcaseMedical className="text-slate-400" /> Giới thiệu ngắn
+          </h3>
+          <textarea
+            disabled={type === "VIEW"}
+            className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 min-h-[150px] outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-700 leading-relaxed"
+            value={payload.description || ""}
+            placeholder="VD: Bác sĩ có hơn 10 năm kinh nghiệm trong lĩnh vực..."
+            onChange={(e) =>
+              setPayload({ ...payload, description: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <h3 className="font-bold text-slate-800">
+            Thông tin bài viết chi tiết
+          </h3>
+          <div
+            className={`rounded-2xl overflow-hidden border border-slate-200 shadow-sm ${type === "VIEW" ? "pointer-events-none opacity-90" : ""}`}
+          >
+            <DescriptionDetail
+              type={type}
+              payload={payload}
+              setPayload={setPayload}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default FormInfoDoctor;

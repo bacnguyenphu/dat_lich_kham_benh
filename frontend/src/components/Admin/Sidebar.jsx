@@ -8,20 +8,17 @@ import {
   FaBookMedical,
   FaChartSimple,
   FaFire,
-  FaHouse,
   FaUserGroup,
 } from "react-icons/fa6";
 import { GrUserManager } from "react-icons/gr";
-import { FaChartLine } from "react-icons/fa";
-import { FaFileMedicalAlt } from "react-icons/fa";
-// import { RxCountdownTimer } from "react-icons/rx";
+import { FaChartLine, FaFileMedicalAlt } from "react-icons/fa";
 import { BiCategoryAlt } from "react-icons/bi";
 import {
+  ADMIN,
   CATEGORY_PACKAGE,
   HOMEPAGE,
   INFORMATION_DOCTOR,
   INFORMATION_PAKAGE,
-  //   MANAGE_APPOINTMENT,
   MANAGE_DOCTOR,
   MANAGE_MEDICAL,
   MANAGE_PACKAGE,
@@ -36,261 +33,260 @@ import {
 import { useState } from "react";
 
 function Sidebar() {
-  const classActive =
-    "relative after:absolute after:w-1 after:bg-primary-50 after:h-full after:left-0 after:top-0 text-primary-50 font-semibold";
-
-  const [isDownDoctor, setIsDownDoctor] = useState(false);
-  const [isDownMedical, setIsDownMedical] = useState(false);
-  const [isDownPackage, setIsDownPackage] = useState(false);
-
   const location = useLocation();
-
+  const navigate = useNavigate();
   const pathManage = location.pathname.split("/")[2];
 
-  const navigate = useNavigate();
+  // States quản lý Dropdown
+  const [isDownDoctor, setIsDownDoctor] = useState(
+    pathManage === MANAGE_DOCTOR,
+  );
+  const [isDownMedical, setIsDownMedical] = useState(
+    pathManage === MANAGE_MEDICAL,
+  );
+  const [isDownPackage, setIsDownPackage] = useState(
+    pathManage === MANAGE_PACKAGE,
+  );
+
+  // CSS Class dùng chung
+  const baseMenuClass =
+    "flex items-center justify-between w-full px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group select-none";
+  const activeMenuClass = `${baseMenuClass} bg-blue-50 text-blue-700 font-bold`;
+  const inactiveMenuClass = `${baseMenuClass} text-slate-600 hover:bg-slate-50 hover:text-blue-600 font-medium`;
+
+  const baseSubMenuClass =
+    "flex items-center gap-3 px-4 py-2.5 ml-4 rounded-xl cursor-pointer transition-all duration-200 text-[14px] select-none";
+  const activeSubMenuClass = `${baseSubMenuClass} bg-blue-50/50 text-blue-600 font-bold`;
+  const inactiveSubMenuClass = `${baseSubMenuClass} text-slate-500 hover:text-blue-600 hover:bg-slate-50 font-medium`;
 
   return (
-    <div>
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 min-h-[500px] h-full flex flex-col">
+      {/* Header / Logo */}
       <div
-        className="flex gap-4 items-center pl-10 cursor-pointer py-2"
-        onClick={() => {
-          navigate(HOMEPAGE);
-        }}
+        className="flex gap-3 items-center px-2 cursor-pointer pb-6 border-b border-slate-100 mb-4 group"
+        onClick={() => navigate(HOMEPAGE)}
       >
-        <div className="h-[50px] w-[50px]">
+        <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center p-1 overflow-hidden transition-transform group-hover:scale-105">
           <img
-            className="object-center object-cover size-full scale-125"
+            className="object-cover h-full w-full"
             src={logo}
+            alt="Nger Admin"
           />
         </div>
-        <p className="text-2xl font-semibold font-Lobster">Nger Admin</p>
+        <p className="text-2xl font-bold font-Lobster text-blue-700 tracking-wide mt-1">
+          Nger Admin
+        </p>
       </div>
-      <div className="mt-5">
+
+      {/* Danh sách Menu */}
+      <div className="flex flex-col gap-1.5 overflow-y-auto flex-1 custom-scrollbar pr-1">
+        {/* === THỐNG KÊ === */}
         <NavLink
-          to={STATISTICAL}
-          className={({ isActive }) => {
-            return isActive ? classActive : "";
-          }}
+          to={`${ADMIN}/${STATISTICAL}`}
+          className={({ isActive }) =>
+            isActive || !pathManage ? activeMenuClass : inactiveMenuClass
+          }
         >
-          <div className="flex items-center h-12 gap-3 pl-10  ">
-            <span>
-              <FaChartLine color="#00A2A1" size={"1.25rem"} />
-            </span>
-            <p>Thống kê</p>
+          <div className="flex items-center gap-3">
+            <FaChartLine className="text-inherit opacity-80" size={"1.25rem"} />
+            <p>Bảng điều khiển</p>
           </div>
         </NavLink>
+
+        {/* === QUẢN LÝ BÁC SĨ === */}
         <div>
-          <div className={`${pathManage === MANAGE_DOCTOR ? classActive : ""}`}>
-            <div
-              className="flex items-center justify-between h-12 px-10 cursor-pointer "
-              onClick={() => {
-                setIsDownDoctor(!isDownDoctor);
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <span>
-                  <FaUserDoctor color="#00A2A1" size={"1.25rem"} />
-                </span>
-                <p>Quản lí bác sĩ</p>
-              </div>
-              <div
-                className={`${isDownDoctor ? "rotate-180 duration-150" : "rotate-0 duration-150"}`}
-              >
-                <FaAngleDown color="black" />
-              </div>
-            </div>
-          </div>
           <div
-            className={`duration-300 overflow-hidden transition-all ${isDownDoctor ? "max-h-24" : "max-h-0"}`}
+            className={
+              pathManage === MANAGE_DOCTOR ? activeMenuClass : inactiveMenuClass
+            }
+            onClick={() => setIsDownDoctor(!isDownDoctor)}
           >
-            <div>
+            <div className="flex items-center gap-3">
+              <FaUserDoctor
+                className="text-inherit opacity-80"
+                size={"1.25rem"}
+              />
+              <p>Quản lý bác sĩ</p>
+            </div>
+            <FaAngleDown
+              className={`transition-transform duration-300 opacity-70 ${isDownDoctor ? "rotate-180" : "rotate-0"}`}
+            />
+          </div>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${isDownDoctor ? "max-h-[500px] opacity-100 mt-1" : "max-h-0 opacity-0"}`}
+          >
+            <div className="flex flex-col gap-1 border-l-2 border-slate-100 ml-6 pl-2">
               <NavLink
                 to={`${MANAGE_DOCTOR}/${INFORMATION_DOCTOR}`}
-                className={({ isActive }) => {
-                  return isActive ? "bg-primary-50/20 block" : "";
-                }}
+                className={({ isActive }) =>
+                  isActive ? activeSubMenuClass : inactiveSubMenuClass
+                }
               >
-                <div className="flex items-center gap-3 pl-16 h-12 cursor-pointer">
-                  <span>
-                    <FaCircleInfo color="black" size={"1.25rem"} />
-                  </span>
-                  <p>Thông tin bác sĩ</p>
-                </div>
+                <FaCircleInfo
+                  className="text-inherit opacity-70"
+                  size={"1.1rem"}
+                />
+                <p>Thông tin bác sĩ</p>
               </NavLink>
               <NavLink
                 to={`${MANAGE_DOCTOR}/${MEDICAL_EXAMINATION_PLAN}`}
-                className={({ isActive }) => {
-                  return isActive ? "bg-primary-50/20 block" : "";
-                }}
+                className={({ isActive }) =>
+                  isActive ? activeSubMenuClass : inactiveSubMenuClass
+                }
               >
-                <div className="flex items-center gap-3 pl-16 h-12 cursor-pointer">
-                  <span>
-                    <FaPaperPlane color="black" size={"1.25rem"} />
-                  </span>
-                  <p>Kế hoạch khám bệnh</p>
-                </div>
+                <FaPaperPlane
+                  className="text-inherit opacity-70"
+                  size={"1.1rem"}
+                />
+                <p>Kế hoạch khám</p>
               </NavLink>
             </div>
           </div>
         </div>
 
+        {/* === QUẢN LÝ Y TẾ === */}
         <div>
           <div
-            className={`${pathManage === MANAGE_MEDICAL ? classActive : ""}`}
+            className={
+              pathManage === MANAGE_MEDICAL
+                ? activeMenuClass
+                : inactiveMenuClass
+            }
+            onClick={() => setIsDownMedical(!isDownMedical)}
           >
-            <div
-              className="flex items-center justify-between h-12 px-10 isDownMedical "
-              onClick={() => {
-                setIsDownMedical(!isDownMedical);
-              }}
-            >
-              <div className="flex items-center gap-3 cursor-pointer">
-                <span>
-                  <FaBookMedical color="#00A2A1" size={"1.25rem"} />
-                </span>
-                <p>Quản lí y tế</p>
-              </div>
-              <div
-                className={`${isDownMedical ? "rotate-180 duration-150" : "rotate-0 duration-150"}`}
-              >
-                <FaAngleDown color="black" />
-              </div>
+            <div className="flex items-center gap-3">
+              <FaBookMedical
+                className="text-inherit opacity-80"
+                size={"1.25rem"}
+              />
+              <p>Quản lý y tế</p>
             </div>
+            <FaAngleDown
+              className={`transition-transform duration-300 opacity-70 ${isDownMedical ? "rotate-180" : "rotate-0"}`}
+            />
           </div>
+
           <div
-            className={`duration-300 overflow-hidden transition-all ${isDownMedical ? "max-h-36" : "max-h-0"}`}
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${isDownMedical ? "max-h-[500px] opacity-100 mt-1" : "max-h-0 opacity-0"}`}
           >
-            <NavLink
-              to={`${MANAGE_MEDICAL}/${MANAGE_SPECIALTY}`}
-              className={({ isActive }) => {
-                return isActive ? "bg-primary-50/20 block" : "";
-              }}
-            >
-              <div className="flex items-center gap-3 pl-16 h-12">
-                <span>
-                  <FaFire color="black" size={"1.25rem"} />
-                </span>
+            <div className="flex flex-col gap-1 border-l-2 border-slate-100 ml-6 pl-2">
+              <NavLink
+                to={`${MANAGE_MEDICAL}/${MANAGE_SPECIALTY}`}
+                className={({ isActive }) =>
+                  isActive ? activeSubMenuClass : inactiveSubMenuClass
+                }
+              >
+                <FaFire className="text-inherit opacity-70" size={"1.1rem"} />
                 <p>Chuyên khoa</p>
-              </div>
-            </NavLink>
-            <NavLink
-              to={`${MANAGE_MEDICAL}/${MANAGE_POSITION}`}
-              className={({ isActive }) => {
-                return isActive ? "bg-primary-50/20 block" : "";
-              }}
-            >
-              <div className="flex items-center gap-3 pl-16 h-12">
-                <span>
-                  <FaChartSimple color="black" size={"1.25rem"} />
-                </span>
+              </NavLink>
+              <NavLink
+                to={`${MANAGE_MEDICAL}/${MANAGE_POSITION}`}
+                className={({ isActive }) =>
+                  isActive ? activeSubMenuClass : inactiveSubMenuClass
+                }
+              >
+                <FaChartSimple
+                  className="text-inherit opacity-70"
+                  size={"1.1rem"}
+                />
                 <p>Chức vụ</p>
-              </div>
-            </NavLink>
+              </NavLink>
+            </div>
           </div>
         </div>
+
+        {/* === GÓI KHÁM === */}
         <div>
           <div
-            className={`${pathManage === MANAGE_PACKAGE ? classActive : ""}`}
+            className={
+              pathManage === MANAGE_PACKAGE
+                ? activeMenuClass
+                : inactiveMenuClass
+            }
+            onClick={() => setIsDownPackage(!isDownPackage)}
           >
-            <div
-              className="flex items-center justify-between h-12 px-10 cursor-pointer "
-              onClick={() => {
-                setIsDownPackage(!isDownPackage);
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <span>
-                  <FaFileMedicalAlt color="#00A2A1" size={"1.25rem"} />
-                </span>
-                <p>Gói khám</p>
-              </div>
-              <div
-                className={`${isDownPackage ? "rotate-180 duration-150" : "rotate-0 duration-150"}`}
-              >
-                <FaAngleDown color="black" />
-              </div>
+            <div className="flex items-center gap-3">
+              <FaFileMedicalAlt
+                className="text-inherit opacity-80"
+                size={"1.25rem"}
+              />
+              <p>Quản lý Gói khám</p>
             </div>
+            <FaAngleDown
+              className={`transition-transform duration-300 opacity-70 ${isDownPackage ? "rotate-180" : "rotate-0"}`}
+            />
           </div>
+
           <div
-            className={`duration-300 overflow-hidden transition-all ${isDownPackage ? "max-h-36" : "max-h-0"}`}
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${isDownPackage ? "max-h-[500px] opacity-100 mt-1" : "max-h-0 opacity-0"}`}
           >
-            <div>
+            <div className="flex flex-col gap-1 border-l-2 border-slate-100 ml-6 pl-2">
               <NavLink
                 to={`${MANAGE_PACKAGE}/${INFORMATION_PAKAGE}`}
-                className={({ isActive }) => {
-                  return isActive ? "bg-primary-50/20 block" : "";
-                }}
+                className={({ isActive }) =>
+                  isActive ? activeSubMenuClass : inactiveSubMenuClass
+                }
               >
-                <div className="flex items-center gap-3 pl-16 h-12 cursor-pointer">
-                  <span>
-                    <FaCircleInfo color="black" size={"1.25rem"} />
-                  </span>
-                  <p>Thông tin gói khám</p>
-                </div>
+                <FaCircleInfo
+                  className="text-inherit opacity-70"
+                  size={"1.1rem"}
+                />
+                <p>Thông tin gói khám</p>
               </NavLink>
               <NavLink
                 to={`${MANAGE_PACKAGE}/${PACKAGE_PLAN}`}
-                className={({ isActive }) => {
-                  return isActive ? "bg-primary-50/20 block" : "";
-                }}
+                className={({ isActive }) =>
+                  isActive ? activeSubMenuClass : inactiveSubMenuClass
+                }
               >
-                <div className="flex items-center gap-3 pl-16 h-12 cursor-pointer">
-                  <span>
-                    <FaPaperPlane color="black" size={"1.25rem"} />
-                  </span>
-                  <p>Kế hoạch gói khám</p>
-                </div>
+                <FaPaperPlane
+                  className="text-inherit opacity-70"
+                  size={"1.1rem"}
+                />
+                <p>Kế hoạch gói khám</p>
               </NavLink>
               <NavLink
                 to={`${MANAGE_PACKAGE}/${CATEGORY_PACKAGE}`}
-                className={({ isActive }) => {
-                  return isActive ? "bg-primary-50/20 block" : "";
-                }}
+                className={({ isActive }) =>
+                  isActive ? activeSubMenuClass : inactiveSubMenuClass
+                }
               >
-                <div className="flex items-center gap-3 pl-16 h-12 cursor-pointer">
-                  <span>
-                    <BiCategoryAlt color="black" size={"1.25rem"} />
-                  </span>
-                  <p>Danh mục gói khám</p>
-                </div>
+                <BiCategoryAlt
+                  className="text-inherit opacity-70"
+                  size={"1.2rem"}
+                />
+                <p>Danh mục gói khám</p>
               </NavLink>
             </div>
           </div>
         </div>
-        {/* <NavLink
-                    to={MANAGE_APPOINTMENT}
-                    className={({ isActive }) => {
-                        return isActive ? classActive : ''
-                    }}
-                >
-                    <div className='flex items-center h-12 gap-3 pl-10  '>
-                        <span><RxCountdownTimer color="#00A2A1" size={'1.25rem'} /></span>
-                        <p>Lịch hẹn</p>
-                    </div>
-                </NavLink> */}
+
+        {/* === QUẢN LÝ LỄ TÂN === */}
         <NavLink
-          to={MANAGE_RECEPTIONIST}
-          className={({ isActive }) => {
-            return isActive ? classActive : "";
-          }}
+          to={`${ADMIN}/${MANAGE_RECEPTIONIST}`}
+          className={({ isActive }) =>
+            isActive ? activeMenuClass : inactiveMenuClass
+          }
         >
-          <div className="flex items-center h-12 gap-3 pl-10  ">
-            <span>
-              <GrUserManager color="#00A2A1" size={"1.25rem"} />
-            </span>
+          <div className="flex items-center gap-3">
+            <GrUserManager
+              className="text-inherit opacity-80"
+              size={"1.25rem"}
+            />
             <p>Quản lý lễ tân</p>
           </div>
         </NavLink>
+
+        {/* === QUẢN LÝ KHÁCH HÀNG === */}
         <NavLink
-          to={MANAGE_USERS}
-          className={({ isActive }) => {
-            return isActive ? classActive : "";
-          }}
+          to={`${ADMIN}/${MANAGE_USERS}`}
+          className={({ isActive }) =>
+            isActive ? activeMenuClass : inactiveMenuClass
+          }
         >
-          <div className="flex items-center h-12 gap-3 pl-10  ">
-            <span>
-              <FaUserGroup color="#00A2A1" size={"1.25rem"} />
-            </span>
+          <div className="flex items-center gap-3">
+            <FaUserGroup className="text-inherit opacity-80" size={"1.25rem"} />
             <p>Quản lý khách hàng</p>
           </div>
         </NavLink>

@@ -1,207 +1,294 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { createAppointment, getInfoToMakeAppointment } from "../services/appointment";
-import { useState } from "react";
-import { FaPhone } from "react-icons/fa6";
+import {
+  createAppointment,
+  getInfoToMakeAppointment,
+} from "../services/appointment";
+import { FaPhone, FaTransgender, FaMoneyBillWave } from "react-icons/fa6";
 import { ImUser } from "react-icons/im";
-import { FaTransgender } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
 import { GiPositionMarker } from "react-icons/gi";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { APPOINTMENT } from "../utils/path";
 import { InfoAppointment } from "../components";
-import dayjs from 'dayjs';
-dayjs.locale('vi')
+import { IoShieldCheckmark } from "react-icons/io5";
+import dayjs from "dayjs";
+dayjs.locale("vi");
 
 function MakeAppointment() {
+  const auth = useSelector((state) => state.auth?.data);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-    const auth = useSelector(state => state.auth?.data)
-    
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate()
+  const idDoctor = searchParams.get("idDoctor");
+  const idMedicalPackage = searchParams.get("idMedicalPackage");
+  const appointment_date = searchParams.get("date");
+  const time_frame = searchParams.get("tf");
 
-    const idDoctor = searchParams.get("idDoctor");
-    const idMedicalPackage = searchParams.get("idMedicalPackage");
-    const appointment_date = searchParams.get("date");
-    const time_frame = searchParams.get("tf");
+  const [infoAppointment, setInfoAppointment] = useState({
+    name: "",
+    price: 0,
+    image: "",
+    time_frame: "",
+    appointment_date: "",
+  });
 
-    const [infoAppointment, setInfoAppointment] = useState({
-        name:'',
-        price:'',
-        image:'',
-        time_frame:'',
-        appointment_date:''
-    })
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const res = await getInfoToMakeAppointment({ idDoctor, idMedicalPackage, time_frame, appointment_date })
-            if (res.err == 0) {
-                setInfoAppointment(res?.data)
-                if(idDoctor){
-                    setInfoAppointment({
-                        name: res.data?.doctor?.position.map(item=>item.name).join(" ") +" "+ res.data?.doctor?.user?.firstName + res.data?.doctor?.user?.lastName,
-                        price: res.data?.doctor?.price.toLocaleString('vi-VN'),
-                        image: res?.data?.doctor?.user?.avatar,
-                        time_frame: res?.data?.time_frame,
-                        appointment_date:res?.data?.appointment_date,
-                    })
-                }
-                if(idMedicalPackage){
-                    setInfoAppointment({
-                        name: res.data?.Medical_package?.name,
-                        price: res.data?.Medical_package?.price,
-                        image: res?.data?.Medical_package?.image,
-                        time_frame: res?.data?.time_frame,
-                        appointment_date:res?.data?.appointment_date,
-                    })
-                }
-            }
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getInfoToMakeAppointment({
+        idDoctor,
+        idMedicalPackage,
+        time_frame,
+        appointment_date,
+      });
+      if (res.err === 0) {
+        if (idDoctor) {
+          const positions = res.data?.doctor?.position
+            .map((item) => item.name)
+            .join(", ");
+          const fullName = `${res.data?.doctor?.user?.firstName} ${res.data?.doctor?.user?.lastName}`;
+          setInfoAppointment({
+            name: `${positions ? positions + " - " : ""}${fullName}`,
+            price: res.data?.doctor?.price || 0,
+            image: res.data?.doctor?.user?.avatar,
+            time_frame: res.data?.time_frame,
+            appointment_date: res.data?.appointment_date,
+          });
         }
-        if (appointment_date && time_frame && (idDoctor || idMedicalPackage)) {
-            fetchData()
+        if (idMedicalPackage) {
+          setInfoAppointment({
+            name: res.data?.Medical_package?.name,
+            price: res.data?.Medical_package?.price || 0,
+            image: res.data?.Medical_package?.image,
+            time_frame: res.data?.time_frame,
+            appointment_date: res.data?.appointment_date,
+          });
         }
-    }, [idDoctor, idMedicalPackage, time_frame, appointment_date])
-    console.log(infoAppointment);
-    
-
-    const handleClickSubmit = async () => {
-        const payload = {
-            idDoctor,
-            idPatient: auth?.id,
-            idMedicalPackage,
-            appointment_date,
-            time_frame: infoAppointment?.time_frame
-        }
-        Swal.fire({
-            title: "Bạn chắc muốn đặt lịch khám ?",
-            showDenyButton: true,
-            confirmButtonText: "Đặt lịch",
-            denyButtonText: "Thoát"
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const res = await createAppointment(payload)
-                if (res.err == 0) {
-                    Swal.fire({
-                        title: "Đặt lịch thành công"
-                    }).then(() => {
-                        navigate(APPOINTMENT)
-                    });
-                }
-                else if (res.err === 5) {
-                    Swal.fire({
-                        title: "Đăng ký lịch hẹn không thành công !",
-                        icon: "error",
-                        text: "Bạn có lịch hẹn khác vào khung giờ này !"
-                    });
-                }
-                else {
-                    Swal.fire({
-                        title: "Đăng ký lịch hẹn không thành công !",
-                        icon: "error",
-                    });
-                }
-            }
-        });
+      }
+    };
+    if (appointment_date && time_frame && (idDoctor || idMedicalPackage)) {
+      fetchData();
     }
+  }, [idDoctor, idMedicalPackage, time_frame, appointment_date]);
 
-    return (
-        <div>
-            <div className="h-36 bg-[#F6F6F6] xl:px-96 lg:px-40 md:px-20 flex items-center sticky top-0 z-10">
-                <InfoAppointment infoAppointment={infoAppointment}/>
-            </div>
-            <div className="xl:px-96 lg:px-40 md:px-20 pt-10">
-                <div className="relative mb-6">
-                    <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                        <ImUser className="text-[#666666]" />
-                    </div>
-                    <input type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 outline-none" placeholder="Họ tên bệnh nhân"
-                        value={`${auth?.firstName} ${auth?.lastName}`}
-                        disabled
-                    />
-                </div>
-                <div className="relative mb-6">
-                    <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                        <FaPhone className="text-[#666666]" />
-                    </div>
-                    <input type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 outline-none" placeholder="Số điện thoại liên hệ"
-                        value={auth?.phone}
-                        disabled
-                    />
-                </div>
-                <div className="relative mb-6">
-                    <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                        <FaTransgender className="text-[#666666]" />
-                    </div>
-                    <input type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 outline-none" placeholder="Giới tính"
-                        value={`${auth?.gender === "male" ? "Nam" : "Nữ"}`}
-                        disabled
-                    />
-                </div>
-                <div className="relative mb-6">
-                    <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                        <CiCalendarDate className="text-[#666666]" />
-                    </div>
-                    <input type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 outline-none" placeholder="Ngày tháng năm sinh"
-                        value={auth?.dateOfBirth ? dayjs(auth?.dateOfBirth).format("DD-MM-YYYY") : ""}
-                        disabled
-                    />
-                </div>
-                <div className="relative mb-6">
-                    <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                        <GiPositionMarker className="text-[#666666]" />
-                    </div>
-                    <input type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 outline-none" placeholder="Địa chỉ"
-                        value={auth?.address}
-                        disabled
-                    />
-                </div>
-                <div className="mb-6">
-                    <p className="text-[#337AB7] text-sm font-semibold">Hình thức thanh toán</p>
-                    <div className="my-2">
-                        <input type="radio" checked disabled />
-                        <label className="text-gray-500"> Thanh toán sau tại cơ sở y tế</label>
-                    </div>
-                    <div className="bg-[#F6F6F6] rounded-lg p-5">
-                        <div className="flex justify-between mb-2">
-                            <p>Giá khám</p>
-                            <p>{infoAppointment?.price.toLocaleString('vi-VN')} VND</p>
-                        </div>
-                        <div className="flex justify-between mb-2">
-                            <p>Phí đặt dịch vụ</p>
-                            <p>Miễn phí</p>
-                        </div>
-                        <hr className="border border-gray-400 mb-3" />
-                        <div className="flex justify-between mb-2">
-                            <p>Tổng cộng</p>
-                            <p className="text-red-600">{infoAppointment?.price.toLocaleString('vi-VN')} VND</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="mb-6">
-                    <p className="text-xs text-gray-400 text-center mb-1">Quý khách vui lòng đảm bảo đầy đủ thông tin để tiết kiệm thời gian làm thủ tục khám</p>
-                    <div className="rounded-lg bg-[#D4EFFC] p-4">
-                        <h3 className="text-xl font-semibold">LƯU Ý :</h3>
-                        <p>Thông tin được lấy từ tài khoản, vui lòng cập nhập đầy đủ thông tin trước khi làm thủ tục. Thông tin anh/chị cung cấp sẽ được sử dụng làm hồ sơ khám bệnh, khi điền thông tin anh/chị vui lòng:</p>
-                        <ul className="list-disc list-inside">
-                            <li>
-                                Ghi rõ họ và tên, viết hoa những chữ cái đầu tiên, ví dụ: Trần Văn Phú
-                            </li>
-                            <li>
-                                Điền đầy đủ, đúng và vui lòng kiểm tra lại thông tin trước khi ấn "Xác nhận"
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <button className="text-white bg-yellow-400 font-semibold text-xl w-full rounded-lg py-2 mb-6 cursor-pointer"
-                    onClick={() => { handleClickSubmit() }}
-                >Xác nhận đặt khám
-                </button>
-            </div>
+  const handleClickSubmit = () => {
+    const payload = {
+      idDoctor,
+      idPatient: auth?.id,
+      idMedicalPackage,
+      appointment_date,
+      time_frame: infoAppointment?.time_frame,
+    };
+
+    Swal.fire({
+      title: "Xác nhận đặt lịch?",
+      text: "Vui lòng kiểm tra lại thông tin trước khi đặt lịch.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3B82F6",
+      cancelButtonColor: "#94A3B8",
+      confirmButtonText: "Xác nhận đặt lịch",
+      cancelButtonText: "Kiểm tra lại",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await createAppointment(payload);
+        if (res.err === 0) {
+          Swal.fire({
+            title: "Thành công!",
+            text: "Lịch khám của bạn đã được ghi nhận.",
+            icon: "success",
+            confirmButtonColor: "#3B82F6",
+          }).then(() => {
+            navigate(APPOINTMENT);
+          });
+        } else if (res.err === 5) {
+          Swal.fire({
+            title: "Trùng lịch!",
+            text: "Bạn đã có một lịch hẹn khác vào khung giờ này.",
+            icon: "warning",
+            confirmButtonColor: "#EF4444",
+          });
+        } else {
+          Swal.fire({
+            title: "Thất bại!",
+            text: "Hệ thống đang bận, vui lòng thử lại sau.",
+            icon: "error",
+            confirmButtonColor: "#EF4444",
+          });
+        }
+      }
+    });
+  };
+
+  const ReadOnlyInput = ({ icon: Icon, value }) => (
+    <div className="relative mb-5">
+      <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+        <Icon className="text-slate-400" size="1.1rem" />
+      </div>
+      <input
+        type="text"
+        className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none cursor-not-allowed font-medium"
+        value={value || "Chưa cập nhật"}
+        readOnly
+      />
+    </div>
+  );
+
+  return (
+    <div className="bg-slate-50 min-h-screen pb-16">
+      <div className="bg-white border-b border-slate-200 sticky top-[0px] z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto">
+          <InfoAppointment infoAppointment={infoAppointment} />
         </div>
+      </div>
 
-    );
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <h1 className="text-2xl font-bold text-slate-800 mb-6">
+          Xác nhận thông tin đặt khám
+        </h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <IoShieldCheckmark className="text-blue-600" size="1.5rem" />
+                  Thông tin Bệnh nhân
+                </h2>
+                <span className="text-xs text-slate-500 italic bg-slate-100 px-3 py-1 rounded-full">
+                  Trích xuất từ Hồ sơ cá nhân
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <ReadOnlyInput
+                  icon={ImUser}
+                  value={`${auth?.firstName} ${auth?.lastName}`}
+                />
+                <ReadOnlyInput icon={FaPhone} value={auth?.phone} />
+                <ReadOnlyInput
+                  icon={FaTransgender}
+                  value={
+                    auth?.gender === "male"
+                      ? "Nam"
+                      : auth?.gender === "female"
+                        ? "Nữ"
+                        : ""
+                  }
+                />
+                <ReadOnlyInput
+                  icon={CiCalendarDate}
+                  value={
+                    auth?.dateOfBirth
+                      ? dayjs(auth?.dateOfBirth).format("DD/MM/YYYY")
+                      : ""
+                  }
+                />
+                <div className="md:col-span-2">
+                  <ReadOnlyInput
+                    icon={GiPositionMarker}
+                    value={auth?.address}
+                  />
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-500 mt-2 italic text-center md:text-left">
+                * Thông tin được tự động điền. Nếu muốn thay đổi, vui lòng vào
+                phần{" "}
+                <strong className="text-blue-600 cursor-pointer">
+                  Hồ sơ cá nhân
+                </strong>
+                .
+              </p>
+            </div>
+
+            {/* Box Lưu ý quan trọng */}
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8">
+              <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2">
+                LƯU Ý QUAN TRỌNG:
+              </h3>
+              <p className="text-amber-700 mb-2 leading-relaxed">
+                Thông tin anh/chị cung cấp sẽ được sử dụng làm{" "}
+                <strong>hồ sơ khám bệnh chính thức</strong> tại cơ sở y tế. Vui
+                lòng đảm bảo:
+              </p>
+              <ul className="list-disc list-inside text-amber-700/80 space-y-1 ml-2">
+                <li>Kiểm tra kỹ Họ Tên, Số điện thoại và Ngày sinh.</li>
+                <li>
+                  Đến trước giờ hẹn <strong>15 phút</strong> để làm thủ tục lễ
+                  tân.
+                </li>
+                <li>Mang theo CMND/CCCD hoặc Giấy tờ tùy thân có ảnh.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sm:p-8 sticky top-[200px]">
+              <h2 className="text-lg font-bold text-slate-800 mb-5 border-b border-slate-100 pb-4">
+                Thông tin thanh toán
+              </h2>
+
+              {/* Phương thức thanh toán */}
+              <div className="mb-6">
+                <p className="text-sm font-semibold text-slate-600 mb-3">
+                  Hình thức
+                </p>
+                <label className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-xl cursor-not-allowed opacity-90">
+                  <input
+                    type="radio"
+                    checked
+                    readOnly
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="flex-1 text-sm font-medium text-blue-800">
+                    Thanh toán tại cơ sở y tế
+                  </span>
+                  <FaMoneyBillWave className="text-blue-600" />
+                </label>
+              </div>
+
+              {/* Chi tiết chi phí */}
+              <div className="bg-slate-50 rounded-xl p-5 border border-slate-100 mb-6">
+                <div className="flex justify-between items-center mb-3 text-slate-600">
+                  <span>Giá dịch vụ</span>
+                  <span className="font-medium">
+                    {infoAppointment?.price?.toLocaleString("vi-VN")} đ
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mb-4 text-slate-600">
+                  <span>Phí đặt lịch</span>
+                  <span className="text-green-600 font-medium">Miễn phí</span>
+                </div>
+
+                <div className="border-t border-dashed border-slate-300 pt-4 flex justify-between items-center">
+                  <span className="font-bold text-slate-800">Tổng cộng</span>
+                  <span className="text-2xl font-bold text-red-500">
+                    {infoAppointment?.price?.toLocaleString("vi-VN")}{" "}
+                    <span className="text-base text-red-400">VNĐ</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Nút Submit */}
+              <button
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 flex justify-center items-center"
+                onClick={handleClickSubmit}
+              >
+                Xác nhận đặt lịch
+              </button>
+
+              <p className="text-xs text-center text-slate-400 mt-4">
+                Bằng việc xác nhận, bạn đồng ý với Điều khoản sử dụng dịch vụ
+                của Nger Hospital.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default MakeAppointment;
