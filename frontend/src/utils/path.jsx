@@ -41,3 +41,7 @@ export const CHANGE_PASSWORD = "doi-mat-khau";
 // Lễ tân
 export const RECEPTIONIST = "receptionist";
 export const LOGIN_RECEPTIONIST = "receptionist-login";
+export const OVERVIEW = "tong-quan";
+export const APPOINTMENTSCHEDULE = "lich-hen";
+export const PATIENT = "benh-nhan";
+export const SETTING_ACCOUNT = "cai-dat-tai-khoan";

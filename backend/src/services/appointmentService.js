@@ -268,14 +268,8 @@ const updateStatusAppointment = async (idAppointment, status) => {
   }
 };
 
-const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
+const getAppointments = async (idDoctor, limit, page, value, filter) => {
   try {
-    if (!idDoctor) {
-      return {
-        err: 1,
-        message: "ID doctor required",
-      };
-    }
     if (!filter) {
       return {
         err: 1,
@@ -283,15 +277,24 @@ const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
       };
     }
     let wherePhoneOrName = {};
-    let whereAppointment = {
-      id_doctor: idDoctor,
-    };
+    let whereAppointment = {};
+    if (idDoctor) {
+      whereAppointment.id_doctor = idDoctor;
+    }
     if (+filter !== 99) {
       whereAppointment.status = +filter;
     }
     if (value) {
       wherePhoneOrName = {
-        [Op.or]: [{ firstName: value }, { lastName: value }, { phone: value }],
+        [Op.or]: [
+          { firstName: value },
+          { lastName: value },
+          {
+            phone: {
+              [Op.like]: `${value}%`,
+            },
+          },
+        ],
       };
     }
 
@@ -331,14 +334,14 @@ const getAppointmentOfDoctor = async (idDoctor, limit, page, value, filter) => {
 
     return {
       err: 0,
-      message: "Get appointment of doctor success !",
+      message: "Get appointments success !",
       data: rows,
       page: page,
       totalPage: Math.ceil(count / limit),
       totalData: count,
     };
   } catch (error) {
-    console.log("Lỗi ở getAppointmentOfDoctor :", error);
+    console.log("Lỗi ở getAppointments :", error);
     return {
       err: -999,
       message: `Error server: ${error}`,
@@ -362,7 +365,17 @@ const getPatientOfDoctor = async (
 
     let whereUser = {};
     if (value) {
-      whereUser = { [Op.or]: [{ firstName: value }, { lastName: value }] };
+      whereUser = {
+        [Op.or]: [
+          { firstName: value },
+          { lastName: value },
+          {
+            phone: {
+              [Op.like]: `${value}%`,
+            },
+          },
+        ],
+      };
     }
 
     const { count, rows } = await db.Appointment.findAndCountAll({
@@ -420,6 +433,6 @@ export {
   createAppointment,
   getAppointmentOfUser,
   updateStatusAppointment,
-  getAppointmentOfDoctor,
+  getAppointments,
   getPatientOfDoctor,
 };

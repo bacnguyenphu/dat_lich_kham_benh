@@ -1,12 +1,12 @@
 import { Outlet } from "react-router-dom";
-import { Sidebar } from "../components/Admin";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { IoMdClose } from "react-icons/io"; // Import icon đóng
 import UserDropdown from "../components/UserDropdown";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import Sidebar from "../components/Receptionist/SideBar";
 
-function LayoutAdmin() {
+function LayoutReceptionist() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
 
@@ -57,17 +57,11 @@ function LayoutAdmin() {
             >
               <HiOutlineMenuAlt2 size="1.5rem" />
             </button>
-
-            <div className="hidden md:block">
-              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
-                Hệ thống quản trị
-              </h2>
-            </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* <div className="flex items-center gap-4">
             <UserDropdown />
-          </div>
+          </div> */}
         </header>
 
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 relative scroll-smooth bg-slate-50">
@@ -78,4 +72,4 @@ function LayoutAdmin() {
   );
 }
 
-export default LayoutAdmin;
+export default LayoutReceptionist;

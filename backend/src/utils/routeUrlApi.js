@@ -2,7 +2,7 @@
 export const GET_INFOR_MAKE_APPOINTMENT = "/get-info-make-appointment";
 export const CREATE_APPOINTMENT = "/create-appointment";
 export const GET_APPOINTMENT_OF_USER = "/get-appointment-of-user";
-export const GET_APPOINTMENT_OF_DOCTOR = "/get-appointment-of-doctor";
+export const GET_APPOINTMENTS = "/get-appointments";
 export const UPDATE_STATUS_APPOINTMENT = "/update-status-appointment";
 
 // Route api auth
@@ -12,6 +12,7 @@ export const REFRESH_TOKEN = "/refresh-token";
 export const LOGOUT = "/logout";
 export const NAVIGATE_ADMIN = "/navigate-admin";
 export const LOGIN_DOCTOR = "/login-doctor";
+export const LOGIN_RECEPTIONIST = "/login-receptionist";
 export const CHANGE_PASSWORD_DOCTOR = "/change-password-doctor";
 
 // Route api category package
@@ -78,3 +79,6 @@ export const GET_COMMENTS = "/get-comments";
 export const UPDATE_COMMENT = "/update-comment";
 export const GET_COMMENTS_BY_APPOINTMENT_ID = "/get-comments-by-appointment-id";
 export const DELETE_COMMENT = "/delete-comment";
+
+// Route statistical
+export const STATISTICAL = "/statistics";

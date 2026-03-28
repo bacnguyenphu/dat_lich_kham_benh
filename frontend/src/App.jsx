@@ -7,6 +7,7 @@ import {
 import {
   ADMIN,
   APPOINTMENT,
+  APPOINTMENTSCHEDULE,
   CATEGORY_PACKAGE,
   CHANGE_PASSWORD,
   DOCTOR,
@@ -31,10 +32,14 @@ import {
   MY_INFORMATION,
   MY_PATIENT,
   MY_SCHEDULE,
+  OVERVIEW,
   PACKAGE_PLAN,
+  PATIENT,
   PROFILE,
+  RECEPTIONIST,
   REGISTER,
   SEARCH,
+  SETTING_ACCOUNT,
   SPECIALTY,
   STATISTICAL,
 } from "./utils/path";
@@ -76,6 +81,11 @@ import {
 import DoctorRoute from "./routes/DoctorRoute";
 import LoginReceptionist from "./pages/Receptionist/LoginReceptionist";
 import ManageReceptionist from "./components/Admin/ManageReceptionist";
+import LayoutReceptionist from "./Layouts/LayoutReceptionist";
+import Overview from "./pages/Receptionist/Overview";
+import AppointmentSchedule from "./pages/Receptionist/AppointmentSchedule";
+import Patient from "./pages/Receptionist/Patient";
+import SettingAccount from "./pages/Receptionist/SettingAccount";
 
 function App() {
   return (
@@ -158,6 +168,12 @@ function App() {
         </Route>
 
         <Route path={LOGIN_RECEPTIONIST} element={<LoginReceptionist />} />
+        <Route path={RECEPTIONIST} element={<LayoutReceptionist />}>
+          <Route path={OVERVIEW} element={<Overview />} />
+          <Route path={APPOINTMENTSCHEDULE} element={<AppointmentSchedule />} />
+          <Route path={PATIENT} element={<Patient />} />
+          <Route path={SETTING_ACCOUNT} element={<SettingAccount />} />
+        </Route>
       </Routes>
       <ToastContainer
         position="top-center"

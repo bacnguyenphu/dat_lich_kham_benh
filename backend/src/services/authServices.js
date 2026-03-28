@@ -260,4 +260,72 @@ const changePasswordDoctor = async (idDoctor, oldPassword, newPassword) => {
   }
 };
 
-export { register, login, loginDoctor, changePasswordDoctor };
+const loginReceptionist = async (data) => {
+  try {
+    if (!data.phone) {
+      return {
+        err: -1,
+        message: "Phone is required !",
+      };
+    }
+    if (!data.password) {
+      return {
+        err: -2,
+        message: "Password is required !",
+      };
+    }
+    const user = await db.User.findOne({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      where: {
+        phone: data.phone,
+      },
+    });
+
+    if (!user) {
+      return {
+        err: -3,
+        message: "Account haven't registered",
+      };
+    }
+    // console.log("check user>>>>",user.dataValues);
+
+    if (user.dataValues?.role !== "R4") {
+      return {
+        err: -4,
+        message: "Incorrect password account",
+      };
+    }
+
+    if (!checkPass(data.password, user.password)) {
+      return {
+        err: -4,
+        message: "Password is not correct !",
+      };
+    }
+
+    let { password, ...other } = user.dataValues;
+    const token = createJWT(other);
+    const refreshToken = createRefreshToken(other);
+    return {
+      err: 0,
+      data: other,
+      token,
+      refreshToken,
+      message: "Log in success!",
+    };
+  } catch (error) {
+    console.log("Lỗi ở loginReceptionist : ", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
+export {
+  register,
+  login,
+  loginDoctor,
+  changePasswordDoctor,
+  loginReceptionist,
+};

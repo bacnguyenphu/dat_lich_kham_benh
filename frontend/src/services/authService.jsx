@@ -1,30 +1,39 @@
 import axios from "../utils/customAxios";
 
 const login = (data) => {
-    return axios.post('login', data)
-}
+  return axios.post("login", data);
+};
 
 const register = (data) => {
-    return axios.post('register', data)
-}
+  return axios.post("register", data);
+};
 
 const logout = () => {
-    return axios.post("logout")
-}
+  return axios.post("logout");
+};
 
 const requestNavigateAdmin = () => {
-    return axios.get("navigate-admin")
-}
+  return axios.get("navigate-admin");
+};
 
 const loginDoctor = (data) => {
-    return axios.post('login-doctor', data)
-}
+  return axios.post("login-doctor", data);
+};
 
 const changePasswordDoctor = (data) => {
-    return axios.post('change-password-doctor', data)
-}
+  return axios.post("change-password-doctor", data);
+};
+
+const loginReceptionist = (data) => {
+  return axios.post("login-receptionist", data);
+};
 
 export {
-    login, register, logout, requestNavigateAdmin,
-    loginDoctor, changePasswordDoctor
-}
+  login,
+  register,
+  logout,
+  requestNavigateAdmin,
+  loginDoctor,
+  changePasswordDoctor,
+  loginReceptionist,
+};

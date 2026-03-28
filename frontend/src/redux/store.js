@@ -1,17 +1,18 @@
-import { configureStore } from '@reduxjs/toolkit'
-import authReducer from './authSlice'
-import authDoctorReducer from './authDoctorSlice'
-import specialty from './specialtySlice'
-import storage from 'redux-persist/lib/storage'
-import hardSet from 'redux-persist/lib/stateReconciler/hardSet'
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "./authSlice";
+import authDoctorReducer from "./authDoctorSlice";
+import authReceptionist from "./authReceptionistSlice";
+import specialty from "./specialtySlice";
+import storage from "redux-persist/lib/storage";
+import hardSet from "redux-persist/lib/stateReconciler/hardSet";
 import { persistStore, persistReducer } from "redux-persist";
 
 const authConfig = {
-    key: 'authUser',
-    storage,
-    stateReconciler: hardSet,
-    whitelist: ["token", "data"]
-}
+  key: "authUser",
+  storage,
+  stateReconciler: hardSet,
+  whitelist: ["token", "data"],
+};
 
 // const authDoctorConfig = {
 //     key: 'authDoctor',
@@ -21,22 +22,23 @@ const authConfig = {
 // }
 
 const specialtyConfig = {
-    key: 'specialties',
-    storage,
-    stateReconciler: hardSet,
-    whitelist: ["data"]
-}
+  key: "specialties",
+  storage,
+  stateReconciler: hardSet,
+  whitelist: ["data"],
+};
 
 export const store = configureStore({
-    reducer: {
-        auth: persistReducer(authConfig, authReducer),
-        authDoctor: persistReducer(authConfig, authDoctorReducer),
-        specialties: persistReducer(specialtyConfig, specialty)
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: false, // 👈 tắt check toàn bộ
-        }),
-})
+  reducer: {
+    auth: persistReducer(authConfig, authReducer),
+    authDoctor: persistReducer(authConfig, authDoctorReducer),
+    authReceptionist: persistReducer(authConfig, authReceptionist),
+    specialties: persistReducer(specialtyConfig, specialty),
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false, // 👈 tắt check toàn bộ
+    }),
+});
 
 export const persistor = persistStore(store);
