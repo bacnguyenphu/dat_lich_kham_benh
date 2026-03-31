@@ -4,6 +4,7 @@ import {
   getAppointmentOfUser,
   getInfoToMakeAppointment,
   getAppointments,
+  getAppointmentById,
 } from "../services/appointmentService";
 
 const handleGetInfoToMakeAppointment = async (req, res) => {
@@ -80,10 +81,26 @@ const handleGetAppointments = async (req, res) => {
   }
 };
 
+const handleGetAppointmentById = async (req, res) => {
+  try {
+    const idAppointment = req.query.id;
+
+    const message = await getAppointmentById(idAppointment);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log(`Lỗi ở handleGetAppointmentById: `, error);
+    return {
+      err: -1,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 export {
   handleGetInfoToMakeAppointment,
   handleCreateAppointment,
   handleGetAppointmentOfUser,
   handleUpdateStatusAppointment,
   handleGetAppointments,
+  handleGetAppointmentById,
 };

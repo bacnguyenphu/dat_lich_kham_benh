@@ -4,28 +4,31 @@ import { getAppointments } from "../../services/appointment";
 import { CiSearch } from "react-icons/ci";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { LuCalendarClock } from "react-icons/lu";
+import { FaRegEye } from "react-icons/fa6";
 import dayjs from "dayjs";
 import Pagination from "../../components/Pagination";
+import ModalInfoAppointment from "../../components/Receptionist/ModalInfoAppointment";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Overview() {
   const [appointments, setAppointments] = useState([]);
   const [value, setValue] = useState(""); // Dùng cho ô tìm kiếm
   const [totalPages, setTotalPages] = useState(0);
+  const [isShowModal, setIsShowModal] = useState(false);
   const limit = 5;
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [type, setType] = useState("INFO"); // "DUYET", "TU_CHOI", "INFO"
 
-  // Fetch dữ liệu mỗi khi page hoặc chuỗi tìm kiếm (value) thay đổi
+  const fetchAppointments = async () => {
+    const res = await getAppointments("", limit, page, value, 1);
+    if (res.err === 0) {
+      setAppointments(res?.data || []);
+      setTotalPages(res?.totalPage || 0);
+    }
+  };
   useEffect(() => {
-    const fetchAppointments = async () => {
-      // Số 1 ở cuối có vẻ là trạng thái "Chờ duyệt"
-      const res = await getAppointments("", limit, page, value, 1);
-      if (res.err === 0) {
-        setAppointments(res?.data || []);
-        setTotalPages(res?.totalPage || 0);
-      }
-    };
-
-    // Tối ưu: Dùng debounce nếu API gọi quá nhanh khi gõ phím (ở đây tạm gọi trực tiếp)
     const timeoutId = setTimeout(() => {
       fetchAppointments();
     }, 300); // Chờ 300ms sau khi ngừng gõ mới gọi API
@@ -171,22 +174,41 @@ function Overview() {
                       {/* Thao tác */}
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          {/* Nút Xác nhận */}
                           <button
                             className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold shadow-sm transition-all active:scale-95"
                             title="Duyệt lịch hẹn"
-                            // onClick={() => handleConfirm(apt.id)} // TODO: Gắn API Duyệt
+                            onClick={() => {
+                              setType("DUYET");
+                              setIsShowModal(true);
+                              navigate(location.pathname + `?id=${apt.id}`);
+                            }}
                           >
-                            <FaCheck size="0.8rem" /> Xác nhận
+                            <FaCheck size="0.8rem" />
+                          </button>
+
+                          <button
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold shadow-sm transition-all active:scale-95"
+                            title="Xem thông tin"
+                            onClick={() => {
+                              navigate(location.pathname + `?id=${apt.id}`);
+                              setIsShowModal(true);
+                              setType("INFO");
+                            }}
+                          >
+                            <FaRegEye size="0.8rem" />
                           </button>
 
                           {/* Nút Hủy */}
                           <button
                             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-lg text-sm font-semibold transition-all active:scale-95"
                             title="Hủy lịch hẹn"
-                            // onClick={() => handleCancel(apt.id)} // TODO: Gắn API Hủy
+                            onClick={() => {
+                              setType("TU_CHOI");
+                              setIsShowModal(true);
+                              navigate(location.pathname + `?id=${apt.id}`);
+                            }}
                           >
-                            <FaTimes size="0.8rem" /> Hủy
+                            <FaTimes size="0.8rem" />
                           </button>
                         </div>
                       </td>
@@ -224,6 +246,15 @@ function Overview() {
                 currentPage={page}
               />
             </div>
+          )}
+
+          {/* Modal xem thông tin lịch hẹn */}
+          {isShowModal && (
+            <ModalInfoAppointment
+              setIsShowModal={setIsShowModal}
+              type={type}
+              fetchAppointments={fetchAppointments}
+            />
           )}
         </div>
       </div>

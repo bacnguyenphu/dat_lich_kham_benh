@@ -38,6 +38,7 @@ import {
   UPDATE_COMMENT,
   DELETE_COMMENT,
   STATISTICAL,
+  GET_APPOINTMENT_BY_ID,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -55,6 +56,7 @@ const ROLE_PERMISSIONS = {
     CREATE_COMMENT,
     UPDATE_COMMENT,
     DELETE_COMMENT,
+    GET_APPOINTMENT_BY_ID,
   ], // bác sĩ
   R4: [
     GET_APPOINTMENTS,
@@ -65,6 +67,7 @@ const ROLE_PERMISSIONS = {
     UPDATE_COMMENT,
     DELETE_COMMENT,
     STATISTICAL,
+    GET_APPOINTMENT_BY_ID,
   ], // nhân viên
   R3: [
     CREATE_APPOINTMENT,

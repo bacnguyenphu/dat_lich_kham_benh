@@ -28,10 +28,15 @@ const getAppointments = (idDoctor, limit, page, value, filter) => {
   });
 };
 
+const getAppointmentById = (id) => {
+  return axios.get("get-appointment-by-id", { params: { id } });
+};
+
 export {
   getInfoToMakeAppointment,
   createAppointment,
   getAppointmentOfUser,
   updateStatusAppointment,
   getAppointments,
+  getAppointmentById,
 };

@@ -428,6 +428,77 @@ const getPatientOfDoctor = async (
   }
 };
 
+const getAppointmentById = async (idAppointment) => {
+  try {
+    if (!idAppointment) {
+      return {
+        err: 1,
+        message: "ID appointment required",
+      };
+    }
+
+    const appointment = await db.Appointment.findOne({
+      where: { id: idAppointment },
+      attributes: [
+        "id",
+        "appointment_date",
+        "time",
+        "status",
+        "payment_status",
+      ],
+      include: [
+        {
+          model: db.Doctor,
+          as: "doctor",
+          attributes: ["id", "price"],
+          include: [
+            {
+              model: db.Position,
+              as: "position",
+              attributes: ["name", "id"],
+              through: { attributes: [] },
+            },
+            {
+              model: db.User,
+              as: "user",
+              attributes: ["id", "firstName", "lastName", "avatar"],
+            },
+          ],
+        },
+        {
+          model: db.Medical_package,
+          as: "medical_package",
+          attributes: ["id", "image", "price", "name"],
+        },
+        {
+          model: db.User,
+          as: "user",
+          attributes: ["id", "firstName", "lastName", "phone"],
+        },
+      ],
+    });
+
+    if (!appointment) {
+      return {
+        err: 2,
+        message: "Appointment is not exist",
+      };
+    }
+
+    return {
+      err: 0,
+      message: "Get appointment by id success !",
+      data: appointment,
+    };
+  } catch (error) {
+    console.log("Lỗi ở getAppointmentById :", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 export {
   getInfoToMakeAppointment,
   createAppointment,
@@ -435,4 +506,5 @@ export {
   updateStatusAppointment,
   getAppointments,
   getPatientOfDoctor,
+  getAppointmentById,
 };

@@ -15,7 +15,6 @@ function Statistical() {
     const fetchData = async () => {
       try {
         const res = await getStatistics();
-        console.log("API Response:", res.data); // Debug log
         if (res.err === 0) {
           setData(res.data);
         } else {
