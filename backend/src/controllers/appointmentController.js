@@ -67,6 +67,7 @@ const handleGetAppointments = async (req, res) => {
     const page = req.query?.page;
     const value = req.query?.value;
     const filter = req.query?.filter;
+    const date = req.query?.date;
 
     const message = await getAppointments(
       idDoctor,
@@ -74,6 +75,7 @@ const handleGetAppointments = async (req, res) => {
       +page,
       value,
       filter,
+      date,
     );
     return res.status(200).json(message);
   } catch (error) {

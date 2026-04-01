@@ -268,9 +268,11 @@ const updateStatusAppointment = async (idAppointment, status) => {
   }
 };
 
-const getAppointments = async (idDoctor, limit, page, value, filter) => {
+const getAppointments = async (idDoctor, limit, page, value, filter, date) => {
   try {
-    if (!filter) {
+    console.log("check value: ", value);
+
+    if (filter === undefined || filter === null || filter === "") {
       return {
         err: 1,
         message: "Filter is required",
@@ -287,14 +289,28 @@ const getAppointments = async (idDoctor, limit, page, value, filter) => {
     if (value) {
       wherePhoneOrName = {
         [Op.or]: [
-          { firstName: value },
-          { lastName: value },
+          {
+            firstName: {
+              [Op.like]: `%${value}%`,
+            },
+          },
+          {
+            lastName: {
+              [Op.like]: `%${value}%`,
+            },
+          },
           {
             phone: {
-              [Op.like]: `${value}%`,
+              [Op.like]: `%${value}%`,
             },
           },
         ],
+      };
+    }
+
+    if (date) {
+      whereAppointment.appointment_date = {
+        [Op.between]: [`${date} 00:00:00`, `${date} 23:59:59`],
       };
     }
 
@@ -306,8 +322,27 @@ const getAppointments = async (idDoctor, limit, page, value, filter) => {
         "time",
         "status",
         "payment_status",
+        "createdAt",
       ],
       include: [
+        {
+          model: db.Doctor,
+          as: "doctor",
+          attributes: ["id", "price"],
+          include: [
+            {
+              model: db.Position,
+              as: "position",
+              attributes: ["name", "id"],
+              through: { attributes: [] },
+            },
+            {
+              model: db.User,
+              as: "user",
+              attributes: ["id", "firstName", "lastName", "avatar"],
+            },
+          ],
+        },
         {
           model: db.User,
           as: "user",
@@ -318,7 +353,7 @@ const getAppointments = async (idDoctor, limit, page, value, filter) => {
       order: [["createdAt", "DESC"]],
       offset: (page - 1) * limit,
       limit: limit,
-      subQuery: false,
+      subQuery: true,
       distinct: true,
     });
 

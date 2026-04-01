@@ -16,7 +16,7 @@ const Sidebar = () => {
     { id: "overview", label: "Tổng quan", icon: "📊", path: OVERVIEW },
     {
       id: "appointments",
-      label: "Lịch hẹn hôm nay",
+      label: "Lịch hẹn",
       icon: "📅",
       path: APPOINTMENTSCHEDULE,
     },
