@@ -96,10 +96,10 @@ const createAppointment = async (data) => {
         message: "Appoinment is required !",
       };
     }
-    if (!data.idPatient) {
+    if (!data.id_user) {
       return {
         err: 3,
-        message: "ID patient is required !",
+        message: "ID user is required !",
       };
     }
     if (!data.time_frame) {
@@ -109,44 +109,109 @@ const createAppointment = async (data) => {
       };
     }
 
-    const appointment = await db.Appointment.findOne({
-      where: {
-        id_patient: data?.idPatient,
-        time: data?.time_frame,
-        [Op.and]: where(
-          fn("DATE", col("appointment_date")),
-          "=",
-          data?.appointment_date,
-        ),
-      },
-    });
-
-    if (appointment) {
-      return {
-        err: 5,
-        message: "Cannot register because you have a duplicate appointment.",
-      };
+    if (data.patient?.id) {
+      const duplicatePatient = await db.Appointment.findOne({
+        where: {
+          id_patient: data.patient.id,
+          time: data.time_frame,
+          [Op.and]: where(
+            fn("DATE", col("appointment_date")),
+            "=",
+            data.appointment_date,
+          ),
+        },
+        transaction: t,
+      });
+      if (duplicatePatient)
+        return {
+          err: 5,
+          message: "You already have an appointment at this time.",
+        };
     }
 
-    await db.Appointment.create({
-      id: uuidv4(),
-      id_doctor: data?.idDoctor,
-      id_patient: data?.idPatient,
-      id_medical_package: data?.idMedicalPackage,
-      appointment_date: data?.appointment_date,
-      time: data?.time_frame,
-    });
+    if (data.idDoctor) {
+      const currentBookingsCount = await db.Appointment.count({
+        where: {
+          id_doctor: data.idDoctor,
+          time: data.time_frame,
+          [Op.and]: where(
+            fn("DATE", col("appointment_date")),
+            "=",
+            data.appointment_date,
+          ),
+          status: { [Op.ne]: 0 }, // Không tính những lịch đã bị hủy
+        },
+        transaction: t,
+      });
+
+      const MAX_PATIENTS_PER_SLOT = 3;
+
+      if (currentBookingsCount >= MAX_PATIENTS_PER_SLOT) {
+        return {
+          err: 6,
+          message: `Khung giờ này đã kín chỗ (Tối đa ${MAX_PATIENTS_PER_SLOT} bệnh nhân). Vui lòng chọn giờ khác.`,
+        };
+      }
+    }
+
+    let idPatient = data?.patient?.id;
+
+    if (!idPatient) {
+      idPatient = uuidv4();
+      await db.Patient.create(
+        {
+          id: idPatient,
+          id_user: data?.id_user,
+          fullName: data.patient?.fullName,
+          phone: data.patient?.phone,
+          email: data.patient?.email,
+          dateOfBirth: data.patient?.dateOfBirth,
+          gender: data.patient?.gender,
+          address: data.patient?.address,
+        },
+        { transaction: t },
+      );
+    } else {
+      await db.Patient.update(
+        {
+          fullName: data.patient?.fullName,
+          phone: data.patient?.phone,
+          address: data.patient?.address,
+        },
+        {
+          where: { id: idPatient },
+          transaction: t,
+        },
+      );
+    }
+
+    await db.Appointment.create(
+      {
+        id: uuidv4(),
+        id_doctor: data?.idDoctor,
+        id_user: data?.id_user,
+        id_patient: idPatient,
+        id_medical_package: data?.idMedicalPackage,
+        appointment_date: data?.appointment_date,
+        time: data?.time_frame,
+        status: data?.status || 0,
+        payment_status: data?.payment_status || false,
+        isCheckIn: data?.isCheckIn || false,
+      },
+      { transaction: t },
+    );
+
+    // LƯU TOÀN BỘ VÀO DB
+    await t.commit();
 
     return {
       err: 0,
       message: "Create appointment success !",
     };
   } catch (error) {
-    console.log("Lỗi ở getInfoToMakeAppointment :", error);
-    return {
-      err: -999,
-      message: `Error server: ${error}`,
-    };
+    await t.rollback();
+    console.log("Lỗi ở createAppointment:", error);
+    return { err: -999, message: `Error server: ${error.message}` };
   }
 };
 
@@ -534,10 +599,48 @@ const getAppointmentById = async (idAppointment) => {
   }
 };
 
+const paymentConfirmation = async (idAppointment) => {
+  try {
+    if (!idAppointment) {
+      return {
+        err: 1,
+        message: "ID appointment required",
+      };
+    }
+
+    const appointment = await db.Appointment.findOne({
+      where: { id: idAppointment },
+    });
+
+    if (!appointment) {
+      return {
+        err: 2,
+        message: "Appointment is not exist",
+      };
+    }
+
+    appointment.payment_status = true;
+    await appointment.save();
+
+    return {
+      err: 0,
+      message: "Payment confirmed successfully !",
+      data: appointment,
+    };
+  } catch (error) {
+    console.log("Lỗi ở paymentConfirmation :", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 export {
   getInfoToMakeAppointment,
   createAppointment,
   getAppointmentOfUser,
+  paymentConfirmation,
   updateStatusAppointment,
   getAppointments,
   getPatientOfDoctor,

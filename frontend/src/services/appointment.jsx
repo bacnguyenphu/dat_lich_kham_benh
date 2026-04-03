@@ -32,6 +32,10 @@ const getAppointmentById = (id) => {
   return axios.get("get-appointment-by-id", { params: { id } });
 };
 
+const paymentConfirmation = (id) => {
+  return axios.put("payment-confirmation", {}, { params: { id } });
+};
+
 export {
   getInfoToMakeAppointment,
   createAppointment,
@@ -39,4 +43,5 @@ export {
   updateStatusAppointment,
   getAppointments,
   getAppointmentById,
+  paymentConfirmation,
 };

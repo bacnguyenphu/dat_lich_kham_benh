@@ -5,6 +5,7 @@ import {
   getInfoToMakeAppointment,
   getAppointments,
   getAppointmentById,
+  paymentConfirmation,
 } from "../services/appointmentService";
 
 const handleGetInfoToMakeAppointment = async (req, res) => {
@@ -98,6 +99,21 @@ const handleGetAppointmentById = async (req, res) => {
   }
 };
 
+const handlePaymentConfirmation = async (req, res) => {
+  try {
+    const idAppointment = req.query.id;
+
+    const message = await paymentConfirmation(idAppointment);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log(`Lỗi ở handlePaymentConfirmation: `, error);
+    return {
+      err: -1,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 export {
   handleGetInfoToMakeAppointment,
   handleCreateAppointment,
@@ -105,4 +121,5 @@ export {
   handleUpdateStatusAppointment,
   handleGetAppointments,
   handleGetAppointmentById,
+  handlePaymentConfirmation,
 };

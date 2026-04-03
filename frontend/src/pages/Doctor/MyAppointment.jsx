@@ -69,70 +69,84 @@ function MyAppointment() {
     return () => clearTimeout(handler);
   }, [value]);
 
-  const handleUpdateStatusAppointment = async (idAppointmemt, status) => {
-    if (idAppointmemt) {
-      if (status === DA_HUY) {
-        Swal.fire({
-          title: "Bạn chắc muốn hủy lịch khám ?",
-          showDenyButton: true,
-          confirmButtonText: "OK",
-          denyButtonText: "Thoát",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            const res = await updateStatusAppointment(idAppointmemt, status);
-            if (res.err === 0) {
-              toast.success("Hủy thành công !");
-              await fetchAppointment();
-            } else {
-              Swal.fire({
-                title: "Hủy lịch hẹn không thành công !",
-                icon: "error",
-              });
-            }
-          }
-        });
-      } else if (status === 2) {
-        Swal.fire({
-          title: "Bạn muốn xác nhận lịch khám ?",
-          showDenyButton: true,
-          confirmButtonText: "OK",
-          denyButtonText: "Thoát",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            const res = await updateStatusAppointment(idAppointmemt, status);
-            if (res.err === 0) {
-              toast.success("Xác nhận khám thành công !");
-              await fetchAppointment();
-            } else {
-              Swal.fire({
-                title: "Xác nhận khám không thành công !",
-                icon: "error",
-              });
-            }
-          }
-        });
-      } else if (status === 3) {
-        Swal.fire({
-          title: "Xác nhận khám xong cho bệnh nhân ?",
-          showDenyButton: true,
-          confirmButtonText: "OK",
-          denyButtonText: "Thoát",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            const res = await updateStatusAppointment(idAppointmemt, status);
-            if (res.err === 0) {
-              toast.success("Xác nhận khám xong thành công !");
-              await fetchAppointment();
-            } else {
-              Swal.fire({
-                title: "Xác nhận khám xong không thành công !",
-                icon: "error",
-              });
-            }
-          }
-        });
-      }
+  const handleUpdateStatusAppointment = async (idAppointment, status) => {
+    if (!idAppointment) return;
+
+    // 1. Cấu hình nội dung Popup dựa theo trạng thái truyền vào
+    let config = {};
+    switch (status) {
+      case DA_HUY:
+        config = {
+          title: "Xác nhận hủy lịch?",
+          text: "Hành động này không thể hoàn tác.",
+          icon: "warning",
+          confirmText: "Hủy lịch ngay",
+          confirmColor: "#ef4444", // Màu đỏ cảnh báo
+          successMsg: "Đã hủy lịch hẹn thành công!",
+        };
+        break;
+      case 2: // Khuyên dùng biến: case XAC_NHAN:
+        config = {
+          title: "Xác nhận lịch khám?",
+          text: "Hệ thống sẽ chuyển trạng thái sang Chờ khám.",
+          icon: "question",
+          confirmText: "Xác nhận",
+          confirmColor: "#3b82f6", // Màu xanh dương
+          successMsg: "Xác nhận khám thành công!",
+        };
+        break;
+      case 3: // Khuyên dùng biến: case DA_XONG:
+        config = {
+          title: "Hoàn tất khám bệnh?",
+          text: "Xác nhận bệnh nhân này đã khám xong.",
+          icon: "info",
+          confirmText: "Hoàn tất",
+          confirmColor: "#10b981", // Màu xanh ngọc (thành công)
+          successMsg: "Đã cập nhật trạng thái hoàn tất!",
+        };
+        break;
+      default:
+        return; // Không làm gì nếu status không hợp lệ
     }
+
+    // 2. Hiển thị Popup xác nhận (Chỉ viết 1 lần duy nhất)
+    Swal.fire({
+      title: config.title,
+      text: config.text,
+      icon: config.icon,
+      showCancelButton: true,
+      confirmButtonColor: config.confirmColor,
+      cancelButtonColor: "#94a3b8", // Màu xám nhạt cho nút Hủy/Đóng
+      confirmButtonText: config.confirmText,
+      cancelButtonText: "Đóng",
+      customClass: {
+        popup: "rounded-2xl", // Bo góc popup cho đồng bộ giao diện
+      },
+    }).then(async (result) => {
+      // 3. Xử lý gọi API nếu người dùng chọn OK
+      if (result.isConfirmed) {
+        try {
+          const res = await updateStatusAppointment(idAppointment, status);
+
+          if (res.err === 0) {
+            toast.success(config.successMsg);
+            await fetchAppointment(); // Load lại bảng dữ liệu
+          } else {
+            Swal.fire({
+              title: "Thao tác thất bại!",
+              text: res.message || "Vui lòng thử lại sau.",
+              icon: "error",
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "Lỗi hệ thống!",
+            text: "Không thể kết nối đến máy chủ.",
+            icon: "error",
+          });
+        }
+      }
+    });
   };
 
   return (

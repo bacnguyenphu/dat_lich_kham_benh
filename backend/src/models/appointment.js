@@ -18,12 +18,16 @@ module.exports = (sequelize, DataTypes) => {
         as: "medical_package",
       });
       Appointment.belongsTo(models.User, {
-        foreignKey: "id_patient",
+        foreignKey: "id_user",
         as: "user",
       });
       Appointment.hasOne(models.Comment, {
         foreignKey: "appointmentId",
         as: "comment",
+      });
+      Appointment.belongsTo(models.Patient, {
+        foreignKey: "id_patient",
+        as: "patient",
       });
     }
   }
@@ -39,11 +43,13 @@ module.exports = (sequelize, DataTypes) => {
 
       id_doctor: DataTypes.STRING,
       id_patient: DataTypes.STRING,
+      id_user: DataTypes.STRING,
       id_medical_package: DataTypes.STRING,
       appointment_date: DataTypes.DATE,
       time: DataTypes.STRING,
       status: DataTypes.INTEGER,
       payment_status: DataTypes.BOOLEAN,
+      isCheckIn: DataTypes.BOOLEAN,
     },
     {
       sequelize,

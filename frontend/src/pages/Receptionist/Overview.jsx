@@ -14,11 +14,11 @@ function Overview() {
   const [appointments, setAppointments] = useState([]);
   const [value, setValue] = useState(""); // Dùng cho ô tìm kiếm
   const [totalPages, setTotalPages] = useState(0);
-  const [isShowModal, setIsShowModal] = useState(false);
   const limit = 5;
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const location = useLocation();
+  const [isShowModal, setIsShowModal] = useState(false);
   const [type, setType] = useState("INFO"); // "DUYET", "TU_CHOI", "INFO"
 
   const fetchAppointments = async () => {

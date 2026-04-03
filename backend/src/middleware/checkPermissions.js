@@ -39,6 +39,7 @@ import {
   DELETE_COMMENT,
   STATISTICAL,
   GET_APPOINTMENT_BY_ID,
+  PAYMENT_CONFIRMATION,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -68,6 +69,7 @@ const ROLE_PERMISSIONS = {
     DELETE_COMMENT,
     STATISTICAL,
     GET_APPOINTMENT_BY_ID,
+    PAYMENT_CONFIRMATION,
   ], // nhân viên
   R3: [
     CREATE_APPOINTMENT,
@@ -75,6 +77,7 @@ const ROLE_PERMISSIONS = {
     CREATE_COMMENT,
     UPDATE_COMMENT,
     DELETE_COMMENT,
+    PAYMENT_CONFIRMATION,
   ], // User thường không có quyền quản trị
 };
 

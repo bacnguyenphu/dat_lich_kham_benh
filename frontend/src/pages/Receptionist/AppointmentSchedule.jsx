@@ -1,16 +1,25 @@
 import { useEffect, useState } from "react";
-import { getAppointments } from "../../services/appointment";
+import {
+  getAppointments,
+  paymentConfirmation,
+  updateStatusAppointment,
+} from "../../services/appointment";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 import { GiSandsOfTime } from "react-icons/gi";
-import { FaRegCheckCircle, FaRegTrashAlt } from "react-icons/fa";
+import { FaRegCheckCircle, FaRegEye, FaRegTrashAlt } from "react-icons/fa";
 import { PiWarningCircleLight } from "react-icons/pi";
 import { MdCheckBox } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
+import { FaMoneyBillAlt } from "react-icons/fa";
 import dayjs from "dayjs";
 import Pagination from "../../components/Pagination";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
+import ModalInfoAppointment from "../../components/Receptionist/ModalInfoAppointment";
 
 dayjs.locale("vi");
 function AppointmentSchedule() {
@@ -32,6 +41,9 @@ function AppointmentSchedule() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0],
   );
+  const [isShowModal, setIsShowModal] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchAppointment = async () => {
     const res = await getAppointments(
@@ -58,6 +70,129 @@ function AppointmentSchedule() {
     }, 500);
     return () => clearTimeout(handler);
   }, [value]);
+
+  const handleUpdateStatusAppointment = async (idAppointment, status) => {
+    if (!idAppointment) return;
+
+    // 1. Cấu hình nội dung Popup dựa theo trạng thái truyền vào
+    let config = {};
+    switch (status) {
+      case DA_HUY:
+        config = {
+          title: "Xác nhận hủy lịch?",
+          text: "Hành động này không thể hoàn tác.",
+          icon: "warning",
+          confirmText: "Hủy lịch ngay",
+          confirmColor: "#ef4444", // Màu đỏ cảnh báo
+          successMsg: "Đã hủy lịch hẹn thành công!",
+        };
+        break;
+      case 2:
+        config = {
+          title: "Xác nhận lịch khám?",
+          text: "Hệ thống sẽ chuyển trạng thái sang Chờ khám.",
+          icon: "question",
+          confirmText: "Xác nhận",
+          confirmColor: "#3b82f6",
+          successMsg: "Xác nhận khám thành công!",
+        };
+        break;
+      case 3:
+        config = {
+          title: "Hoàn tất khám bệnh?",
+          text: "Xác nhận bệnh nhân này đã khám xong.",
+          icon: "info",
+          confirmText: "Hoàn tất",
+          confirmColor: "#10b981",
+          successMsg: "Đã cập nhật trạng thái hoàn tất!",
+        };
+        break;
+      default:
+        return;
+    }
+
+    Swal.fire({
+      title: config.title,
+      text: config.text,
+      icon: config.icon,
+      showCancelButton: true,
+      confirmButtonColor: config.confirmColor,
+      cancelButtonColor: "#94a3b8",
+      confirmButtonText: config.confirmText,
+      cancelButtonText: "Đóng",
+      customClass: {
+        popup: "rounded-2xl",
+      },
+    }).then(async (result) => {
+      // 3. Xử lý gọi API nếu người dùng chọn OK
+      if (result.isConfirmed) {
+        try {
+          const res = await updateStatusAppointment(idAppointment, status);
+
+          if (res.err === 0) {
+            toast.success(config.successMsg);
+            await fetchAppointment(); // Load lại bảng dữ liệu
+          } else {
+            Swal.fire({
+              title: "Thao tác thất bại!",
+              text: res.message || "Vui lòng thử lại sau.",
+              icon: "error",
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "Lỗi hệ thống!",
+            text: "Không thể kết nối đến máy chủ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const handlePaymentConfirm = async (idAppointment) => {
+    if (!idAppointment) return;
+
+    Swal.fire({
+      title: "Xác nhận đã thu tiền?",
+      text: "Hệ thống sẽ ghi nhận lịch hẹn này đã được thanh toán.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#0d9488",
+      cancelButtonColor: "#94a3b8",
+      confirmButtonText: "Xác nhận thu",
+      cancelButtonText: "Đóng",
+      customClass: {
+        popup: "rounded-2xl",
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Gọi API cập nhật trạng thái thanh toán
+          const res = await paymentConfirmation(idAppointment);
+
+          if (res.err === 0) {
+            toast.success("Xác nhận thanh toán thành công!");
+            await fetchAppointment();
+          } else {
+            Swal.fire({
+              title: "Thao tác thất bại!",
+              text: res.message || "Vui lòng kiểm tra lại.",
+              icon: "error",
+              customClass: { popup: "rounded-2xl" },
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "Lỗi hệ thống!",
+            text: "Không thể kết nối đến máy chủ.",
+            icon: "error",
+            customClass: { popup: "rounded-2xl" },
+          });
+        }
+      }
+    });
+  };
 
   return (
     <div>
@@ -222,7 +357,30 @@ function AppointmentSchedule() {
                           {/* Thao tác (Action Buttons) */}
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-2">
-                              {/* Nút: Xác nhận chờ khám (Từ trạng thái 1 -> 2) */}
+                              <button
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold shadow-sm transition-all active:scale-95"
+                                title="Xem thông tin"
+                                onClick={() => {
+                                  navigate(
+                                    location.pathname + `?id=${appointment.id}`,
+                                  );
+                                  setIsShowModal(true);
+                                }}
+                              >
+                                <FaRegEye size="0.8rem" />
+                              </button>
+                              {!appointment?.payment_status &&
+                                !appointment?.status === 0 && (
+                                  <button
+                                    className="p-2 text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-all active:scale-95"
+                                    title="Xác nhận thanh toán"
+                                    onClick={() =>
+                                      handlePaymentConfirm(appointment.id)
+                                    }
+                                  >
+                                    <FaMoneyBillAlt size="1.3rem" />
+                                  </button>
+                                )}
                               {appointment?.status === 1 && (
                                 <button
                                   className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors active:scale-95"
@@ -238,7 +396,6 @@ function AppointmentSchedule() {
                                 </button>
                               )}
 
-                              {/* Nút: Xác nhận khám xong (Từ trạng thái 2 -> 3) */}
                               {appointment?.status === 2 && (
                                 <button
                                   className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors active:scale-95"
@@ -254,7 +411,6 @@ function AppointmentSchedule() {
                                 </button>
                               )}
 
-                              {/* Nút: Hủy lịch (Chỉ hiện khi đang chờ xác nhận hoặc chờ khám) */}
                               {(appointment?.status === 1 ||
                                 appointment?.status === 2) && (
                                 <button
@@ -302,6 +458,9 @@ function AppointmentSchedule() {
         <div>
           <Pagination setPage={setPage} totalPages={totalPages} />
         </div>
+      )}
+      {isShowModal && (
+        <ModalInfoAppointment setIsShowModal={setIsShowModal} type={"INFO"} />
       )}
     </div>
   );
