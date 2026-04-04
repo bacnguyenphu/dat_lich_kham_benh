@@ -40,6 +40,8 @@ import {
   STATISTICAL,
   GET_APPOINTMENT_BY_ID,
   PAYMENT_CONFIRMATION,
+  UPDATE_USER,
+  GET_PATIENTS_BY_ID_USER,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -70,6 +72,7 @@ const ROLE_PERMISSIONS = {
     STATISTICAL,
     GET_APPOINTMENT_BY_ID,
     PAYMENT_CONFIRMATION,
+    GET_PATIENTS_BY_ID_USER,
   ], // nhân viên
   R3: [
     CREATE_APPOINTMENT,
@@ -78,6 +81,7 @@ const ROLE_PERMISSIONS = {
     UPDATE_COMMENT,
     DELETE_COMMENT,
     PAYMENT_CONFIRMATION,
+    GET_PATIENTS_BY_ID_USER,
   ], // User thường không có quyền quản trị
 };
 
@@ -109,6 +113,7 @@ const BLACKIST = [
   GET_USER_BY_ID,
   GET_COMMENTS,
   GET_COMMENTS_BY_APPOINTMENT_ID,
+  UPDATE_USER,
 ]; // những route nào có trong đây không cần đăng nhập vẫn truy cập được
 
 export const checkUserPermission = async (req, res, next) => {

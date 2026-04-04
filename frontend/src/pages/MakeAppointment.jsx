@@ -8,18 +8,49 @@ import { FaPhone, FaTransgender, FaMoneyBillWave } from "react-icons/fa6";
 import { ImUser } from "react-icons/im";
 import { CiCalendarDate } from "react-icons/ci";
 import { GiPositionMarker } from "react-icons/gi";
+import { FaUser, FaUserFriends } from "react-icons/fa";
+import { IoIosCalendar, IoIosMail } from "react-icons/io";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { APPOINTMENT } from "../utils/path";
 import { InfoAppointment } from "../components";
 import { IoShieldCheckmark } from "react-icons/io5";
 import dayjs from "dayjs";
+import { getPatientsByIdUser } from "../services/patientService";
+import Select from "react-select";
 dayjs.locale("vi");
+
+const customSelectStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    padding: "2px",
+    borderRadius: "0.75rem", // rounded-xl
+    borderColor: state.isFocused ? "#3b82f6" : "#e2e8f0", // blue-500 or slate-200
+    boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : "none",
+    "&:hover": { borderColor: "#94a3b8" }, // slate-400
+    backgroundColor: "#f8fafc", // slate-50
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? "#3b82f6"
+      : state.isFocused
+        ? "#eff6ff"
+        : "white",
+    color: state.isSelected ? "white" : "#334155",
+    cursor: "pointer",
+  }),
+};
 
 function MakeAppointment() {
   const auth = useSelector((state) => state.auth?.data);
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [forMyself, setForMyself] = useState(true);
+  const [infoPatient, setInfoPatient] = useState({});
+  const [patients, setPatients] = useState([]); // danh sách người quen trước có đặt lịch
+  const [listItems, setListItems] = useState([]); // dùng để lưu cho Select nguoiewf quentrước có đặt lịch
 
   const idDoctor = searchParams.get("idDoctor");
   const idMedicalPackage = searchParams.get("idMedicalPackage");
@@ -67,10 +98,29 @@ function MakeAppointment() {
         }
       }
     };
+
+    const fetchPatients = async () => {
+      const res = await getPatientsByIdUser(auth?.id);
+      if (res.err === 0 && res.data.length > 0) {
+        setPatients(res?.data);
+        let temp = res.data.map((item) => ({
+          value: item?.id,
+          label: `${item?.fullName} - SĐT: ${item?.phone}`,
+          fullName: item?.fullName,
+          phone: item?.phone,
+          email: item?.email,
+          address: item?.address,
+        }));
+        setListItems(temp);
+      }
+    };
     if (appointment_date && time_frame && (idDoctor || idMedicalPackage)) {
       fetchData();
+      fetchPatients();
     }
   }, [idDoctor, idMedicalPackage, time_frame, appointment_date]);
+
+  const handleOnchangeSelectPatient = () => {};
 
   const handleClickSubmit = () => {
     const payload = {
@@ -79,6 +129,10 @@ function MakeAppointment() {
       idMedicalPackage,
       appointment_date,
       time_frame: infoAppointment?.time_frame,
+      status: 1,
+      payment_status: false,
+      isCheckIn: false,
+      patient: infoPatient,
     };
 
     Swal.fire({
@@ -147,63 +201,284 @@ function MakeAppointment() {
         <h1 className="text-2xl font-bold text-slate-800 mb-6">
           Xác nhận thông tin đặt khám
         </h1>
+        <div className="w-full">
+          <p className="text-sm font-bold text-slate-700 mb-3">
+            Đối tượng khám bệnh <span className="text-red-500">*</span>
+          </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Thẻ: Đặt cho bản thân */}
+            <label
+              htmlFor="forMyself"
+              className={`
+        relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200
+        ${
+          forMyself
+            ? "border-blue-500 bg-blue-50 text-blue-600 shadow-sm"
+            : "border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:bg-slate-50"
+        }
+      `}
+            >
+              <input
+                type="radio"
+                id="forMyself"
+                name="patient"
+                className="hidden" // Giấu đi nút radio xấu xí mặc định
+                checked={forMyself}
+                onChange={() => setForMyself(true)}
+              />
+              <FaUser size="1.5rem" className="mb-2" />
+              <span className="font-bold text-[15px]">Đặt cho bản thân</span>
+
+              {/* Nút check nhỏ góc phải khi được chọn */}
+              {forMyself && (
+                <div className="absolute top-3 right-3 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                </div>
+              )}
+            </label>
+
+            {/* Thẻ: Đặt cho người khác */}
+            <label
+              htmlFor="forSomeone"
+              className={`
+        relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200
+        ${
+          !forMyself
+            ? "border-emerald-500 bg-emerald-50 text-emerald-600 shadow-sm"
+            : "border-slate-200 bg-white text-slate-500 hover:border-emerald-200 hover:bg-slate-50"
+        }
+      `}
+            >
+              <input
+                type="radio"
+                id="forSomeone"
+                name="patient"
+                className="hidden"
+                checked={!forMyself}
+                onChange={() => setForMyself(false)}
+              />
+              <FaUserFriends size="1.5rem" className="mb-2" />
+              <span className="font-bold text-[15px]">Đặt cho người thân</span>
+
+              {/* Nút check nhỏ góc phải khi được chọn */}
+              {!forMyself && (
+                <div className="absolute top-3 right-3 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                </div>
+              )}
+            </label>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
           <div className="lg:col-span-2 flex flex-col gap-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <IoShieldCheckmark className="text-blue-600" size="1.5rem" />
-                  Thông tin Bệnh nhân
-                </h2>
-                <span className="text-xs text-slate-500 italic bg-slate-100 px-3 py-1 rounded-full">
-                  Trích xuất từ Hồ sơ cá nhân
-                </span>
-              </div>
+            {forMyself ? (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <IoShieldCheckmark
+                      className="text-blue-600"
+                      size="1.5rem"
+                    />
+                    Thông tin Bệnh nhân
+                  </h2>
+                  <span className="text-xs text-slate-500 italic bg-slate-100 px-3 py-1 rounded-full">
+                    Trích xuất từ Hồ sơ cá nhân
+                  </span>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <ReadOnlyInput
-                  icon={ImUser}
-                  value={`${auth?.firstName} ${auth?.lastName}`}
-                />
-                <ReadOnlyInput icon={FaPhone} value={auth?.phone} />
-                <ReadOnlyInput
-                  icon={FaTransgender}
-                  value={
-                    auth?.gender === "male"
-                      ? "Nam"
-                      : auth?.gender === "female"
-                        ? "Nữ"
-                        : ""
-                  }
-                />
-                <ReadOnlyInput
-                  icon={CiCalendarDate}
-                  value={
-                    auth?.dateOfBirth
-                      ? dayjs(auth?.dateOfBirth).format("DD/MM/YYYY")
-                      : ""
-                  }
-                />
-                <div className="md:col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                   <ReadOnlyInput
-                    icon={GiPositionMarker}
-                    value={auth?.address}
+                    icon={ImUser}
+                    value={`${auth?.firstName} ${auth?.lastName}`}
+                  />
+                  <ReadOnlyInput icon={FaPhone} value={auth?.phone} />
+                  <ReadOnlyInput
+                    icon={FaTransgender}
+                    value={
+                      auth?.gender === "male"
+                        ? "Nam"
+                        : auth?.gender === "female"
+                          ? "Nữ"
+                          : ""
+                    }
+                  />
+                  <ReadOnlyInput
+                    icon={CiCalendarDate}
+                    value={
+                      auth?.dateOfBirth
+                        ? dayjs(auth?.dateOfBirth).format("DD/MM/YYYY")
+                        : ""
+                    }
+                  />
+                  <div className="md:col-span-2">
+                    <ReadOnlyInput
+                      icon={GiPositionMarker}
+                      value={auth?.address}
+                    />
+                  </div>
+                </div>
+
+                <p className="text-sm text-slate-500 mt-2 italic text-center md:text-left">
+                  * Thông tin được tự động điền. Nếu muốn thay đổi, vui lòng vào
+                  phần{" "}
+                  <strong className="text-blue-600 cursor-pointer">
+                    Hồ sơ cá nhân
+                  </strong>
+                  .
+                </p>
+                <div className="mt-5 cursor-default">
+                  <p className="text-sm font-bold text-slate-700 mb-3">
+                    Lý do khám bệnh
+                  </p>
+                  <textarea
+                    className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-600 outline-none resize-none"
+                    placeholder="Mô tả ngắn gọn về tình trạng sức khỏe hoặc triệu chứng bạn đang gặp phải..."
                   />
                 </div>
               </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <ImUser className="text-blue-600" size="1.5rem" />
+                    Thông tin người đặt lịch
+                  </h2>
+                  <span className="text-xs text-slate-500 italic bg-slate-100 px-3 py-1 rounded-full">
+                    Trích xuất từ Hồ sơ cá nhân
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 mt-4">
+                  <ReadOnlyInput
+                    icon={ImUser}
+                    value={`${auth?.firstName} ${auth?.lastName}`}
+                  />
+                  <ReadOnlyInput icon={FaPhone} value={auth?.phone} />
+                </div>
+                <div className="mt-5">
+                  <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-5">
+                    <IoShieldCheckmark
+                      className="text-blue-600"
+                      size="1.5rem"
+                    />
+                    Thông tin Bệnh nhân
+                  </h2>
+                  <div className="md:col-span-8 flex flex-col gap-2">
+                    <label className=" font-semibold text-slate-700">
+                      Người quen đã có
+                    </label>
+                    <Select
+                      value={selectedItem}
+                      onChange={setSelectedItem}
+                      options={listItems}
+                      styles={customSelectStyles}
+                      placeholder="Tìm kiếm và lựa chọn..."
+                      noOptionsMessage={() => "Không tìm thấy dữ liệu"}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 mt-4">
+                    <div className="relative mb-5">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+                        <ImUser className="text-slate-400" size="1.1rem" />
+                      </div>
+                      <input
+                        type="text"
+                        className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
+                        placeholder="Họ tên người bệnh (VD: Nguyễn Văn A) (bắt buộc)"
+                      />
+                    </div>
 
-              <p className="text-sm text-slate-500 mt-2 italic text-center md:text-left">
-                * Thông tin được tự động điền. Nếu muốn thay đổi, vui lòng vào
-                phần{" "}
-                <strong className="text-blue-600 cursor-pointer">
-                  Hồ sơ cá nhân
-                </strong>
-                .
-              </p>
-            </div>
+                    <div className="relative mb-5">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+                        <FaPhone className="text-slate-400" size="1.1rem" />
+                      </div>
+                      <input
+                        type="text"
+                        className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
+                        placeholder="Số điện thoại (bắt buộc)"
+                      />
+                    </div>
+                    <div className="relative mb-5">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+                        <IoIosMail className="text-slate-400" size="1.1rem" />
+                      </div>
+                      <input
+                        type="text"
+                        className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
+                        placeholder="Email"
+                      />
+                    </div>
+                    <div className="relative mb-5">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+                        <IoIosCalendar
+                          className="text-slate-400"
+                          size="1.1rem"
+                        />
+                      </div>
+                      <input
+                        type="date"
+                        className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
+                        placeholder="Ngày sinh"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-4 mb-5">
+                    <label className="font-semibold text-slate-700 mb-1">
+                      Giới tính <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex items-center gap-6 h-full pb-1">
+                      <label className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="male"
+                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                        />
+                        <span className="text-slate-700 group-hover:text-blue-600 transition-colors">
+                          Nam
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="female"
+                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                        />
+                        <span className="text-slate-700 group-hover:text-blue-600 transition-colors">
+                          Nữ
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="relative mb-5">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+                      <GiPositionMarker
+                        className="text-slate-400"
+                        size="1.1rem"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
+                      placeholder="Địa chỉ"
+                    />
+                  </div>
+                  <div className="mt-5 cursor-default">
+                    <p className="text-sm font-bold text-slate-700 mb-3">
+                      Lý do khám bệnh
+                    </p>
+                    <textarea
+                      className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-600 outline-none resize-none"
+                      placeholder="Mô tả ngắn gọn về tình trạng sức khỏe hoặc triệu chứng bạn đang gặp phải..."
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
-            {/* Box Lưu ý quan trọng */}
+            {/* Box Lưu ý  */}
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8">
               <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2">
                 LƯU Ý QUAN TRỌNG:

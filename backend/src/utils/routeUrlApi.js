@@ -84,3 +84,6 @@ export const DELETE_COMMENT = "/delete-comment";
 
 // Route statistical
 export const STATISTICAL = "/statistics";
+
+// Route patient
+export const GET_PATIENTS_BY_ID_USER = "/get-patients-by-id-user";

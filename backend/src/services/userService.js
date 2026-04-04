@@ -1,4 +1,5 @@
 import { where } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
 import db from "../models/index";
 
 const getUsers = async (limit, page, role) => {
@@ -94,6 +95,24 @@ const updateUser = async (data) => {
         err: 2,
         message: `User is not exist`,
       };
+    }
+
+    const checkPatient = await db.Patient.findOne({
+      where: { id_user: data?.idUser },
+      attributes: ["id"],
+    });
+
+    if (!checkPatient) {
+      await db.Patient.create({
+        id: uuidv4(),
+        id_user: data?.idUser,
+        fullName: data?.firstName.trim() + " " + data?.lastName.trim(),
+        phone: data?.phone.trim(),
+        email: data?.email.trim(),
+        dateOfBirth: data?.dateOfBirth,
+        gender: data?.gender,
+        address: data?.address.trim(),
+      });
     }
 
     await db.User.update(
