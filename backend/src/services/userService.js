@@ -104,7 +104,7 @@ const updateUser = async (data) => {
 
     if (!checkPatient) {
       await db.Patient.create({
-        id: uuidv4(),
+        id: data?.idUser,
         id_user: data?.idUser,
         fullName: data?.firstName.trim() + " " + data?.lastName.trim(),
         phone: data?.phone.trim(),

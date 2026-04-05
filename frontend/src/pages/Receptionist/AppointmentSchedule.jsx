@@ -288,11 +288,10 @@ function AppointmentSchedule() {
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
                               <p className="font-bold text-[15px] text-slate-800">
-                                {appointment?.user?.firstName}{" "}
-                                {appointment?.user?.lastName}
+                                {appointment?.patient?.fullName}
                               </p>
                               <p className="text-sm font-medium text-slate-500 mt-0.5">
-                                {appointment?.user?.phone}
+                                {appointment?.patient?.phone}
                               </p>
                             </div>
                           </td>
@@ -370,7 +369,7 @@ function AppointmentSchedule() {
                                 <FaRegEye size="0.8rem" />
                               </button>
                               {!appointment?.payment_status &&
-                                !appointment?.status === 0 && (
+                                appointment?.status !== 0 && (
                                   <button
                                     className="p-2 text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-all active:scale-95"
                                     title="Xác nhận thanh toán"
@@ -396,7 +395,7 @@ function AppointmentSchedule() {
                                 </button>
                               )}
 
-                              {appointment?.status === 2 && (
+                              {/* {appointment?.status === 2 && (
                                 <button
                                   className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors active:scale-95"
                                   onClick={() =>
@@ -409,7 +408,7 @@ function AppointmentSchedule() {
                                 >
                                   <IoCheckmarkCircleSharp size="1.3rem" />
                                 </button>
-                              )}
+                              )} */}
 
                               {(appointment?.status === 1 ||
                                 appointment?.status === 2) && (

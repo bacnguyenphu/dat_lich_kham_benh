@@ -12,7 +12,7 @@ import { IoClose } from "react-icons/io5";
 import { GiSandsOfTime } from "react-icons/gi";
 import { FaCheck } from "react-icons/fa6";
 import { PiWarningCircleLight } from "react-icons/pi";
-import { FaRegCheckCircle, FaRegTrashAlt } from "react-icons/fa";
+import { FaRegCheckCircle, FaRegTrashAlt, FaUserAlt } from "react-icons/fa"; // Nhớ import thêm FaUserAlt
 import { VscFeedback } from "react-icons/vsc";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -43,7 +43,6 @@ function ListAppointment() {
             return {
               id: item.id,
               status: item.status,
-              // Sửa lỗi hiển thị tên bác sĩ (Thêm khoảng trắng và dấu phẩy)
               name:
                 (item?.doctor?.position?.map((pos) => pos.name).join(", ") ||
                   "") +
@@ -58,6 +57,7 @@ function ListAppointment() {
               payment_status: item?.payment_status,
               doctorId: item?.doctor?.id,
               medicalPackageId: null,
+              infoPatient: item?.patient, // Data patient từ API
             };
           }
           if (item?.medical_package) {
@@ -72,11 +72,12 @@ function ListAppointment() {
               payment_status: item?.payment_status,
               medicalPackageId: item?.medical_package?.id,
               doctorId: null,
+              infoPatient: item?.patient, // Data patient từ API
             };
           }
           return null;
         })
-        .filter(Boolean); // Lọc bỏ các phần tử null nếu có
+        .filter(Boolean);
       setInfoAppointment(data);
     }
   };
@@ -98,9 +99,10 @@ function ListAppointment() {
         cancelButtonColor: "#94A3B8",
         confirmButtonText: "Đồng ý Hủy",
         cancelButtonText: "Quay lại",
+        customClass: { popup: "rounded-2xl" }, // Thêm bo góc cho mượt
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const res = await updateStatusAppointment(idAppointmemt, 0); // 0 = Đã hủy
+          const res = await updateStatusAppointment(idAppointmemt, 0);
           if (res.err === 0) {
             toast.success("Đã hủy lịch khám thành công!");
             await fetchAppointment();
@@ -110,6 +112,7 @@ function ListAppointment() {
               text: "Hủy lịch hẹn không thành công!",
               icon: "error",
               confirmButtonColor: "#3B82F6",
+              customClass: { popup: "rounded-2xl" },
             });
           }
         }
@@ -147,19 +150,47 @@ function ListAppointment() {
         <div className="flex flex-col gap-6">
           {infoAppointments.length > 0 ? (
             infoAppointments.map((item) => {
-              const { id, status, payment_status, ...other } = item;
+              // Bóc tách infoPatient ra để hiển thị riêng
+              const { id, status, payment_status, infoPatient, ...other } =
+                item;
+
               return (
                 <div
                   key={id}
-                  className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                    {/* Phần thông tin (Component InfoAppointment) */}
+                  {/* Dải màu đánh dấu (Tùy chọn cho đẹp) */}
+                  <div
+                    className={`absolute top-0 left-0 w-1.5 h-full ${status === 0 ? "bg-red-400" : status === 3 ? "bg-green-400" : "bg-blue-400"}`}
+                  ></div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pl-2">
                     <div className="flex-1">
+                      {/* Component gốc của bạn */}
                       <InfoAppointment infoAppointment={other} />
+
+                      {/* HIỂN THỊ THÔNG TIN BỆNH NHÂN (MỚI THÊM) */}
+                      {infoPatient && (
+                        <div className="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-blue-50/50 border border-blue-100 rounded-xl">
+                          <div className="w-8 h-8 rounded-full bg-white text-blue-500 flex items-center justify-center shadow-sm">
+                            <FaUserAlt size="0.9rem" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">
+                              Hồ sơ bệnh nhân
+                            </span>
+                            <span className="text-sm font-bold text-slate-700">
+                              {infoPatient.fullName}{" "}
+                              <span className="font-medium text-slate-500">
+                                - {infoPatient.phone}
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Nút Hành động (Nằm góc phải trên Desktop, trên cùng phải trên Mobile) */}
+                    {/* Nút Hành động */}
                     <div className="flex items-center justify-end sm:justify-start gap-2 -mt-2 sm:mt-0">
                       {(status === 1 || status === 2) && (
                         <Tippy content="Hủy lịch khám" placement="top">
@@ -187,11 +218,11 @@ function ListAppointment() {
                     </div>
                   </div>
 
-                  <hr className="my-5 border-slate-100" />
+                  <hr className="my-5 border-slate-100 ml-2" />
 
                   {/* Nhãn trạng thái (Badges) */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    {/* Trạng thái Lịch khám */}
+                  <div className="flex flex-wrap items-center gap-3 ml-2">
+                    {/* ... (Các trạng thái của bạn được giữ nguyên) ... */}
                     {status === 1 && (
                       <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-semibold bg-yellow-50 text-yellow-600 border border-yellow-200">
                         <GiSandsOfTime size="1rem" /> Chờ xác nhận
@@ -213,7 +244,6 @@ function ListAppointment() {
                       </span>
                     )}
 
-                    {/* Trạng thái Thanh toán */}
                     {!payment_status ? (
                       <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-medium bg-slate-100 text-slate-500 border border-slate-200">
                         <PiWarningCircleLight size="1.1rem" /> Chưa thanh toán

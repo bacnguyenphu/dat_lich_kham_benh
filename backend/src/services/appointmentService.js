@@ -84,6 +84,7 @@ const getInfoToMakeAppointment = async (data) => {
 
 const createAppointment = async (data) => {
   try {
+    const t = await db.sequelize.transaction();
     if (!data.idDoctor && !data.idMedicalPackage) {
       return {
         err: 1,
@@ -119,6 +120,7 @@ const createAppointment = async (data) => {
             "=",
             data.appointment_date,
           ),
+          status: { [Op.ne]: 0 },
         },
         transaction: t,
       });
@@ -172,17 +174,22 @@ const createAppointment = async (data) => {
         { transaction: t },
       );
     } else {
-      await db.Patient.update(
-        {
-          fullName: data.patient?.fullName,
-          phone: data.patient?.phone,
-          address: data.patient?.address,
-        },
-        {
-          where: { id: idPatient },
-          transaction: t,
-        },
-      );
+      if (idPatient !== data?.id_user && data?.patient) {
+        await db.Patient.update(
+          {
+            fullName: data.patient?.fullName,
+            phone: data.patient?.phone,
+            address: data.patient?.address,
+            email: data.patient?.email,
+            dateOfBirth: data.patient?.dateOfBirth,
+            gender: data.patient?.gender,
+          },
+          {
+            where: { id: idPatient },
+            transaction: t,
+          },
+        );
+      }
     }
 
     await db.Appointment.create(
@@ -194,9 +201,10 @@ const createAppointment = async (data) => {
         id_medical_package: data?.idMedicalPackage,
         appointment_date: data?.appointment_date,
         time: data?.time_frame,
-        status: data?.status || 0,
+        status: data?.status,
         payment_status: data?.payment_status || false,
         isCheckIn: data?.isCheckIn || false,
+        diseaseDescription: data?.diseaseDescription || "",
       },
       { transaction: t },
     );
@@ -225,13 +233,14 @@ const getAppointmentOfUser = async (idUser, limit, page) => {
     }
 
     const { count, rows } = await db.Appointment.findAndCountAll({
-      where: { id_patient: idUser },
+      where: { id_user: idUser },
       attributes: [
         "id",
         "appointment_date",
         "time",
         "status",
         "payment_status",
+        "createdAt",
       ],
       include: [
         {
@@ -257,11 +266,25 @@ const getAppointmentOfUser = async (idUser, limit, page) => {
           as: "medical_package",
           attributes: ["id", "image", "price", "name"],
         },
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "fullName",
+            "phone",
+            "email",
+            "dateOfBirth",
+            "gender",
+            "address",
+          ],
+        },
       ],
       order: [["createdAt", "DESC"]],
       offset: (page - 1) * limit,
       limit: limit,
-      subQuery: false,
+      distinct: true,
+      // subQuery: false,
     });
 
     if (rows.length === 0) {
@@ -333,49 +356,48 @@ const updateStatusAppointment = async (idAppointment, status) => {
   }
 };
 
-const getAppointments = async (idDoctor, limit, page, value, filter, date) => {
+const getAppointments = async (
+  idDoctor,
+  limit = 10,
+  page = 1,
+  value,
+  filter,
+  date,
+) => {
   try {
-    console.log("check value: ", value);
-
     if (filter === undefined || filter === null || filter === "") {
-      return {
-        err: 1,
-        message: "Filter is required",
-      };
+      return { err: 1, message: "Filter is required" };
     }
-    let wherePhoneOrName = {};
+
+    // Ép kiểu an toàn cho phân trang
+    const limitData = parseInt(limit, 10);
+    const pageData = parseInt(page, 10);
+
     let whereAppointment = {};
+    let wherePatientSearch = {}; // Đổi tên biến cho rõ nghĩa
+
     if (idDoctor) {
       whereAppointment.id_doctor = idDoctor;
     }
+
     if (+filter !== 99) {
       whereAppointment.status = +filter;
     }
-    if (value) {
-      wherePhoneOrName = {
-        [Op.or]: [
-          {
-            firstName: {
-              [Op.like]: `%${value}%`,
-            },
-          },
-          {
-            lastName: {
-              [Op.like]: `%${value}%`,
-            },
-          },
-          {
-            phone: {
-              [Op.like]: `%${value}%`,
-            },
-          },
-        ],
-      };
-    }
 
     if (date) {
-      whereAppointment.appointment_date = {
-        [Op.between]: [`${date} 00:00:00`, `${date} 23:59:59`],
+      whereAppointment[Op.and] = where(
+        fn("DATE", col("appointment_date")),
+        "=",
+        date,
+      );
+    }
+
+    if (value) {
+      wherePatientSearch = {
+        [Op.or]: [
+          { fullName: { [Op.like]: `%${value}%` } },
+          { phone: { [Op.like]: `%${value}%` } },
+        ],
       };
     }
 
@@ -409,25 +431,41 @@ const getAppointments = async (idDoctor, limit, page, value, filter, date) => {
           ],
         },
         {
+          // Vẫn include User để biết AI LÀ NGƯỜI ĐẶT
           model: db.User,
           as: "user",
           attributes: ["id", "firstName", "lastName", "phone"],
-          where: wherePhoneOrName,
+        },
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "fullName",
+            "phone",
+            "email",
+            "dateOfBirth",
+            "gender",
+          ],
+          where: value ? wherePatientSearch : undefined,
         },
       ],
-      order: [["createdAt", "DESC"]],
-      offset: (page - 1) * limit,
-      limit: limit,
-      subQuery: true,
+      order: [
+        ["appointment_date", "DESC"],
+        ["time", "ASC"],
+      ],
+      offset: (pageData - 1) * limitData,
+      limit: limitData,
+      subQuery: false,
       distinct: true,
     });
 
     if (rows.length === 0) {
       return {
         err: 0,
-        message: "No appointments found for this doctor.",
+        message: "No appointments found.",
         data: [],
-        page: 1,
+        page: pageData,
         totalPage: 0,
       };
     }
@@ -436,8 +474,8 @@ const getAppointments = async (idDoctor, limit, page, value, filter, date) => {
       err: 0,
       message: "Get appointments success !",
       data: rows,
-      page: page,
-      totalPage: Math.ceil(count / limit),
+      page: pageData,
+      totalPage: Math.ceil(count / limitData),
       totalData: count,
     };
   } catch (error) {
@@ -467,11 +505,10 @@ const getPatientOfDoctor = async (
     if (value) {
       whereUser = {
         [Op.or]: [
-          { firstName: value },
-          { lastName: value },
+          { fullName: { [Op.like]: `%${value}%` } },
           {
             phone: {
-              [Op.like]: `${value}%`,
+              [Op.like]: `%${value}%`,
             },
           },
         ],
@@ -491,6 +528,18 @@ const getPatientOfDoctor = async (
           model: db.User,
           as: "user",
           attributes: ["firstName", "lastName", "address", "phone"],
+        },
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "fullName",
+            "phone",
+            "email",
+            "dateOfBirth",
+            "gender",
+          ],
           where: whereUser,
         },
       ],
@@ -575,6 +624,18 @@ const getAppointmentById = async (idAppointment) => {
           as: "user",
           attributes: ["id", "firstName", "lastName", "phone"],
         },
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "fullName",
+            "phone",
+            "email",
+            "dateOfBirth",
+            "gender",
+          ],
+        },
       ],
     });
 
@@ -643,6 +704,6 @@ export {
   paymentConfirmation,
   updateStatusAppointment,
   getAppointments,
-  getPatientOfDoctor,
+  getPatientOfDoctor, // chưa sửa
   getAppointmentById,
 };

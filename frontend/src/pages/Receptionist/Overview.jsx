@@ -132,14 +132,14 @@ function Overview() {
                       {/* Bệnh nhân */}
                       <td className="px-6 py-4">
                         <p className="font-bold text-[15px] text-slate-800">
-                          {apt.user.lastName} {apt.user.firstName}
+                          {apt?.patient?.fullName}
                         </p>
                       </td>
 
                       {/* SĐT */}
                       <td className="px-6 py-4">
                         <span className="font-medium text-slate-700 bg-slate-100 px-3 py-1 rounded-md text-sm">
-                          {apt.user.phone}
+                          {apt?.patient?.phone}
                         </span>
                       </td>
 

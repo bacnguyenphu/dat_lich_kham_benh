@@ -248,11 +248,10 @@ function MyAppointment() {
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
                               <p className="font-bold text-[15px] text-slate-800">
-                                {appointment?.user?.firstName}{" "}
-                                {appointment?.user?.lastName}
+                                {appointment?.patient?.fullName}
                               </p>
                               <p className="text-sm font-medium text-slate-500 mt-0.5">
-                                {appointment?.user?.phone}
+                                {appointment?.patient?.phone}
                               </p>
                             </div>
                           </td>

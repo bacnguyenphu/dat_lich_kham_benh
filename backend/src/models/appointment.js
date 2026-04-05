@@ -50,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       status: DataTypes.INTEGER,
       payment_status: DataTypes.BOOLEAN,
       isCheckIn: DataTypes.BOOLEAN,
+      diseaseDescription: DataTypes.TEXT("medium"),
     },
     {
       sequelize,

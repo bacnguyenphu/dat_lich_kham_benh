@@ -110,6 +110,8 @@ function MakeAppointment() {
           phone: item?.phone,
           email: item?.email,
           address: item?.address,
+          gender: item?.gender,
+          dateOfBirth: item?.dateOfBirth.split("T")[0],
         }));
         setListItems(temp);
       }
@@ -120,20 +122,78 @@ function MakeAppointment() {
     }
   }, [idDoctor, idMedicalPackage, time_frame, appointment_date]);
 
-  const handleOnchangeSelectPatient = () => {};
+  const handleOnchangeSelectPatient = (selectedOption) => {
+    if (selectedOption) {
+      setInfoPatient({
+        id: selectedOption.value,
+        fullName: selectedOption.fullName,
+        phone: selectedOption.phone,
+        email: selectedOption.email,
+        address: selectedOption.address,
+        gender: selectedOption.gender,
+        dateOfBirth: selectedOption.dateOfBirth,
+        id_user: auth?.id,
+      });
+    } else {
+      setInfoPatient({});
+    }
+  };
 
   const handleClickSubmit = () => {
-    const payload = {
-      idDoctor,
-      idPatient: auth?.id,
-      idMedicalPackage,
-      appointment_date,
-      time_frame: infoAppointment?.time_frame,
-      status: 1,
-      payment_status: false,
-      isCheckIn: false,
-      patient: infoPatient,
-    };
+    let payload = {};
+    if (forMyself) {
+      payload = {
+        idDoctor,
+        id_user: auth?.id,
+        idPatient: auth?.id,
+        idMedicalPackage,
+        appointment_date,
+        time_frame: infoAppointment?.time_frame,
+        status: 1,
+        payment_status: false,
+        isCheckIn: false,
+        diseaseDescription: infoPatient?.diseaseDescription || "",
+        patient: { id: auth?.id },
+      };
+    } else {
+      payload = {
+        idDoctor,
+        id_user: auth?.id,
+        idPatient: infoPatient?.id,
+        idMedicalPackage,
+        appointment_date,
+        time_frame: infoAppointment?.time_frame,
+        status: 1,
+        payment_status: false,
+        isCheckIn: false,
+        patient: infoPatient,
+        diseaseDescription: infoPatient?.diseaseDescription || "",
+      };
+    }
+
+    if (!forMyself) {
+      if (
+        !infoPatient?.fullName ||
+        !infoPatient?.phone ||
+        !infoPatient?.email ||
+        !infoPatient?.address ||
+        !infoPatient?.gender ||
+        !infoPatient?.dateOfBirth
+      ) {
+        Swal.fire({
+          title: "Thiếu thông tin người bệnh!",
+          text: "Vui lòng điền đầy đủ các trường thông tin bắt buộc của người thân để tiếp tục.",
+          icon: "warning",
+          confirmButtonText: "Đã hiểu và Bổ sung",
+          confirmButtonColor: "#f59e0b",
+          customClass: {
+            popup: "rounded-2xl",
+          },
+        });
+
+        return;
+      }
+    }
 
     Swal.fire({
       title: "Xác nhận đặt lịch?",
@@ -188,6 +248,13 @@ function MakeAppointment() {
       />
     </div>
   );
+
+  const handleOnchangeInput = (e) => {
+    const { name, value } = e.target;
+    setInfoPatient({ ...infoPatient, [name]: value });
+  };
+
+  // console.log(infoPatient);
 
   return (
     <div className="bg-slate-50 min-h-screen pb-16">
@@ -335,6 +402,9 @@ function MakeAppointment() {
                   <textarea
                     className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-600 outline-none resize-none"
                     placeholder="Mô tả ngắn gọn về tình trạng sức khỏe hoặc triệu chứng bạn đang gặp phải..."
+                    name="diseaseDescription"
+                    value={infoPatient?.diseaseDescription || ""}
+                    onChange={handleOnchangeInput}
                   />
                 </div>
               </div>
@@ -369,8 +439,7 @@ function MakeAppointment() {
                       Người quen đã có
                     </label>
                     <Select
-                      value={selectedItem}
-                      onChange={setSelectedItem}
+                      onChange={handleOnchangeSelectPatient}
                       options={listItems}
                       styles={customSelectStyles}
                       placeholder="Tìm kiếm và lựa chọn..."
@@ -386,6 +455,10 @@ function MakeAppointment() {
                         type="text"
                         className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
                         placeholder="Họ tên người bệnh (VD: Nguyễn Văn A) (bắt buộc)"
+                        name="fullName"
+                        value={infoPatient?.fullName || ""}
+                        onChange={handleOnchangeInput}
+                        required
                       />
                     </div>
 
@@ -397,6 +470,10 @@ function MakeAppointment() {
                         type="text"
                         className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
                         placeholder="Số điện thoại (bắt buộc)"
+                        name="phone"
+                        value={infoPatient?.phone || ""}
+                        onChange={handleOnchangeInput}
+                        required
                       />
                     </div>
                     <div className="relative mb-5">
@@ -407,6 +484,9 @@ function MakeAppointment() {
                         type="text"
                         className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
                         placeholder="Email"
+                        name="email"
+                        value={infoPatient?.email || ""}
+                        onChange={handleOnchangeInput}
                       />
                     </div>
                     <div className="relative mb-5">
@@ -420,6 +500,9 @@ function MakeAppointment() {
                         type="date"
                         className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
                         placeholder="Ngày sinh"
+                        name="dateOfBirth"
+                        value={infoPatient?.dateOfBirth || ""}
+                        onChange={handleOnchangeInput}
                       />
                     </div>
                   </div>
@@ -434,6 +517,8 @@ function MakeAppointment() {
                           name="gender"
                           value="male"
                           className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                          checked={infoPatient?.gender === "male"}
+                          onChange={handleOnchangeInput}
                         />
                         <span className="text-slate-700 group-hover:text-blue-600 transition-colors">
                           Nam
@@ -445,6 +530,8 @@ function MakeAppointment() {
                           name="gender"
                           value="female"
                           className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                          checked={infoPatient?.gender === "female"}
+                          onChange={handleOnchangeInput}
                         />
                         <span className="text-slate-700 group-hover:text-blue-600 transition-colors">
                           Nữ
@@ -462,7 +549,10 @@ function MakeAppointment() {
                     <input
                       type="text"
                       className="w-full bg-slate-50 border border-slate-200 border-dashed text-slate-600 rounded-xl pl-11 p-3 outline-none font-medium"
-                      placeholder="Địa chỉ"
+                      placeholder="Địa chỉ (bắt buộc)"
+                      name="address"
+                      value={infoPatient?.address || ""}
+                      onChange={handleOnchangeInput}
                     />
                   </div>
                   <div className="mt-5 cursor-default">
@@ -472,6 +562,9 @@ function MakeAppointment() {
                     <textarea
                       className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-600 outline-none resize-none"
                       placeholder="Mô tả ngắn gọn về tình trạng sức khỏe hoặc triệu chứng bạn đang gặp phải..."
+                      name="diseaseDescription"
+                      value={infoPatient?.diseaseDescription || ""}
+                      onChange={handleOnchangeInput}
                     />
                   </div>
                 </div>

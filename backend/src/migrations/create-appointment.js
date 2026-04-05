@@ -45,6 +45,9 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: true,
       },
+      diseaseDescription: {
+        type: Sequelize.TEXT("medium"),
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

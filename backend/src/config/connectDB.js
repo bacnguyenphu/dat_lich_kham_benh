@@ -3,6 +3,7 @@ const { Sequelize } = require("sequelize");
 const sequelize = new Sequelize("dat_lich_kham_benh", "root", null, {
   host: "localhost",
   dialect: "mysql",
+  timezone: "+07:00",
   // define: {
   //   freezeTableName: true // áp dụng cho toàn bộ model
   // }
