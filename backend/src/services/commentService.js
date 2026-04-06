@@ -134,6 +134,20 @@ const getCommentsByTarget = async (targetId, targetType) => {
           model: db.Appointment,
           as: "Appointment",
           attributes: ["appointment_date"],
+          include: [
+            {
+              model: db.Patient,
+              as: "patient",
+              attributes: [
+                "id",
+                "fullName",
+                // "phone",
+                // "email",
+                // "dateOfBirth",
+                // "gender",
+              ],
+            },
+          ],
         },
       ],
       order: [["createdAt", "DESC"]],

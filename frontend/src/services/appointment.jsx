@@ -22,9 +22,17 @@ const updateStatusAppointment = (idAppointment, status) => {
   );
 };
 
-const getAppointments = (idDoctor, limit, page, value, filter, date) => {
+const getAppointments = (
+  idDoctor,
+  limit,
+  page,
+  value,
+  filter,
+  date,
+  isCheckIn,
+) => {
   return axios.get("get-appointments", {
-    params: { idDoctor, limit, page, value, filter, date },
+    params: { idDoctor, limit, page, value, filter, date, isCheckIn },
   });
 };
 

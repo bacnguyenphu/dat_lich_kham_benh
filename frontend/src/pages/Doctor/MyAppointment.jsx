@@ -28,6 +28,7 @@ function MyAppointment() {
   const [page, setPage] = useState(1);
 
   const [appointments, setAppointments] = useState([]);
+  const [checkInFilter, setCheckInFilter] = useState("true");
 
   // 99:Tat ca, 1: chờ xác nhận, 2: xác  nhận, 3 : đã xong, 0: đã huỷ
   const ALL = 99;
@@ -50,6 +51,7 @@ function MyAppointment() {
       value,
       filter,
       selectedDate,
+      checkInFilter,
     );
     if (res.err === 0) {
       setTotalPages(res?.totalPage);
@@ -59,7 +61,7 @@ function MyAppointment() {
 
   useEffect(() => {
     fetchAppointment();
-  }, [page, filter, debouncedValue, selectedDate]);
+  }, [page, filter, debouncedValue, selectedDate, checkInFilter]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -184,6 +186,28 @@ function MyAppointment() {
                 setSelectedDate(e.target.value);
               }}
             />
+          </div>
+          {/* Bộ lọc Check-in */}
+          <div className="relative w-full sm:w-[160px]">
+            <select
+              className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3 py-2.5 pr-8 text-[14px] font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm cursor-pointer"
+              defaultValue={"true"}
+              value={checkInFilter}
+              onChange={(e) => {
+                setCheckInFilter(e.target.value);
+                setPage(1);
+              }}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                backgroundPosition: `right 0.5rem center`,
+                backgroundRepeat: `no-repeat`,
+                backgroundSize: `1.2em 1.2em`,
+              }}
+            >
+              <option value={"ALL"}>Tất cả</option>
+              <option value={"true"}>Đã Check-in</option>
+              <option value={"false"}>Chưa Check-in</option>
+            </select>
           </div>
 
           {/* Bộ lọc Trạng thái */}

@@ -363,6 +363,7 @@ const getAppointments = async (
   value,
   filter,
   date,
+  is_check_in,
 ) => {
   try {
     if (filter === undefined || filter === null || filter === "") {
@@ -378,6 +379,10 @@ const getAppointments = async (
 
     if (idDoctor) {
       whereAppointment.id_doctor = idDoctor;
+    }
+
+    if (is_check_in !== "ALL") {
+      whereAppointment.isCheckIn = is_check_in === "true" ? true : false;
     }
 
     if (+filter !== 99) {
@@ -410,6 +415,8 @@ const getAppointments = async (
         "status",
         "payment_status",
         "createdAt",
+        "isCheckIn",
+        "diseaseDescription",
       ],
       include: [
         {
