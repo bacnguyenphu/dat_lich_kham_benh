@@ -704,6 +704,50 @@ const paymentConfirmation = async (idAppointment) => {
   }
 };
 
+const chekInConfirmation = async (idAppointment, isCheckIn) => {
+  try {
+    if (!idAppointment) {
+      return {
+        err: 1,
+        message: "ID appointment required",
+      };
+    }
+
+    if (isCheckIn === undefined || isCheckIn === null) {
+      return {
+        err: 2,
+        message: "isCheckIn is required",
+      };
+    }
+
+    const appointment = await db.Appointment.findOne({
+      where: { id: idAppointment },
+    });
+
+    if (!appointment) {
+      return {
+        err: 3,
+        message: "Appointment is not exist",
+      };
+    }
+
+    appointment.isCheckIn = isCheckIn;
+    await appointment.save();
+
+    return {
+      err: 0,
+      message: "Check-in status updated successfully !",
+      data: appointment,
+    };
+  } catch (error) {
+    console.log("Lỗi ở chekInConfirmation :", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 export {
   getInfoToMakeAppointment,
   createAppointment,
@@ -711,6 +755,7 @@ export {
   paymentConfirmation,
   updateStatusAppointment,
   getAppointments,
-  getPatientOfDoctor, // chưa sửa
+  getPatientOfDoctor,
   getAppointmentById,
+  chekInConfirmation,
 };

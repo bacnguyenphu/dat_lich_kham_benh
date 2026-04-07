@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  checkInConfirmation,
   getAppointments,
   paymentConfirmation,
   updateStatusAppointment,
@@ -211,15 +212,30 @@ function AppointmentSchedule() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Giả sử bạn có API updateCheckInAppointment, nếu dùng hàm update chung thì thay đổi nhé
-          // const res = await updateCheckInAppointment(idAppointment, true);
-          // Code mẫu (Bạn tự thay bằng API thực tế của bạn):
-          // if (res.err === 0) {
-          //   toast.success("Đã xác nhận Check-in!");
-          //   await fetchAppointment();
-          // }
+          const res = await checkInConfirmation(idAppointment, true);
+
+          if (res.err === 0) {
+            toast.success("Xác nhận Check-in thành công!");
+            await fetchAppointment();
+          } else {
+            Swal.fire({
+              title: "Check-in thất bại!",
+              text:
+                res.message ||
+                "Không thể xác nhận, vui lòng tải lại trang và thử lại.",
+              icon: "error",
+              confirmButtonColor: "#3B82F6",
+              customClass: { popup: "rounded-2xl" },
+            });
+          }
         } catch (error) {
-          toast.error("Lỗi hệ thống!");
+          Swal.fire({
+            title: "Lỗi hệ thống!",
+            text: "Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng.",
+            icon: "error",
+            confirmButtonColor: "#3B82F6",
+            customClass: { popup: "rounded-2xl" },
+          });
         }
       }
     });
@@ -260,7 +276,6 @@ function AppointmentSchedule() {
           <div className="relative w-full sm:w-[160px]">
             <select
               className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3 py-2.5 pr-8 text-[14px] font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm cursor-pointer"
-              defaultValue={"false"}
               value={checkInFilter}
               onChange={(e) => {
                 setCheckInFilter(e.target.value);
@@ -283,7 +298,6 @@ function AppointmentSchedule() {
           <div className="relative w-full sm:w-[170px]">
             <select
               className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3 py-2.5 pr-8 text-[14px] font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm cursor-pointer"
-              defaultValue={XAC_NHAN}
               onChange={(e) => {
                 setFilter(e.target.value);
                 setPage(1);
@@ -316,7 +330,7 @@ function AppointmentSchedule() {
                     <th className="px-6 py-4 w-16 text-center">STT</th>
                     <th className="px-6 py-4">Bệnh nhân</th>
                     <th className="px-6 py-4">Lịch hẹn</th>
-                    <th className="px-6 py-4">Thông tin trạng thái</th>{" "}
+                    <th className="px-6 py-4">Thông tin trạng thái </th>
                     {/* Đổi tên cột cho bao quát */}
                     <th className="px-6 py-4 text-center w-48">Thao tác</th>
                   </tr>
@@ -397,7 +411,7 @@ function AppointmentSchedule() {
                               </span>
                             )}
 
-                            {/* 3. Trạng thái Check-in (MỚI THÊM) */}
+                            {/* 3. Trạng thái Check-in */}
                             {appointment?.isCheckIn ? (
                               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full text-[11px] font-bold uppercase tracking-wider">
                                 <FaUserCheck size="0.9rem" /> Đã Check-in
@@ -440,7 +454,7 @@ function AppointmentSchedule() {
                                 </button>
                               )}
 
-                            {/* Nút Check-in (MỚI THÊM) - Chỉ hiện khi chưa checkin và lịch chưa hủy/chưa khám xong */}
+                            {/* Nút Check-in - Chỉ hiện khi chưa checkin và lịch chưa hủy/chưa khám xong */}
                             {!appointment?.isCheckIn &&
                               appointment?.status !== 0 &&
                               appointment?.status !== 3 && (

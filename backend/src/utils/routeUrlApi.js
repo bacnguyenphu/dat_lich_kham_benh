@@ -6,6 +6,7 @@ export const GET_APPOINTMENTS = "/get-appointments";
 export const UPDATE_STATUS_APPOINTMENT = "/update-status-appointment";
 export const GET_APPOINTMENT_BY_ID = "/get-appointment-by-id";
 export const PAYMENT_CONFIRMATION = "/payment-confirmation";
+export const CHECK_IN_CONFIRMATION = "/check-in-confirmation";
 
 // Route api auth
 export const REGISTER = "/register";
@@ -87,3 +88,4 @@ export const STATISTICAL = "/statistics";
 
 // Route patient
 export const GET_PATIENTS_BY_ID_USER = "/get-patients-by-id-user";
+export const GET_PATIENTS = "/get-patients";

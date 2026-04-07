@@ -84,8 +84,8 @@ import ManageReceptionist from "./components/Admin/ManageReceptionist";
 import LayoutReceptionist from "./Layouts/LayoutReceptionist";
 import Overview from "./pages/Receptionist/Overview";
 import AppointmentSchedule from "./pages/Receptionist/AppointmentSchedule";
-import Patient from "./pages/Receptionist/Patient";
 import SettingAccount from "./pages/Receptionist/SettingAccount";
+import Patients from "./pages/Receptionist/Patients";
 
 function App() {
   return (
@@ -171,7 +171,7 @@ function App() {
         <Route path={RECEPTIONIST} element={<LayoutReceptionist />}>
           <Route path={OVERVIEW} element={<Overview />} />
           <Route path={APPOINTMENTSCHEDULE} element={<AppointmentSchedule />} />
-          <Route path={PATIENT} element={<Patient />} />
+          <Route path={PATIENT} element={<Patients />} />
           <Route path={SETTING_ACCOUNT} element={<SettingAccount />} />
         </Route>
       </Routes>

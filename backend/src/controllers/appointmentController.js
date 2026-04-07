@@ -6,6 +6,7 @@ import {
   getAppointments,
   getAppointmentById,
   paymentConfirmation,
+  chekInConfirmation,
 } from "../services/appointmentService";
 
 const handleGetInfoToMakeAppointment = async (req, res) => {
@@ -117,6 +118,21 @@ const handlePaymentConfirmation = async (req, res) => {
   }
 };
 
+const handleCheckInConfirmation = async (req, res) => {
+  try {
+    const { idAppointment, isCheckIn } = req.body;
+
+    const message = await chekInConfirmation(idAppointment, isCheckIn);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log(`Lỗi ở handleCheckInConfirmation: `, error);
+    return {
+      err: -1,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 export {
   handleGetInfoToMakeAppointment,
   handleCreateAppointment,
@@ -125,4 +141,5 @@ export {
   handleGetAppointments,
   handleGetAppointmentById,
   handlePaymentConfirmation,
+  handleCheckInConfirmation,
 };

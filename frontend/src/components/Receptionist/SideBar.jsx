@@ -6,11 +6,11 @@ import {
   PATIENT,
   SETTING_ACCOUNT,
 } from "../../utils/path";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  const [activeItem, setActiveItem] = useState("Tổng quan");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
     { id: "overview", label: "Tổng quan", icon: "📊", path: OVERVIEW },
@@ -48,17 +48,14 @@ const Sidebar = () => {
       {/* Menu List */}
       <ul className="list-none p-0 my-5 flex flex-col gap-2">
         {menuItems.map((item) => {
-          const isActive = activeItem === item.label;
-
           return (
             <li
               key={item.id}
               onClick={() => {
-                setActiveItem(item.label);
                 navigate(item.path);
               }}
               className={`py-3 px-5 mx-3 flex items-center cursor-pointer rounded-lg transition-colors duration-200 ${
-                isActive
+                item.path === location.pathname.split("/").pop()
                   ? "bg-blue-50 text-blue-700 font-semibold"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}

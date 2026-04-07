@@ -1,3 +1,4 @@
+import { Op, where } from "sequelize";
 import db from "../models/index";
 
 const getPatientsByIdUser = async (idUser) => {
@@ -31,4 +32,54 @@ const getPatientsByIdUser = async (idUser) => {
   }
 };
 
-export { getPatientsByIdUser };
+const getPatients = async (limit, page, value) => {
+  try {
+    if (!limit || !page) {
+      return {
+        err: 1,
+        message: "Limit and page is required",
+        data: [],
+      };
+    }
+
+    let wherePatient = {};
+    if (value) {
+      wherePatient = {
+        [Op.or]: [
+          { fullName: { [Op.like]: `%${value}%` } },
+          {
+            phone: {
+              [Op.like]: `%${value}%`,
+            },
+          },
+        ],
+      };
+    }
+
+    const { count, rows } = await db.Patient.findAndCountAll({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      where: wherePatient,
+      order: [["createdAt", "DESC"]],
+      offset: (page - 1) * limit,
+      limit: limit,
+    });
+
+    return {
+      err: 0,
+      message: "Get patients success!",
+      data: rows,
+      page: page,
+      totalPage: Math.ceil(count / limit),
+      totalData: count,
+    };
+  } catch (error) {
+    console.log("Lỗi ở getPatients ", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+      data: [],
+    };
+  }
+};
+
+export { getPatientsByIdUser, getPatients };
