@@ -38,8 +38,6 @@ function LoginReceptionist() {
 
     setIsLoading(true);
     const res = await dispatch(loginReceptionistRedux(payload));
-    console.log("check res: ", res);
-
     setIsLoading(false);
 
     if (res.payload?.error === 0) {

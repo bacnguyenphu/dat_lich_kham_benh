@@ -44,6 +44,7 @@ import {
   GET_PATIENTS_BY_ID_USER,
   CHECK_IN_CONFIRMATION,
   GET_PATIENTS,
+  GET_APPOINTMENT_OF_PATIENT,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -118,6 +119,7 @@ const BLACKIST = [
   GET_COMMENTS_BY_APPOINTMENT_ID,
   UPDATE_USER,
   GET_PATIENTS,
+  GET_APPOINTMENT_OF_PATIENT,
 ]; // những route nào có trong đây không cần đăng nhập vẫn truy cập được
 
 export const checkUserPermission = async (req, res, next) => {

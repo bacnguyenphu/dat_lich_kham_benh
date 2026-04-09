@@ -7,6 +7,7 @@ import {
   getAppointmentById,
   paymentConfirmation,
   chekInConfirmation,
+  getAppointmentOfPatient,
 } from "../services/appointmentService";
 
 const handleGetInfoToMakeAppointment = async (req, res) => {
@@ -47,6 +48,19 @@ const handleGetAppointmentOfUser = async (req, res) => {
     return res.status(200).json(message);
   } catch (error) {
     console.log(`Lỗi ở handleGetAppointmentOfUser: `, error);
+  }
+};
+
+const handleGetAppointmentOfPatient = async (req, res) => {
+  try {
+    const idPatient = req.query.idPatient;
+    const limit = req.query.limit;
+    const page = req.query.page;
+
+    const message = await getAppointmentOfPatient(idPatient, +limit, +page);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log(`Lỗi ở handleGetAppointmentOfPatient: `, error);
   }
 };
 
@@ -142,4 +156,5 @@ export {
   handleGetAppointmentById,
   handlePaymentConfirmation,
   handleCheckInConfirmation,
+  handleGetAppointmentOfPatient,
 };

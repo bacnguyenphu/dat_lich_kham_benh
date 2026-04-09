@@ -314,6 +314,97 @@ const getAppointmentOfUser = async (idUser, limit, page) => {
   }
 };
 
+const getAppointmentOfPatient = async (idPatient, limit, page) => {
+  try {
+    if (!idPatient) {
+      return {
+        err: 1,
+        message: "ID user required",
+      };
+    }
+
+    const { count, rows } = await db.Appointment.findAndCountAll({
+      where: { id_patient: idPatient },
+      attributes: [
+        "id",
+        "appointment_date",
+        "time",
+        "status",
+        "payment_status",
+        "createdAt",
+      ],
+      include: [
+        {
+          model: db.Doctor,
+          as: "doctor",
+          attributes: ["id", "price"],
+          include: [
+            {
+              model: db.Position,
+              as: "position",
+              attributes: ["name", "id"],
+              through: { attributes: [] },
+            },
+            {
+              model: db.User,
+              as: "user",
+              attributes: ["id", "firstName", "lastName", "avatar"],
+            },
+          ],
+        },
+        {
+          model: db.Medical_package,
+          as: "medical_package",
+          attributes: ["id", "image", "price", "name"],
+        },
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "fullName",
+            "phone",
+            "email",
+            "dateOfBirth",
+            "gender",
+            "address",
+          ],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+      offset: (page - 1) * limit,
+      limit: limit,
+      distinct: true,
+      // subQuery: false,
+    });
+
+    if (rows.length === 0) {
+      return {
+        err: 0,
+        message: "Get appointment of user success !",
+        data: [],
+        page: 1,
+        totalPage: 0,
+      };
+    }
+
+    return {
+      err: 0,
+      message: "Get appointment of user success !",
+      data: rows,
+      page: page,
+      totalPage: Math.ceil(count / limit),
+      totalData: count,
+    };
+  } catch (error) {
+    console.log("Lỗi ở getAppointmentOfUser :", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 const updateStatusAppointment = async (idAppointment, status) => {
   try {
     if (!idAppointment) {
@@ -758,4 +849,5 @@ export {
   getPatientOfDoctor,
   getAppointmentById,
   chekInConfirmation,
+  getAppointmentOfPatient,
 };

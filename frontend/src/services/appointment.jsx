@@ -14,6 +14,12 @@ const getAppointmentOfUser = (idUser, limit, page) => {
   });
 };
 
+const getAppointmetOfPatient = (idPatient, limit, page) => {
+  return axios.get("get-appointment-of-patient", {
+    params: { idPatient, limit, page },
+  });
+};
+
 const updateStatusAppointment = (idAppointment, status) => {
   return axios.put(
     "update-status-appointment",
@@ -57,4 +63,5 @@ export {
   getAppointmentById,
   paymentConfirmation,
   checkInConfirmation,
+  getAppointmetOfPatient,
 };

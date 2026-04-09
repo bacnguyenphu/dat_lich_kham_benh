@@ -8,6 +8,7 @@ const {
   handleGetAppointmentById,
   handlePaymentConfirmation,
   handleCheckInConfirmation,
+  handleGetAppointmentOfPatient,
 } = require("../controllers/appointmentController");
 const router = express.Router();
 import {
@@ -15,6 +16,7 @@ import {
   CREATE_APPOINTMENT,
   GET_APPOINTMENTS,
   GET_APPOINTMENT_BY_ID,
+  GET_APPOINTMENT_OF_PATIENT,
   GET_APPOINTMENT_OF_USER,
   GET_INFOR_MAKE_APPOINTMENT,
   PAYMENT_CONFIRMATION,
@@ -29,5 +31,6 @@ router.put(UPDATE_STATUS_APPOINTMENT, handleUpdateStatusAppointment);
 router.get(GET_APPOINTMENT_BY_ID, handleGetAppointmentById);
 router.put(PAYMENT_CONFIRMATION, handlePaymentConfirmation);
 router.post(CHECK_IN_CONFIRMATION, handleCheckInConfirmation);
+router.get(GET_APPOINTMENT_OF_PATIENT, handleGetAppointmentOfPatient);
 
 export default router;

@@ -2,6 +2,7 @@
 export const GET_INFOR_MAKE_APPOINTMENT = "/get-info-make-appointment";
 export const CREATE_APPOINTMENT = "/create-appointment";
 export const GET_APPOINTMENT_OF_USER = "/get-appointment-of-user";
+export const GET_APPOINTMENT_OF_PATIENT = "/get-appointment-of-patient";
 export const GET_APPOINTMENTS = "/get-appointments";
 export const UPDATE_STATUS_APPOINTMENT = "/update-status-appointment";
 export const GET_APPOINTMENT_BY_ID = "/get-appointment-by-id";
