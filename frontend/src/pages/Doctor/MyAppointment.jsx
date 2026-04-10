@@ -191,7 +191,6 @@ function MyAppointment() {
           <div className="relative w-full sm:w-[160px]">
             <select
               className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3 py-2.5 pr-8 text-[14px] font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm cursor-pointer"
-              defaultValue={"true"}
               value={checkInFilter}
               onChange={(e) => {
                 setCheckInFilter(e.target.value);

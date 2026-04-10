@@ -97,22 +97,24 @@ const updateUser = async (data) => {
       };
     }
 
-    const checkPatient = await db.Patient.findOne({
-      where: { id_user: data?.idUser },
-      attributes: ["id"],
-    });
-
-    if (!checkPatient) {
-      await db.Patient.create({
-        id: data?.idUser,
-        id_user: data?.idUser,
-        fullName: data?.firstName.trim() + " " + data?.lastName.trim(),
-        phone: data?.phone.trim(),
-        email: data?.email.trim(),
-        dateOfBirth: data?.dateOfBirth,
-        gender: data?.gender,
-        address: data?.address.trim(),
+    if (data?.role === "R3") {
+      const checkPatient = await db.Patient.findOne({
+        where: { id_user: data?.idUser },
+        attributes: ["id"],
       });
+
+      if (!checkPatient) {
+        await db.Patient.create({
+          id: data?.idUser,
+          id_user: data?.idUser,
+          fullName: data?.firstName.trim() + " " + data?.lastName.trim(),
+          phone: data?.phone.trim(),
+          email: data?.email.trim(),
+          dateOfBirth: data?.dateOfBirth,
+          gender: data?.gender,
+          address: data?.address.trim(),
+        });
+      }
     }
 
     await db.User.update(
