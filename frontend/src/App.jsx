@@ -10,6 +10,7 @@ import {
   APPOINTMENTSCHEDULE,
   CATEGORY_PACKAGE,
   CHANGE_PASSWORD,
+  CREATE_APPOINTMENT,
   DOCTOR,
   DOCTORS,
   INFORMATION_DOCTOR,
@@ -86,6 +87,7 @@ import Overview from "./pages/Receptionist/Overview";
 import AppointmentSchedule from "./pages/Receptionist/AppointmentSchedule";
 import SettingAccount from "./pages/Receptionist/SettingAccount";
 import Patients from "./pages/Receptionist/Patients";
+import CreateAppointment from "./pages/Receptionist/CreateAppointment";
 
 function App() {
   return (
@@ -173,6 +175,7 @@ function App() {
           <Route path={APPOINTMENTSCHEDULE} element={<AppointmentSchedule />} />
           <Route path={PATIENT} element={<Patients />} />
           <Route path={SETTING_ACCOUNT} element={<SettingAccount />} />
+          <Route path={CREATE_APPOINTMENT} element={<CreateAppointment />} />
         </Route>
       </Routes>
       <ToastContainer

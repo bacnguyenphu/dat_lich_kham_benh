@@ -118,8 +118,8 @@ function MedicalExaminationPlan({ type }) {
         }
       };
 
-      const fetchMedicalPackageOfDoctor = async () => {
-        const res = await getMedicalPackageFollowIdDoctor(selectedItem.value);
+      const fetchMedicalPackageOfDoctor = async (id) => {
+        const res = await getMedicalPackageFollowIdDoctor(id);
         if (res.err === 0) {
           setPackageOfDoctor(res.data);
         }
@@ -127,7 +127,9 @@ function MedicalExaminationPlan({ type }) {
 
       fetchScheduleFollowDate();
       if (type === "DOCTOR") {
-        fetchMedicalPackageOfDoctor();
+        fetchMedicalPackageOfDoctor(selectedItem.value);
+      } else if (type === "DOCTOR_ONLY") {
+        fetchMedicalPackageOfDoctor(idDoctor);
       }
     } else {
       // Reset nếu chưa chọn ai
@@ -188,7 +190,7 @@ function MedicalExaminationPlan({ type }) {
         }
       };
       const res = await createOrUpdateSchedule(payload);
-      if (packageOfDoctor.length > 0 && type === "DOCTOR") {
+      if (packageOfDoctor.length > 0) {
         await createOrUpdateForPackageSameTime();
       }
       if (res.err === 0) {

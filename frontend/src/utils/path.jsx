@@ -45,3 +45,4 @@ export const OVERVIEW = "tong-quan";
 export const APPOINTMENTSCHEDULE = "lich-hen";
 export const PATIENT = "benh-nhan";
 export const SETTING_ACCOUNT = "cai-dat-tai-khoan";
+export const CREATE_APPOINTMENT = "tao-lich-hen";

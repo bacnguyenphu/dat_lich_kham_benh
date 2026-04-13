@@ -8,4 +8,8 @@ const getPatients = (limit, page, value) => {
   return axios.get("get-patients", { params: { limit, page, value } });
 };
 
-export { getPatientsByIdUser, getPatients };
+const getAllPatient = () => {
+  return axios.get("get-all-patient");
+};
+
+export { getPatientsByIdUser, getPatients, getAllPatient };

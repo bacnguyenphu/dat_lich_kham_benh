@@ -13,11 +13,13 @@ import {
 import dayjs from "dayjs";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 import { GiSandsOfTime } from "react-icons/gi";
-import { FaRegCheckCircle, FaRegTrashAlt } from "react-icons/fa";
+import { FaRegCheckCircle, FaRegEye, FaRegTrashAlt } from "react-icons/fa";
 import { PiWarningCircleLight } from "react-icons/pi";
 import { MdCheckBox } from "react-icons/md";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
+import ModalInfoAppointment from "../../components/Receptionist/ModalInfoAppointment";
 dayjs.locale("vi");
 
 function MyAppointment() {
@@ -26,6 +28,9 @@ function MyAppointment() {
   const [totalPages, setTotalPages] = useState(0);
   const limit = 5;
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isShowModal, setIsShowModal] = useState(false);
 
   const [appointments, setAppointments] = useState([]);
   const [checkInFilter, setCheckInFilter] = useState("true");
@@ -40,7 +45,9 @@ function MyAppointment() {
   const [value, setValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
+    new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    }),
   );
 
   const fetchAppointment = async () => {
@@ -339,6 +346,20 @@ function MyAppointment() {
                           {/* Thao tác (Action Buttons) */}
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-2">
+                              {/* Nút Xem chi tiết */}
+                              <button
+                                className="flex items-center justify-center w-8 h-8 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all shadow-sm active:scale-95"
+                                title="Xem thông tin"
+                                onClick={() => {
+                                  navigate(
+                                    location.pathname + `?id=${appointment.id}`,
+                                  );
+                                  setIsShowModal(true);
+                                }}
+                              >
+                                <FaRegEye size="0.9rem" />
+                              </button>
+
                               {/* Nút: Xác nhận chờ khám (Từ trạng thái 1 -> 2) */}
                               {appointment?.status === 1 && (
                                 <button
@@ -419,6 +440,9 @@ function MyAppointment() {
         <div>
           <Pagination setPage={setPage} totalPages={totalPages} />
         </div>
+      )}
+      {isShowModal && (
+        <ModalInfoAppointment setIsShowModal={setIsShowModal} type={"INFO"} />
       )}
     </div>
   );

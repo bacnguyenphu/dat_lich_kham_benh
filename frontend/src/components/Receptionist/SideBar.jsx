@@ -6,6 +6,7 @@ import {
   OVERVIEW,
   PATIENT,
   SETTING_ACCOUNT,
+  CREATE_APPOINTMENT,
 } from "../../utils/path";
 import { IoLogOut } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -25,6 +26,12 @@ const Sidebar = () => {
       label: "Lịch hẹn",
       icon: "📅",
       path: APPOINTMENTSCHEDULE,
+    },
+    {
+      id: "create-appointment",
+      label: "Tạo lịch hẹn",
+      icon: "📝",
+      path: CREATE_APPOINTMENT,
     },
     { id: "patients", label: "Bệnh nhân", icon: "👥", path: PATIENT },
     {

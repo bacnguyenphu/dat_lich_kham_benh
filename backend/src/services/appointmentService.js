@@ -447,6 +447,166 @@ const updateStatusAppointment = async (idAppointment, status) => {
   }
 };
 
+const getAppointmentsOfMedicalPackagesByDoctor = async (
+  idDoctor,
+  limit = 10,
+  page = 1,
+  value,
+  filter,
+  date,
+  is_check_in,
+) => {
+  try {
+    if (!idDoctor) {
+      return {
+        err: 1,
+        message: "ID doctor is required",
+      };
+    }
+
+    if (filter === undefined || filter === null || filter === "") {
+      return { err: 2, message: "Filter is required" };
+    }
+
+    // Ép kiểu an toàn cho phân trang
+    const limitData = parseInt(limit, 10);
+    const pageData = parseInt(page, 10);
+
+    // Tìm tất cả medical packages do bác sĩ này phụ trách
+    const medicalPackages = await db.Medical_package.findAll({
+      where: { id_doctor: idDoctor },
+      attributes: ["id"],
+    });
+
+    const medicalPackageIds = medicalPackages.map((pkg) => pkg.id);
+
+    if (medicalPackageIds.length === 0) {
+      return {
+        err: 0,
+        message: "No medical packages found for this doctor.",
+        data: [],
+        page: pageData,
+        totalPage: 0,
+        totalData: 0,
+      };
+    }
+
+    let whereAppointment = {
+      id_medical_package: {
+        [Op.in]: medicalPackageIds,
+      },
+    };
+
+    let wherePatientSearch = {};
+
+    if (is_check_in !== "ALL") {
+      whereAppointment.isCheckIn = is_check_in === "true" ? true : false;
+    }
+
+    if (+filter !== 99) {
+      whereAppointment.status = +filter;
+    }
+
+    if (date) {
+      whereAppointment[Op.and] = where(
+        fn("DATE", col("appointment_date")),
+        "=",
+        date,
+      );
+    }
+
+    if (value) {
+      wherePatientSearch = {
+        [Op.or]: [
+          { fullName: { [Op.like]: `%${value}%` } },
+          { phone: { [Op.like]: `%${value}%` } },
+        ],
+      };
+    }
+
+    const { count, rows } = await db.Appointment.findAndCountAll({
+      where: whereAppointment,
+      attributes: [
+        "id",
+        "appointment_date",
+        "time",
+        "status",
+        "payment_status",
+        "createdAt",
+        "isCheckIn",
+        "diseaseDescription",
+      ],
+      include: [
+        {
+          model: db.Medical_package,
+          as: "medical_package",
+          attributes: ["id", "name", "image", "price"],
+          include: [
+            {
+              model: db.Category_package,
+              as: "category_package",
+              attributes: ["name"],
+            },
+          ],
+        },
+        {
+          model: db.User,
+          as: "user",
+          attributes: ["id", "firstName", "lastName", "phone"],
+        },
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "fullName",
+            "phone",
+            "email",
+            "dateOfBirth",
+            "gender",
+          ],
+          where: value ? wherePatientSearch : undefined,
+        },
+      ],
+      order: [
+        ["appointment_date", "DESC"],
+        ["time", "ASC"],
+      ],
+      offset: (pageData - 1) * limitData,
+      limit: limitData,
+      subQuery: false,
+      distinct: true,
+    });
+
+    if (rows.length === 0) {
+      return {
+        err: 0,
+        message:
+          "No appointments found for medical packages managed by this doctor.",
+        data: [],
+        page: pageData,
+        totalPage: 0,
+        totalData: 0,
+      };
+    }
+
+    return {
+      err: 0,
+      message: "Get appointments of medical packages by doctor success !",
+      data: rows,
+      page: pageData,
+      totalPage: Math.ceil(count / limitData),
+      totalData: count,
+    };
+  } catch (error) {
+    console.log("Lỗi ở getAppointmentsOfMedicalPackagesByDoctor :", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+    };
+  }
+};
+
 const getAppointments = async (
   idDoctor,
   limit = 10,
@@ -469,7 +629,26 @@ const getAppointments = async (
     let wherePatientSearch = {}; // Đổi tên biến cho rõ nghĩa
 
     if (idDoctor) {
-      whereAppointment.id_doctor = idDoctor;
+      // 1. Lấy danh sách gói khám của bác sĩ
+      const medicalPackages = await db.Medical_package.findAll({
+        where: { id_doctor: idDoctor },
+        attributes: ["id"],
+      });
+
+      // 2. Chuyển thành mảng ID
+      const medicalPackageIds = medicalPackages.map((pkg) => pkg.id);
+
+      // 3. Khởi tạo điều kiện OR
+      whereAppointment[Op.or] = [
+        { id_doctor: idDoctor }, // Nhánh 1: Bệnh nhân đặt khám chuyên khoa trực tiếp
+      ];
+
+      // 4. Nếu bác sĩ này có quản lý gói, thì push thêm nhánh 2 vào OR
+      if (medicalPackageIds.length > 0) {
+        whereAppointment[Op.or].push({
+          id_medical_package: { [Op.in]: medicalPackageIds }, // Nhánh 2: Bệnh nhân đặt gói khám
+        });
+      }
     }
 
     if (is_check_in !== "ALL") {

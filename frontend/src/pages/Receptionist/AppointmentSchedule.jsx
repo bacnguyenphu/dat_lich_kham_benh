@@ -40,7 +40,9 @@ function AppointmentSchedule() {
   const [value, setValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
+    new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    }),
   );
   const [isShowModal, setIsShowModal] = useState(false);
   const navigate = useNavigate();

@@ -58,9 +58,8 @@ function ModalInfoAppointment({ setIsShowModal, type, fetchAppointments }) {
               payment_status: res.data?.payment_status,
               medicalPackageId: res.data?.medical_package?.id,
               doctorId: null,
-              patientName:
-                res.data?.user?.firstName + " " + res.data?.user?.lastName,
-              patientPhone: res.data?.user?.phone,
+              patientName: res.data?.patient?.fullName,
+              patientPhone: res.data?.patient?.phone,
             });
           }
         }

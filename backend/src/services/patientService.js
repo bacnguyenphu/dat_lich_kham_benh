@@ -82,4 +82,26 @@ const getPatients = async (limit, page, value) => {
   }
 };
 
-export { getPatientsByIdUser, getPatients };
+const getAllPatient = async () => {
+  try {
+    const patients = await db.Patient.findAll({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      order: [["createdAt", "DESC"]],
+    });
+
+    return {
+      err: 0,
+      message: "Get all patients success!",
+      data: patients,
+    };
+  } catch (error) {
+    console.log("Lỗi ở getAllPatient ", error);
+    return {
+      err: -999,
+      message: `Error server: ${error}`,
+      data: [],
+    };
+  }
+};
+
+export { getPatientsByIdUser, getPatients, getAllPatient };

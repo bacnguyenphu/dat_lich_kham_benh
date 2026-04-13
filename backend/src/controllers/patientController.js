@@ -1,6 +1,7 @@
 const {
   getPatientsByIdUser,
   getPatients,
+  getAllPatient,
 } = require("../services/patientService");
 
 const handleGetPatientsByIdUser = async (req, res) => {
@@ -35,4 +36,18 @@ const handleGetPatients = async (req, res) => {
   }
 };
 
-export { handleGetPatientsByIdUser, handleGetPatients };
+const handleGetAllPatient = async (req, res) => {
+  try {
+    const message = await getAllPatient();
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log("Lỗi ở handleGetAllPatient: ", error);
+    return res.status(500).json({
+      err: -999,
+      message: `Error server : ${error}`,
+      data: [],
+    });
+  }
+};
+
+export { handleGetPatientsByIdUser, handleGetPatients, handleGetAllPatient };

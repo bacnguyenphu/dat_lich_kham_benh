@@ -8,7 +8,12 @@ import Schedules from "../components/Schedules";
 import { scrollToTop } from "../utils/scrollToTop";
 import { getCommentsByTarget } from "../services/commentService";
 import { IoIosCheckmarkCircle } from "react-icons/io";
-import { FaHospitalUser, FaMoneyBillWave } from "react-icons/fa";
+import {
+  FaHospitalUser,
+  FaMoneyBillWave,
+  FaQuoteLeft,
+  FaUserFriends,
+} from "react-icons/fa";
 
 function DetailMedicalPackage() {
   const [medicalPackage, setMedicalPackage] = useState(null);
@@ -177,43 +182,72 @@ function DetailMedicalPackage() {
         )}
 
         {/* ===== PHẢN HỒI (REVIEWS) ===== */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-10">
-          <h3 className="text-xl font-bold text-slate-800 mb-6">
-            Đánh giá từ khách hàng ({comments?.length || 0})
-          </h3>
+        <div className="flex flex-col gap-5">
+          {comments && comments.length > 0 ? (
+            comments.map((cmt) => (
+              <div
+                key={cmt.id}
+                className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm">
+                    {cmt.user.lastName?.charAt(0) || "U"}
+                  </div>
 
-          <div className="flex flex-col gap-5">
-            {comments && comments.length > 0 ? (
-              comments.map((cmt) => (
-                <div
-                  key={cmt.id}
-                  className="bg-slate-50 p-5 rounded-xl border border-slate-100"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <p className="font-bold text-slate-800 text-lg">
-                      {cmt.user.firstName} {cmt.user.lastName}
-                    </p>
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-sm font-medium rounded-full border border-green-100">
-                      <IoIosCheckmarkCircle size={"1.1rem"} />
-                      <span>
-                        Đã khám ngày{" "}
-                        {new Date(
-                          cmt.Appointment?.appointment_date,
-                        ).toLocaleDateString("vi-VN")}
-                      </span>
+                  {/* Nội dung Card */}
+                  <div className="flex-1 w-full">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                      <div className="flex flex-col items-start gap-1.5">
+                        <p className="font-bold text-slate-800 text-[16px]">
+                          {cmt.user.firstName} {cmt.user.lastName}{" "}
+                          <span className="text-xs font-light">
+                            (Người đánh giá)
+                          </span>
+                        </p>
+
+                        {/* Tag Người khám thực tế */}
+                        {cmt.Appointment?.patient?.fullName && (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                            <FaUserFriends
+                              className="text-slate-400"
+                              size="0.9rem"
+                            />
+                            Bệnh nhân khám: {cmt.Appointment.patient.fullName}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Badge Ngày khám */}
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 text-[11px] font-bold uppercase tracking-wider rounded-full border border-emerald-100 shrink-0 w-fit">
+                        <IoIosCheckmarkCircle size="1.2rem" />
+                        <span>
+                          Đã khám{" "}
+                          {new Date(
+                            cmt.Appointment?.appointment_date,
+                          ).toLocaleDateString("vi-VN")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Body: Lời nhận xét */}
+                    <div className="relative bg-slate-50/80 border border-slate-100 rounded-2xl p-4 sm:p-5 mt-2">
+                      <FaQuoteLeft
+                        className="absolute top-4 left-4 text-slate-200 opacity-60"
+                        size="1.8rem"
+                      />
+                      <p className="text-slate-700 leading-relaxed font-medium relative z-10 pl-8 text-[15px]">
+                        {cmt.content}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-slate-600 leading-relaxed italic">
-                    "{cmt.content}"
-                  </p>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                Chưa có phản hồi nào cho gói khám này.
               </div>
-            )}
-          </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              Chưa có phản hồi nào cho bác sĩ này.
+            </div>
+          )}
         </div>
       </div>
     </div>

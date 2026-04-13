@@ -60,7 +60,7 @@ function InfoAppointment({ infoAppointment }) {
             <IoPricetagOutline className="text-slate-400" size="1.1rem" />
             <span>Chi phí dự kiến:</span>
             <span className="text-blue-600 font-bold text-base ml-1">
-              {infoAppointment?.price}{" "}
+              {infoAppointment?.price.toLocaleString("vi-VN")}{" "}
               <span className="text-xs text-slate-500 font-normal">VNĐ</span>
             </span>
           </div>

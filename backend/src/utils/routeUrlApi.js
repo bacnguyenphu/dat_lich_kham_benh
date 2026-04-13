@@ -92,3 +92,4 @@ export const STATISTICAL = "/statistics";
 // Route patient
 export const GET_PATIENTS_BY_ID_USER = "/get-patients-by-id-user";
 export const GET_PATIENTS = "/get-patients";
+export const GET_ALL_PATIENT = "/get-all-patient";

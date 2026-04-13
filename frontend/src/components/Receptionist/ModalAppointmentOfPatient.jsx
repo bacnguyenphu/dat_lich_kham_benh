@@ -230,7 +230,7 @@ function ModalAppointmentOfPatient({ setIsShowModal, navigate, location }) {
                       <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 border-dashed">
                         <div className="flex items-center gap-1.5 font-bold text-orange-600 text-sm">
                           <MdOutlinePayment size="1.2rem" />
-                          {item.price} VNĐ
+                          {item.price.toLocaleString("vi-VN")} VNĐ
                         </div>
 
                         <div className="flex items-center gap-2">
