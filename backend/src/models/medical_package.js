@@ -27,6 +27,14 @@ module.exports = (sequelize, DataTypes) => {
         scope: { targetType: "medical_package" },
         as: "comments",
       });
+      Medical_package.hasMany(models.Schedule, {
+        foreignKey: "id_medical_package",
+        as: "schedule",
+      });
+      Medical_package.belongsTo(models.Doctor, {
+        foreignKey: "id_doctor",
+        as: "doctor",
+      });
     }
   }
   Medical_package.init(
@@ -42,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       image: DataTypes.STRING,
       description: DataTypes.STRING,
       id_category_package: DataTypes.STRING,
+      id_doctor: DataTypes.STRING,
     },
     {
       sequelize,

@@ -15,7 +15,9 @@ import {
   updateMedicalPackage,
 } from "../../services/medicalPackageService";
 import { toast } from "react-toastify";
-import { FaMoneyBillWave, FaTags, FaFileAlt } from "react-icons/fa";
+import { FaMoneyBillWave, FaTags, FaFileAlt, FaUserMd } from "react-icons/fa";
+import Select from "react-select";
+import { getDoctors } from "../../services/doctorService";
 
 function ModalCRUDMedicalPackage({
   setIsShowModal,
@@ -23,6 +25,7 @@ function ModalCRUDMedicalPackage({
   fetchMedicalPackages,
 }) {
   const [categoriesPackage, setCategoriesPackage] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [payload, setPayload] = useState({
     name: "",
     description_detail: "",
@@ -30,6 +33,7 @@ function ModalCRUDMedicalPackage({
     image: null,
     description: "",
     id_category_package: "",
+    id_doctor: "",
   });
   const [imgUpload, setImgUpload] = useState();
   const [errors, setErrors] = useState({});
@@ -49,6 +53,20 @@ function ModalCRUDMedicalPackage({
   }, []);
 
   useEffect(() => {
+    const fetchDoctors = async () => {
+      const res = await getDoctors();
+      if (res.err === 0 && res.data.length > 0) {
+        let temp = res.data.map((item) => ({
+          value: item?.id,
+          label: `${item?.user?.firstName} ${item?.user?.lastName} - Khoa: ${item?.specialty.map((spe) => spe?.name).join(", ")}`,
+        }));
+        setDoctors(temp);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
+  useEffect(() => {
     if (type !== "ADD" && id) {
       const fetchMedicalPackageById = async () => {
         const res = await getMedicalPackageById(id);
@@ -60,6 +78,7 @@ function ModalCRUDMedicalPackage({
             image: res?.data?.image,
             description: res?.data?.description,
             id_category_package: res?.data?.category_package?.id,
+            id_doctor: res?.data?.id_doctor || "",
           });
         }
       };
@@ -159,6 +178,29 @@ function ModalCRUDMedicalPackage({
       toast.error(res.message);
     }
     setIsLoading(false);
+  };
+
+  // Custom CSS cho React-Select để nó hợp với Tailwind
+  const customSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      padding: "2px",
+      borderRadius: "0.75rem", // rounded-xl
+      borderColor: state.isFocused ? "#3b82f6" : "#e2e8f0", // blue-500 or slate-200
+      boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : "none",
+      "&:hover": { borderColor: "#94a3b8" }, // slate-400
+      backgroundColor: "#f8fafc", // slate-50
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#3b82f6"
+        : state.isFocused
+          ? "#eff6ff"
+          : "white",
+      color: state.isSelected ? "white" : "#334155",
+      cursor: "pointer",
+    }),
   };
 
   if (type === "DELETE") {
@@ -301,7 +343,28 @@ function ModalCRUDMedicalPackage({
             )}
           </div>
 
-          {/* Hàng 3: Ảnh & Giới thiệu ngắn */}
+          {/* Hàng 3: Chọn Bác sĩ phụ trách */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <FaUserMd className="text-green-500" /> Bác sĩ phụ trách
+            </label>
+            <Select
+              value={doctors.find((d) => d.value === payload.id_doctor)}
+              onChange={(selected) =>
+                setPayload((prev) => ({
+                  ...prev,
+                  id_doctor: selected?.value || "",
+                }))
+              }
+              options={doctors}
+              styles={customSelectStyles}
+              placeholder="Chọn bác sĩ phụ trách..."
+              noOptionsMessage={() => "Không tìm thấy bác sĩ"}
+              isClearable
+            />
+          </div>
+
+          {/* Hàng 4: Ảnh & Giới thiệu ngắn */}
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex flex-col items-center gap-2 shrink-0">
               <label className="text-sm font-bold text-slate-700">

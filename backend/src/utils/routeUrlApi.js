@@ -45,6 +45,8 @@ export const GET_MEDICAL_PACKAGE_BY_ID = "/get-medical-package-by-id";
 export const DELETE_MEDICAL_PACKAGE = "/delete-medical-package";
 export const GET_MEDICAL_PACKAGE_FOLLOW_CATEGORY =
   "/get-medical-package-follow-category";
+export const GET_MEDICAL_PACKAGE_FOLLOW_ID_DOCTOR =
+  "/get-medical-package-follow-id-doctor";
 
 // Route api position
 export const GET_POSITIONS = "/get-postions";

@@ -8,18 +8,25 @@ import {
   getScheduleFollowDate,
 } from "../../services/scheduleService";
 import { toast } from "react-toastify";
-import { getMedicalPackage } from "../../services/medicalPackageService";
+import {
+  getMedicalPackage,
+  getMedicalPackageFollowIdDoctor,
+} from "../../services/medicalPackageService";
 import { useSelector } from "react-redux";
 import { IoIosSave } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaCalendarAlt, FaRegClock, FaCheckCircle } from "react-icons/fa";
 
 function MedicalExaminationPlan({ type }) {
+  const [packageOfDoctor, setPackageOfDoctor] = useState([]); // cái này dùng để lưu tạm danh sách gói khám của bác sĩ khi chọn bác sĩ
+
   const [timeFrames, setTimeFrames] = useState([]);
   const [listItems, setListItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
+    new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    }),
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -110,7 +117,18 @@ function MedicalExaminationPlan({ type }) {
           setTimeFrames(temp);
         }
       };
+
+      const fetchMedicalPackageOfDoctor = async () => {
+        const res = await getMedicalPackageFollowIdDoctor(selectedItem.value);
+        if (res.err === 0) {
+          setPackageOfDoctor(res.data);
+        }
+      };
+
       fetchScheduleFollowDate();
+      if (type === "DOCTOR") {
+        fetchMedicalPackageOfDoctor();
+      }
     } else {
       // Reset nếu chưa chọn ai
       let temp = _.cloneDeep(timeFrames).map((item) => ({
@@ -157,7 +175,22 @@ function MedicalExaminationPlan({ type }) {
     };
 
     try {
+      // tạo ra lịch gói khám mà bác sĩ phụ trách luôn
+      const createOrUpdateForPackageSameTime = async () => {
+        let { idDoctor, ...tempPayload } = payload;
+        const promises = packageOfDoctor.map((item) =>
+          createOrUpdateSchedule({ ...tempPayload, idMedicalPackage: item.id }),
+        );
+        try {
+          await Promise.allSettled(promises);
+        } catch (error) {
+          console.log("Lỗi:", error);
+        }
+      };
       const res = await createOrUpdateSchedule(payload);
+      if (packageOfDoctor.length > 0 && type === "DOCTOR") {
+        await createOrUpdateForPackageSameTime();
+      }
       if (res.err === 0) {
         toast.success("Lưu kế hoạch khám thành công!");
       } else {

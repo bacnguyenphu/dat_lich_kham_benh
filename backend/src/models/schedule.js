@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Schedule extends Model {
     /**
@@ -11,20 +9,34 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Schedule.belongsTo(models.Doctor,{foreignKey:'id_doctor', as:'schedule'})
-      Schedule.belongsToMany(models.Time_frame,{through:'Schedule_timeFrame', as:'time_frame',foreignKey:'id_schedule'})
+      Schedule.belongsTo(models.Doctor, {
+        foreignKey: "id_doctor",
+        as: "schedule",
+      });
+      Schedule.belongsToMany(models.Time_frame, {
+        through: "Schedule_timeFrame",
+        as: "time_frame",
+        foreignKey: "id_schedule",
+      });
+      Schedule.belongsTo(models.Medical_package, {
+        foreignKey: "id_medical_package",
+        as: "medical_package",
+      });
     }
   }
-  Schedule.init({
-    //     - id
-    // - id_doctor (fk)
-    // - appointment_date
-    id_doctor: DataTypes.STRING,
-    appointment_date: DataTypes.DATE,
-    id_medical_package: DataTypes.STRING,
-  }, {
-    sequelize,
-    modelName: 'Schedule',
-  });
+  Schedule.init(
+    {
+      //     - id
+      // - id_doctor (fk)
+      // - appointment_date
+      id_doctor: DataTypes.STRING,
+      appointment_date: DataTypes.DATE,
+      id_medical_package: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "Schedule",
+    },
+  );
   return Schedule;
 };
