@@ -733,7 +733,7 @@ const getAppointments = async (
       ],
       offset: (pageData - 1) * limitData,
       limit: limitData,
-      subQuery: false,
+      // subQuery: false,
       distinct: true,
     });
 

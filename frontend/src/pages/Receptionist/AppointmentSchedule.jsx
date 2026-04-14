@@ -310,6 +310,7 @@ function AppointmentSchedule() {
                 backgroundRepeat: `no-repeat`,
                 backgroundSize: `1.2em 1.2em`,
               }}
+              value={filter}
             >
               <option value={ALL}>Tất cả trạng thái</option>
               <option value={CHO_XAC_NHAN}>Chờ xác nhận</option>

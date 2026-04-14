@@ -41,7 +41,7 @@ function MyAppointment() {
   const XAC_NHAN = 2;
   const DA_XONG = 3;
   const DA_HUY = 0;
-  const [filter, setFilter] = useState(ALL);
+  const [filter, setFilter] = useState(XAC_NHAN);
   const [value, setValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
   const [selectedDate, setSelectedDate] = useState(
@@ -220,7 +220,7 @@ function MyAppointment() {
           <div className="relative w-full sm:w-[180px]">
             <select
               className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-10 text-[14px] font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm cursor-pointer"
-              defaultValue="ALL"
+              value={filter}
               onChange={(e) => {
                 // Giả sử bạn có hàm setFilter, nếu không hãy điều chỉnh theo logic của bạn
                 setFilter(e.target.value);

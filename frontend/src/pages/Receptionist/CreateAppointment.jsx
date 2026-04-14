@@ -519,7 +519,7 @@ function CreateAppointment() {
                           <input
                             type="radio"
                             name="gender"
-                            value="Nam"
+                            value="male"
                             checked={patientInfo.gender === "Nam"}
                             onChange={(e) =>
                               handlePatientInfoChange("gender", e.target.value)
@@ -533,7 +533,7 @@ function CreateAppointment() {
                           <input
                             type="radio"
                             name="gender"
-                            value="Nữ"
+                            value="female"
                             checked={patientInfo.gender === "Nữ"}
                             onChange={(e) =>
                               handlePatientInfoChange("gender", e.target.value)
