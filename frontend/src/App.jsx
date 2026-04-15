@@ -88,8 +88,13 @@ import AppointmentSchedule from "./pages/Receptionist/AppointmentSchedule";
 import SettingAccount from "./pages/Receptionist/SettingAccount";
 import Patients from "./pages/Receptionist/Patients";
 import CreateAppointment from "./pages/Receptionist/CreateAppointment";
+import ChatWidget from "./components/ChatWidget";
 
 function App() {
+  const isAdminRoute =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/receptionist") ||
+    location.pathname.startsWith("/doctor");
   return (
     <>
       <Routes>
@@ -190,6 +195,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
+      {!isAdminRoute && <ChatWidget />}
     </>
   );
 }
