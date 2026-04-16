@@ -47,6 +47,7 @@ import {
   GET_APPOINTMENT_OF_PATIENT,
   GET_MEDICAL_PACKAGE_FOLLOW_ID_DOCTOR,
   GET_ALL_PATIENT,
+  GET_HISTORY_CHAT_BY_CUSTOMER,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -88,6 +89,7 @@ const ROLE_PERMISSIONS = {
     DELETE_COMMENT,
     PAYMENT_CONFIRMATION,
     GET_PATIENTS_BY_ID_USER,
+    GET_HISTORY_CHAT_BY_CUSTOMER,
   ], // User thường không có quyền quản trị
 };
 

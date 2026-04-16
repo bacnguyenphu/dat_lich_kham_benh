@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import family from "../assets/familyImage.jpeg";
+import family from "../assets/familyImage.png";
 import { navs } from "../utils/navs";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";

@@ -7,6 +7,7 @@ import {
   PATIENT,
   SETTING_ACCOUNT,
   CREATE_APPOINTMENT,
+  RECEPTIONIST_CHAT,
 } from "../../utils/path";
 import { IoLogOut } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -34,6 +35,7 @@ const Sidebar = () => {
       path: CREATE_APPOINTMENT,
     },
     { id: "patients", label: "Bệnh nhân", icon: "👥", path: PATIENT },
+    { id: "chat", label: "Chat", icon: "💬", path: RECEPTIONIST_CHAT },
     {
       id: "settings",
       label: "Cài đặt tài khoản",

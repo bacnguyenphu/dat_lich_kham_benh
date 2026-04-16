@@ -38,6 +38,7 @@ import {
   PATIENT,
   PROFILE,
   RECEPTIONIST,
+  RECEPTIONIST_CHAT,
   REGISTER,
   SEARCH,
   SETTING_ACCOUNT,
@@ -89,12 +90,16 @@ import SettingAccount from "./pages/Receptionist/SettingAccount";
 import Patients from "./pages/Receptionist/Patients";
 import CreateAppointment from "./pages/Receptionist/CreateAppointment";
 import ChatWidget from "./components/ChatWidget";
+import ReceptionistChat from "./pages/Receptionist/ReceptionistChat";
+import { useSelector } from "react-redux";
 
 function App() {
   const isAdminRoute =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/receptionist") ||
     location.pathname.startsWith("/doctor");
+
+  const auth = useSelector((state) => state?.auth?.data?.id) || null;
   return (
     <>
       <Routes>
@@ -181,6 +186,7 @@ function App() {
           <Route path={PATIENT} element={<Patients />} />
           <Route path={SETTING_ACCOUNT} element={<SettingAccount />} />
           <Route path={CREATE_APPOINTMENT} element={<CreateAppointment />} />
+          <Route path={RECEPTIONIST_CHAT} element={<ReceptionistChat />} />
         </Route>
       </Routes>
       <ToastContainer
@@ -195,7 +201,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
-      {!isAdminRoute && <ChatWidget />}
+      {!isAdminRoute && auth && <ChatWidget />}
     </>
   );
 }

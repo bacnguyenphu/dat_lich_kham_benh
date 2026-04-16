@@ -93,3 +93,6 @@ export const STATISTICAL = "/statistics";
 export const GET_PATIENTS_BY_ID_USER = "/get-patients-by-id-user";
 export const GET_PATIENTS = "/get-patients";
 export const GET_ALL_PATIENT = "/get-all-patient";
+
+// Route chat
+export const GET_HISTORY_CHAT_BY_CUSTOMER = "/get-history-chat-by-customer";

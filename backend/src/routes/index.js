@@ -13,6 +13,7 @@ import comment from "./comment";
 import search from "./search";
 import statistical from "./statistical";
 import patient from "./patient";
+import chat from "./chat";
 import { checkUserPermission } from "../middleware/checkPermissions";
 
 const initRoutes = (app) => {
@@ -42,6 +43,7 @@ const initRoutes = (app) => {
   app.use("/api", search);
   app.use("/api", statistical);
   app.use("/api", patient);
+  app.use("/api", chat);
 
   app.use("/api", insert);
 

@@ -1,28 +1,84 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import io from "socket.io-client";
+import { getChatHistoryByCustomer } from "../services/chatService";
+
+const socket = io("http://localhost:3001");
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState("");
+  const [currentRoomId, setCurrentRoomId] = useState(null);
+
+  const user_id = useSelector((state) => state?.auth?.data?.id) || null;
+
+  const messagesEndRef = useRef(null);
 
   // Dữ liệu mẫu (mock data)
-  const mockMessages = [
-    {
-      id: 1,
-      senderRole: "RECEPTIONIST",
-      text: "Chào bạn, phòng khám có thể giúp gì cho bạn hôm nay?",
-    },
-    {
-      id: 2,
-      senderRole: "PATIENT",
-      text: "Mình muốn hỏi lịch làm việc của bác sĩ chuyên khoa nội.",
-    },
-    {
-      id: 3,
-      senderRole: "RECEPTIONIST",
-      text: "Bác sĩ chuyên khoa nội làm việc từ thứ 2 đến thứ 6, trong giờ hành chính ạ.",
-    },
-  ];
+  // const mockMessages = [
+  //   {
+  //     id: 1,
+  //     senderRole: "RECEPTIONIST",
+  //     text: "Chào bạn, phòng khám có thể giúp gì cho bạn hôm nay?",
+  //   },
+  //   {
+  //     id: 2,
+  //     senderRole: "PATIENT",
+  //     text: "Mình muốn hỏi lịch làm việc của bác sĩ chuyên khoa nội.",
+  //   },
+  //   {
+  //     id: 3,
+  //     senderRole: "RECEPTIONIST",
+  //     text: "Bác sĩ chuyên khoa nội làm việc từ thứ 2 đến thứ 6, trong giờ hành chính ạ.",
+  //   },
+  // ];
 
-  const toggleChat = () => setIsOpen(!isOpen);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isOpen]);
+
+  const toggleChat = async () => {
+    const willOpen = !isOpen;
+    setIsOpen(willOpen);
+
+    if (willOpen && !currentRoomId && user_id) {
+      try {
+        const res = await getChatHistoryByCustomer(); // Lúc đầu chưa có room-id, chỉ gửi patientId
+
+        if (res.err !== 0) {
+          console.error("Lỗi khi lấy lịch sử chat:", res.data.message);
+          return;
+        }
+        const roomId = res.data?.id_chat_room;
+        const historyMessages = res.data?.messages || [];
+
+        setCurrentRoomId(roomId);
+        setMessages(historyMessages);
+
+        // Join room bằng biến socket import trực tiếp
+        socket.emit("join_room", { "room-id": roomId });
+      } catch (error) {
+        console.error("Lỗi khi lấy lịch sử chat:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleReceiveMessage = (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    };
+
+    socket.on("receive_message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
+  }, []);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 font-sans">
@@ -42,7 +98,7 @@ const ChatWidget = () => {
 
           {/* Body (Danh sách tin nhắn) */}
           <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-gray-50">
-            {mockMessages.map((msg) => (
+            {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex w-full ${msg.senderRole === "PATIENT" ? "justify-end" : "justify-start"}`}
@@ -58,6 +114,8 @@ const ChatWidget = () => {
                 </div>
               </div>
             ))}
+            {/* Dùng div rỗng này để làm mỏ neo cuộn xuống cuối */}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Footer (Input & Nút gửi) */}
