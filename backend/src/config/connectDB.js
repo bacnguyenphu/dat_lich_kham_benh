@@ -7,6 +7,7 @@ const sequelize = new Sequelize("dat_lich_kham_benh", "root", null, {
   define: {
     freezeTableName: true, // áp dụng cho toàn bộ model
   },
+  logging: false, //Dòng này sẽ tắt toàn bộ log SQL ở terminal
 });
 
 const connectDB = async () => {

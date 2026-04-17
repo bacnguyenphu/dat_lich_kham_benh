@@ -51,4 +51,113 @@ const getChatHistoryByCustomer = async (id_user, limit = 50, offset = 0) => {
   }
 };
 
-export { getChatHistoryByCustomer };
+const getChatHistoryByReceptionist = async (
+  id_room_chat,
+  limit = 50,
+  offset = 0,
+) => {
+  try {
+    // 1. Lễ tân bắt buộc phải truyền id_room_chat
+    if (!id_room_chat) {
+      return {
+        err: 1,
+        message: "Thiếu thông tin phòng chat (id_room_chat)",
+      };
+    }
+
+    // 2. Lấy danh sách tin nhắn có phân trang
+    const messages = await db.Message.findAll({
+      where: { chat_room_id: id_room_chat },
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
+      raw: true,
+    });
+
+    const sortedMessages = messages.reverse();
+
+    return {
+      err: 0,
+      data: {
+        id_chat_room: id_room_chat,
+        messages: sortedMessages,
+      },
+    };
+  } catch (error) {
+    console.error("Lỗi ở getChatHistoryByReceptionist: ", error);
+    return {
+      err: -999,
+      message: "Lỗi hệ thống máy chủ, vui lòng thử lại sau.",
+    };
+  }
+};
+
+const saveMessage = async (data) => {
+  try {
+    const chat_room_id = data.chat_room_id || data.roomId || data["room-id"];
+    const sender_id = data.sender_id || data.senderId || data["sender-id"];
+    const sender_type =
+      data.sender_type || data.senderType || data.senderRole || "CUSTOMER";
+    const content = data.content || data.text || data.message;
+
+    if (!sender_id || !content) {
+      return {
+        err: 1,
+        message:
+          "Thiếu thông tin gửi tin nhắn: sender_id và nội dung là bắt buộc.",
+      };
+    }
+
+    let room_chat;
+    if (chat_room_id) {
+      room_chat = await db.Chat_room.findByPk(chat_room_id);
+    } else {
+      return {
+        err: 2,
+        message: "Thiếu thông tin phòng chat (chat_room_id).",
+      };
+    }
+
+    const transaction = await db.sequelize.transaction();
+    try {
+      const savedMessage = await db.Message.create(
+        {
+          id: uuidv4(),
+          chat_room_id: room_chat.id,
+          sender_id,
+          content,
+          sender_type,
+        },
+        { transaction },
+      );
+
+      await room_chat.update(
+        {
+          last_message: content,
+        },
+        { transaction },
+      );
+
+      await transaction.commit();
+
+      return {
+        err: 0,
+        data: {
+          message: savedMessage,
+          chat_room_id: room_chat.id,
+        },
+      };
+    } catch (innerError) {
+      await transaction.rollback();
+      throw innerError;
+    }
+  } catch (error) {
+    console.error("Lỗi ở saveMessage: ", error);
+    return {
+      err: -999,
+      message: "Lỗi hệ thống máy chủ, không thể lưu tin nhắn.",
+    };
+  }
+};
+
+export { getChatHistoryByCustomer, saveMessage, getChatHistoryByReceptionist };

@@ -61,7 +61,7 @@ const ChatWidget = () => {
         setMessages(historyMessages);
 
         // Join room bằng biến socket import trực tiếp
-        socket.emit("join_room", { "room-id": roomId });
+        socket.emit("join_room", { chat_room_id: roomId });
       } catch (error) {
         console.error("Lỗi khi lấy lịch sử chat:", error);
       }
@@ -70,6 +70,10 @@ const ChatWidget = () => {
 
   useEffect(() => {
     const handleReceiveMessage = (newMessage) => {
+      if (newMessage.sender_id === user_id) {
+        return;
+      }
+
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 
@@ -78,7 +82,24 @@ const ChatWidget = () => {
     return () => {
       socket.off("receive_message", handleReceiveMessage);
     };
-  }, []);
+  }, [user_id]);
+
+  const handleSendMessage = () => {
+    if (!inputText.trim() || !currentRoomId) return;
+
+    const messageData = {
+      id: Date.now(),
+      chat_room_id: currentRoomId,
+      sender_id: user_id,
+      sender_type: "CUSTOMER",
+      content: inputText,
+      createdAt: new Date().toISOString(),
+    };
+
+    socket.emit("send_message", messageData);
+    setMessages((prev) => [...prev, messageData]);
+    setInputText("");
+  };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 font-sans">
@@ -98,22 +119,124 @@ const ChatWidget = () => {
 
           {/* Body (Danh sách tin nhắn) */}
           <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-gray-50">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex w-full ${msg.senderRole === "PATIENT" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[75%] px-4 py-2 text-sm leading-relaxed break-words shadow-sm ${
-                    msg.senderRole === "PATIENT"
-                      ? "bg-blue-500 text-white rounded-2xl rounded-br-sm" // Bong bóng bên phải (Bệnh nhân)
-                      : "bg-white text-gray-800 rounded-2xl rounded-bl-sm border border-gray-100" // Bong bóng bên trái (Lễ tân)
-                  }`}
-                >
-                  {msg.text}
+            {messages.map((msg, index) => {
+              const isCustomer = msg.sender_type === "CUSTOMER";
+
+              // ==========================================
+              // 1. LOGIC XỬ LÝ NGÀY (DATE DIVIDER)
+              // ==========================================
+              const currentDate = new Date(msg.createdAt);
+              const prevDate =
+                index > 0 ? new Date(messages[index - 1].createdAt) : null;
+
+              let isDifferentDay = false;
+              // Khác ngày nếu là tin đầu tiên HOẶC ngày/tháng/năm không trùng với tin trước đó
+              if (!prevDate) {
+                isDifferentDay = true;
+              } else if (
+                currentDate.getDate() !== prevDate.getDate() ||
+                currentDate.getMonth() !== prevDate.getMonth() ||
+                currentDate.getFullYear() !== prevDate.getFullYear()
+              ) {
+                isDifferentDay = true;
+              }
+
+              // Hàm chuyển đổi ngày thành chữ "Hôm nay", "Hôm qua" hoặc "DD/MM/YYYY"
+              const formatDividerDate = (date) => {
+                const today = new Date();
+                if (date.toDateString() === today.toDateString())
+                  return "Hôm nay";
+
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (date.toDateString() === yesterday.toDateString())
+                  return "Hôm qua";
+
+                return date.toLocaleDateString("vi-VN", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                });
+              };
+
+              // ==========================================
+              // 2. LOGIC XỬ LÝ GIỜ (GỘP TIN NHẮN CÙNG PHÚT)
+              // ==========================================
+              const nextMsg = messages[index + 1];
+              const currentTimeStr = currentDate.toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+              const nextTimeStr = nextMsg
+                ? new Date(nextMsg.createdAt).toLocaleTimeString("vi-VN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : null;
+
+              // Chỉ hiện thời gian khi:
+              // - Là tin nhắn cuối cùng của cuộc hội thoại
+              // - HOẶC tin nhắn tiếp theo khác phút
+              // - HOẶC tin nhắn tiếp theo là của người kia gửi (đổi luồng chat)
+              const showTime =
+                !nextMsg ||
+                currentTimeStr !== nextTimeStr ||
+                nextMsg.sender_type !== msg.sender_type;
+
+              // ==========================================
+              // 3. LOGIC BO GÓC BONG BÓNG (NỐI LIỀN NHAU)
+              // ==========================================
+              const isFirstInGroup =
+                !prevDate ||
+                messages[index - 1].sender_type !== msg.sender_type ||
+                isDifferentDay;
+              const isLastInGroup = showTime;
+
+              return (
+                <div key={msg.id}>
+                  {/* Vạch ngăn cách khi sang ngày mới */}
+                  {isDifferentDay && (
+                    <div className="flex justify-center my-6">
+                      <span className="text-[12px] text-gray-500 font-bold bg-gray-200/60 px-3 py-1 rounded-full">
+                        {formatDividerDate(currentDate)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Dòng Chat */}
+                  <div
+                    className={`flex w-full ${isCustomer ? "justify-end" : "justify-start"} ${isLastInGroup ? "mb-4" : "mb-[2px]"}`}
+                  >
+                    <div
+                      className={`flex flex-col ${isCustomer ? "items-end" : "items-start"} max-w-[75%]`}
+                    >
+                      {/* Bong bóng tin nhắn */}
+                      <div
+                        className={`px-4 py-2 text-[15px] leading-relaxed break-words shadow-sm ${
+                          isCustomer
+                            ? "bg-blue-600 text-white"
+                            : "bg-white text-gray-800 border border-gray-200"
+                        } ${
+                          // Tạo hiệu ứng bo góc dính liền nhau cực xịn
+                          isCustomer
+                            ? `rounded-l-2xl ${isFirstInGroup ? "rounded-tr-2xl" : "rounded-tr-[4px]"} ${isLastInGroup ? "rounded-br-2xl" : "rounded-br-[4px]"}`
+                            : `rounded-r-2xl ${isFirstInGroup ? "rounded-tl-2xl" : "rounded-tl-[4px]"} ${isLastInGroup ? "rounded-bl-2xl" : "rounded-bl-[4px]"}`
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+
+                      {/* Dòng hiển thị Thời gian */}
+                      {showTime && (
+                        <span className="text-[11px] text-gray-400 mt-1 px-1 font-medium select-none">
+                          {currentTimeStr}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {/* Dùng div rỗng này để làm mỏ neo cuộn xuống cuối */}
             <div ref={messagesEndRef} />
           </div>
@@ -124,8 +247,19 @@ const ChatWidget = () => {
               type="text"
               placeholder="Nhập tin nhắn..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
             />
-            <button className="bg-blue-500 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition-colors focus:outline-none shadow-sm">
+            <button
+              className="bg-blue-500 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition-colors focus:outline-none shadow-sm"
+              onClick={handleSendMessage}
+            >
               Gửi
             </button>
           </div>

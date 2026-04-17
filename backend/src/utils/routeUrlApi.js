@@ -96,3 +96,5 @@ export const GET_ALL_PATIENT = "/get-all-patient";
 
 // Route chat
 export const GET_HISTORY_CHAT_BY_CUSTOMER = "/get-history-chat-by-customer";
+export const GET_HISTORY_CHAT_BY_RECEPTIONIST =
+  "/get-history-chat-by-receptionist";
