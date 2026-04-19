@@ -98,3 +98,4 @@ export const GET_ALL_PATIENT = "/get-all-patient";
 export const GET_HISTORY_CHAT_BY_CUSTOMER = "/get-history-chat-by-customer";
 export const GET_HISTORY_CHAT_BY_RECEPTIONIST =
   "/get-history-chat-by-receptionist";
+export const GET_ALL_CHAT_ROOM = "/get-all-chat-room";

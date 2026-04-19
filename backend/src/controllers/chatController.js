@@ -1,4 +1,8 @@
-import { getChatHistoryByCustomer } from "../services/chatService";
+import {
+  getAllChatRooms,
+  getChatHistoryByCustomer,
+  getChatHistoryByReceptionist,
+} from "../services/chatService";
 
 const handleGetHistoryChatByCustomer = async (req, res) => {
   try {
@@ -28,4 +32,17 @@ const handleGetHistoryChatByReceptionist = async (req, res) => {
   }
 };
 
-export { handleGetHistoryChatByCustomer, handleGetHistoryChatByReceptionist };
+const handleGetAllChatRoom = async (req, res) => {
+  try {
+    const chatRooms = await getAllChatRooms();
+    return res.status(200).json(chatRooms);
+  } catch (error) {
+    console.log("Lỗi ở handleGetAllChatRoom: ", error);
+  }
+};
+
+export {
+  handleGetHistoryChatByCustomer,
+  handleGetHistoryChatByReceptionist,
+  handleGetAllChatRoom,
+};

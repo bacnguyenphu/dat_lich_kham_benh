@@ -7,8 +7,8 @@ const socket = io("http://localhost:3001");
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
+  const [messages, setMessages] = useState([]);
   const [currentRoomId, setCurrentRoomId] = useState(null);
 
   const user_id = useSelector((state) => state?.auth?.data?.id) || null;

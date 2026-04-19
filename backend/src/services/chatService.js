@@ -160,4 +160,42 @@ const saveMessage = async (data) => {
   }
 };
 
-export { getChatHistoryByCustomer, saveMessage, getChatHistoryByReceptionist };
+const getAllChatRooms = async () => {
+  try {
+    const chatRooms = await db.Chat_room.findAll({
+      include: [
+        {
+          model: db.User,
+          as: "customer",
+          attributes: ["id", "lastName", "firstName"],
+        },
+        {
+          model: db.User,
+          as: "receptionist",
+          attributes: ["id", "lastName", "firstName"],
+        },
+      ],
+      order: [["updatedAt", "DESC"]],
+      raw: true,
+      nest: true,
+    });
+
+    return {
+      err: 0,
+      data: chatRooms,
+    };
+  } catch (error) {
+    console.error("Lỗi ở getAllChatRooms: ", error);
+    return {
+      err: -999,
+      message: "Lỗi hệ thống máy chủ, không thể lấy danh sách phòng chat.",
+    };
+  }
+};
+
+export {
+  getChatHistoryByCustomer,
+  saveMessage,
+  getChatHistoryByReceptionist,
+  getAllChatRooms,
+};

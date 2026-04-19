@@ -49,6 +49,7 @@ import {
   GET_ALL_PATIENT,
   GET_HISTORY_CHAT_BY_CUSTOMER,
   GET_HISTORY_CHAT_BY_RECEPTIONIST,
+  GET_ALL_CHAT_ROOM,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -83,6 +84,7 @@ const ROLE_PERMISSIONS = {
     CHECK_IN_CONFIRMATION,
     GET_HISTORY_CHAT_BY_CUSTOMER,
     GET_HISTORY_CHAT_BY_RECEPTIONIST,
+    GET_ALL_CHAT_ROOM,
   ], // nhân viên
   R3: [
     CREATE_APPOINTMENT,
