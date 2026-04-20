@@ -3,7 +3,9 @@ import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { getChatHistoryByCustomer } from "../services/chatService";
 
-const socket = io("http://localhost:3001");
+const socket = io("http://localhost:3001", {
+  autoConnect: false,
+});
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,24 +17,15 @@ const ChatWidget = () => {
 
   const messagesEndRef = useRef(null);
 
-  // Dữ liệu mẫu (mock data)
-  // const mockMessages = [
-  //   {
-  //     id: 1,
-  //     senderRole: "RECEPTIONIST",
-  //     text: "Chào bạn, phòng khám có thể giúp gì cho bạn hôm nay?",
-  //   },
-  //   {
-  //     id: 2,
-  //     senderRole: "PATIENT",
-  //     text: "Mình muốn hỏi lịch làm việc của bác sĩ chuyên khoa nội.",
-  //   },
-  //   {
-  //     id: 3,
-  //     senderRole: "RECEPTIONIST",
-  //     text: "Bác sĩ chuyên khoa nội làm việc từ thứ 2 đến thứ 6, trong giờ hành chính ạ.",
-  //   },
-  // ];
+  useEffect(() => {
+    // Chủ động kết nối khi component được render
+    socket.connect();
+
+    // Cleanup function: Ngắt kết nối khi rời khỏi component (hoặc reload trang, HMR)
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

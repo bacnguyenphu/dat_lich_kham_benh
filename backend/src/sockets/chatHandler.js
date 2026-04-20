@@ -19,12 +19,15 @@ const handleSocketEvents = (io) => {
         const sender_type = data.sender_type;
         const content = data.content;
 
-        const saveMessageDB = await saveMessage({
-          chat_room_id: chat_room_id,
-          sender_id: sender_id,
-          content: content,
-          sender_type: sender_type,
-        });
+        const saveMessageDB = await saveMessage(
+          {
+            chat_room_id: chat_room_id,
+            sender_id: sender_id,
+            content: content,
+            sender_type: sender_type,
+          },
+          io,
+        );
 
         if (saveMessageDB.err !== 0) {
           console.error("🔴 Lỗi lưu tin nhắn: ", saveMessageDB.message);
@@ -32,7 +35,7 @@ const handleSocketEvents = (io) => {
         }
 
         // Phát tin nhắn cho đối phương
-        io.to(chat_room_id).emit("receive_message", {
+        socket.to(chat_room_id).emit("receive_message", {
           id: saveMessageDB.data.message.id,
           chat_room_id: chat_room_id,
           sender_id: sender_id,

@@ -10,7 +10,9 @@ import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001");
+const socket = io("http://localhost:3001", {
+  autoConnect: false,
+});
 
 function ReceptionistChat() {
   const auth = useSelector((state) => state.auth);
@@ -21,7 +23,6 @@ function ReceptionistChat() {
   const [inputText, setInputText] = useState("");
 
   const [messages, setMessages] = useState([]);
-  const currentRoomIdRef = useRef(currentRoomId);
   const messagesEndRef = useRef(null);
 
   // Format thời gian từ ISO string sang HH:mm
@@ -32,11 +33,21 @@ function ReceptionistChat() {
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      // Dùng hàm scrollTo của chính cái khung chứa tin nhắn
+      messagesEndRef.current.scrollTo({
+        top: messagesEndRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   };
+
   useEffect(() => {
-    currentRoomIdRef.current = currentRoomId;
-  }, [currentRoomId]);
+    socket.connect();
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -59,10 +70,13 @@ function ReceptionistChat() {
   }, []);
 
   useEffect(() => {
+    socket.on("new_room_created", (newRoom) => {
+      // Thêm phòng mới vào đầu danh sách
+      setChatRooms((prevRooms) => [newRoom, ...prevRooms]);
+    });
+
     const handleReceiveMessage = (newMessage) => {
-      if (newMessage.sender_id === user_id) {
-        return;
-      }
+      console.log("check receive: ", newMessage);
 
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
@@ -71,12 +85,13 @@ function ReceptionistChat() {
 
     return () => {
       socket.off("receive_message", handleReceiveMessage);
+      socket.off("new_room_created");
     };
   }, []);
 
   useEffect(() => {
     if (currentRoomId) {
-      socket.emit("join_room", currentRoomId);
+      socket.emit("join_room", { chat_room_id: currentRoomId });
       const fetchMessages = async () => {
         try {
           const res = await getChatHistoryByReceptionist(currentRoomId);
@@ -231,7 +246,10 @@ function ReceptionistChat() {
             </div>
 
             {/* Thân Chat (Nơi chứa tin nhắn) */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div
+              className="flex-1 overflow-y-auto p-6 space-y-4"
+              ref={messagesEndRef}
+            >
               {messages.map((msg, index) => {
                 const isCustomer = msg.sender_type === "CUSTOMER";
 
@@ -350,8 +368,6 @@ function ReceptionistChat() {
                   </div>
                 );
               })}
-              {/* Dùng div rỗng này để làm mỏ neo cuộn xuống cuối */}
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Vùng nhập tin nhắn (Bottom Input) */}
@@ -399,8 +415,7 @@ function ReceptionistChat() {
               Tin nhắn Lễ tân
             </h3>
             <p className="text-slate-500 mt-2">
-              Đang tải dữ liệu hoặc chọn một bệnh nhân ở danh sách bên trái để
-              bắt đầu trò chuyện
+              Chọn một bệnh nhân ở danh sách bên trái để bắt đầu trò chuyện
             </p>
           </div>
         )}

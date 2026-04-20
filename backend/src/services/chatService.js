@@ -17,11 +17,27 @@ const getChatHistoryByCustomer = async (id_user, limit = 50, offset = 0) => {
       defaults: {
         id: uuidv4(),
         customer_id: id_user,
-        status: "ACTIVE",
+        status: "WAITING",
       },
     });
 
     const roomChatIdToFetch = room_chat.id;
+
+    // if (created && io) {
+    //   const customerData = await db.User.findByPk(id_user, {
+    //     attributes: ["id", "firstName", "lastName", "avatar"],
+    //   });
+
+    //   const newRoomData = {
+    //     id: roomChatIdToFetch,
+    //     customer_id: id_user,
+    //     receptionist_id: null,
+    //     status: "WAITING",
+    //     last_message: null,
+    //     customer: customerData,
+    //   };
+    //   io.emit("new_room_created", newRoomData);
+    // }
 
     // 3. Lấy danh sách tin nhắn có phân trang
     const messages = await db.Message.findAll({
@@ -92,7 +108,7 @@ const getChatHistoryByReceptionist = async (
   }
 };
 
-const saveMessage = async (data) => {
+const saveMessage = async (data, io) => {
   try {
     const chat_room_id = data.chat_room_id || data.roomId || data["room-id"];
     const sender_id = data.sender_id || data.senderId || data["sender-id"];
@@ -111,6 +127,21 @@ const saveMessage = async (data) => {
     let room_chat;
     if (chat_room_id) {
       room_chat = await db.Chat_room.findByPk(chat_room_id);
+      if (!room_chat) {
+        console.log("🔴 Không tìm thấy phòng chat với ID:", chat_room_id);
+        return;
+      }
+      const roomData = room_chat.toJSON();
+      if (roomData.last_message === null) {
+        const customerData = await db.User.findByPk(sender_id, {
+          attributes: ["id", "firstName", "lastName", "avatar"],
+        });
+        io.emit("new_room_created", {
+          ...roomData,
+          last_message: content,
+          customer: customerData,
+        });
+      }
     } else {
       return {
         err: 2,
@@ -130,7 +161,6 @@ const saveMessage = async (data) => {
         },
         { transaction },
       );
-
       await room_chat.update(
         {
           last_message: content,
