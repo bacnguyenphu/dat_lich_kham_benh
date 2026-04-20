@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { IoSearch, IoSend, IoEllipsisHorizontal } from "react-icons/io5";
+import {
+  IoSearch,
+  IoSend,
+  IoEllipsisHorizontal,
+  IoCheckmarkCircleOutline,
+  IoStopCircleOutline,
+} from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 import { BsEmojiSmile } from "react-icons/bs";
 import {
@@ -67,7 +73,7 @@ function ReceptionistChat() {
     };
 
     fetchChatRooms();
-  }, []);
+  }, [currentRoomId]);
 
   useEffect(() => {
     socket.on("new_room_created", (newRoom) => {
@@ -76,16 +82,26 @@ function ReceptionistChat() {
     });
 
     const handleReceiveMessage = (newMessage) => {
-      console.log("check receive: ", newMessage);
+      // console.log("check receive: ", newMessage);
 
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
+
+    socket.on("actived_room_chat", (updateRoom) => {
+      setActiveChat((prev) => {
+        if (prev && prev.id === updateRoom.id) {
+          return { ...prev, ...updateRoom };
+        }
+        return prev;
+      });
+    });
 
     socket.on("receive_message", handleReceiveMessage);
 
     return () => {
       socket.off("receive_message", handleReceiveMessage);
       socket.off("new_room_created");
+      socket.off("actived_room_chat");
     };
   }, []);
 
@@ -123,6 +139,24 @@ function ReceptionistChat() {
     socket.emit("send_message", messageData);
     setMessages((prev) => [...prev, messageData]);
     setInputText("");
+  };
+
+  const handleAcceptChat = (roomId) => {
+    socket.emit("active_room_chat", {
+      chat_room_id: roomId,
+      receptionist_id: user_id,
+    });
+    const messageData = {
+      id: Date.now(),
+      chat_room_id: currentRoomId,
+      sender_id: user_id,
+      sender_type: "RECEPTIONIST",
+      content: `Lễ tân ${auth.data?.firstName || ""} ${auth.data?.lastName || ""} đã tiếp nhận cuộc trò chuyện.`,
+      createdAt: new Date().toISOString(),
+    };
+
+    socket.emit("send_message", messageData);
+    setMessages((prev) => [...prev, messageData]);
   };
 
   return (
@@ -229,16 +263,32 @@ function ReceptionistChat() {
                   <h2 className="text-[16px] font-bold text-slate-800 leading-tight">
                     {`${activeChat.customer?.firstName || ""} ${activeChat.customer?.lastName || ""}`.trim()}
                   </h2>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    {activeChat.status === "ACTIVE"
-                      ? "Đang hoạt động"
-                      : "Ngoại tuyến"}
-                  </p>
                 </div>
               </div>
 
               {/* Các nút công cụ Header */}
               <div className="flex items-center gap-3 text-blue-600">
+                {activeChat.status === "WAITING" && (
+                  <button
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-bold rounded-full shadow-sm transition-all active:scale-95"
+                    title="Tiếp nhận cuộc trò chuyện này"
+                    onClick={() => handleAcceptChat(activeChat.id)} // Hàm gọi API của bạn
+                  >
+                    <IoCheckmarkCircleOutline size="1.2rem" />
+                    <span>Tiếp nhận</span>
+                  </button>
+                )}
+
+                {activeChat.status === "ACTIVE" && (
+                  <button
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-[13px] font-bold rounded-full shadow-sm transition-all active:scale-95"
+                    title="Kết thúc cuộc trò chuyện"
+                    // onClick={() => handleEndChat(activeChat.id)} // Hàm gọi API của bạn
+                  >
+                    <IoStopCircleOutline size="1.2rem" />
+                    <span>Kết thúc</span>
+                  </button>
+                )}
                 <button className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
                   <IoEllipsisHorizontal size="1.4rem" />
                 </button>
@@ -377,6 +427,7 @@ function ReceptionistChat() {
                   type="text"
                   className="flex-1 bg-transparent border-none focus:outline-none text-[15px] text-slate-700"
                   placeholder="Nhập tin nhắn..."
+                  disabled={activeChat.status !== "ACTIVE"} // Chỉ cho phép nhập khi cuộc trò chuyện đang ACTIVE
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyDown={(e) => {

@@ -1,5 +1,6 @@
 import db from "../models/index";
 import { v4 as uuidv4 } from "uuid";
+const { Op } = require("sequelize");
 
 const getChatHistoryByCustomer = async (id_user, limit = 50, offset = 0) => {
   try {
@@ -13,7 +14,12 @@ const getChatHistoryByCustomer = async (id_user, limit = 50, offset = 0) => {
 
     // 2. Tìm phòng chat của user, nếu chưa có thì tạo mới (Dùng findOrCreate tránh Race Condition)
     const [room_chat, created] = await db.Chat_room.findOrCreate({
-      where: { customer_id: id_user },
+      where: {
+        customer_id: id_user,
+        status: {
+          [Op.ne]: "CLOSE",
+        },
+      },
       defaults: {
         id: uuidv4(),
         customer_id: id_user,

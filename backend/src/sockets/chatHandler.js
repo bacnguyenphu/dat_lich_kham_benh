@@ -1,4 +1,5 @@
 const { saveMessage } = require("../services/chatService");
+import db from "../models/index";
 
 const handleSocketEvents = (io) => {
   io.on("connection", (socket) => {
@@ -45,6 +46,41 @@ const handleSocketEvents = (io) => {
         });
       } catch (error) {
         console.error("🔴 Lỗi lưu tin nhắn: ", error);
+      }
+    });
+
+    socket.on("active_room_chat", async (data) => {
+      const roomId = data.chat_room_id;
+      console.log("🔵 Kích hoạt phòng chat: ", roomId);
+      if (roomId) {
+        const room = await db.Chat_room.update(
+          { status: "ACTIVE", receptionist_id: data.receptionist_id },
+          {
+            where: { id: roomId },
+          },
+        );
+        if (room[0] > 0) {
+          // 3. Query lại data mới (Gom `where` vào cùng 1 object)
+          const roomUpdated = await db.Chat_room.findOne({
+            where: { id: roomId }, // Đã đưa where vào đây
+            include: [
+              {
+                model: db.User,
+                as: "customer",
+                attributes: ["id", "lastName", "firstName"],
+              },
+              {
+                model: db.User,
+                as: "receptionist",
+                attributes: ["id", "lastName", "firstName"],
+              },
+            ],
+            raw: true,
+            nest: true,
+          });
+
+          io.in(roomId).emit("actived_room_chat", roomUpdated);
+        }
       }
     });
 
