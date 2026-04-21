@@ -2,6 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { getChatHistoryByCustomer } from "../services/chatService";
+import {
+  IoChatbubblesOutline,
+  IoCheckmarkDoneCircleOutline,
+} from "react-icons/io5";
 
 const socket = io("http://localhost:3001", {
   autoConnect: false,
@@ -12,6 +16,7 @@ const ChatWidget = () => {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const [currentRoomId, setCurrentRoomId] = useState(null);
+  const [isEndedChat, setIsEndedChat] = useState(false);
 
   const user_id = useSelector((state) => state?.auth?.data?.id) || null;
 
@@ -33,7 +38,7 @@ const ChatWidget = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isEndedChat]);
 
   const toggleChat = async () => {
     const willOpen = !isOpen;
@@ -66,14 +71,19 @@ const ChatWidget = () => {
       if (newMessage.sender_id === user_id) {
         return;
       }
-
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 
+    const handleRoomEnded = () => {
+      setIsEndedChat(true);
+    };
+
     socket.on("receive_message", handleReceiveMessage);
+    socket.on("room_has_been_ended", handleRoomEnded);
 
     return () => {
       socket.off("receive_message", handleReceiveMessage);
+      socket.off("room_has_been_ended", handleRoomEnded);
     };
   }, [user_id]);
 
@@ -92,6 +102,15 @@ const ChatWidget = () => {
     socket.emit("send_message", messageData);
     setMessages((prev) => [...prev, messageData]);
     setInputText("");
+  };
+
+  const handleStartNewChat = () => {
+    setIsOpen((prev) => !prev);
+    setIsEndedChat(() => false);
+    setCurrentRoomId(null);
+    setMessages([]);
+    setInputText("");
+    toggleChat();
   };
 
   return (
@@ -231,6 +250,25 @@ const ChatWidget = () => {
               );
             })}
             {/* Dùng div rỗng này để làm mỏ neo cuộn xuống cuối */}
+            {isEndedChat && (
+              <div className="flex flex-col items-center justify-center mt-4 mb-2 py-6 px-4 bg-slate-50/80 border border-slate-200 border-dashed rounded-2xl mx-4 sm:mx-12">
+                <div className="w-12 h-12 bg-slate-200/50 text-slate-400 rounded-full flex items-center justify-center mb-3">
+                  <IoCheckmarkDoneCircleOutline size="1.8rem" />
+                </div>
+
+                <p className="text-[14px] font-semibold text-slate-500 mb-4 text-center">
+                  Cuộc trò chuyện này đã được kết thúc.
+                </p>
+
+                <button
+                  className="flex items-center gap-2 px-5 py-2.5 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 text-[13.5px] font-bold rounded-full shadow-sm transition-all active:scale-95 cursor-pointer"
+                  onClick={() => handleStartNewChat()}
+                >
+                  <IoChatbubblesOutline size="1.2rem" className="pb-[1px]" />
+                  <span>Cuộc trò chuyện mới</span>
+                </button>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -248,6 +286,7 @@ const ChatWidget = () => {
                   handleSendMessage();
                 }
               }}
+              disabled={isEndedChat}
             />
             <button
               className="bg-blue-500 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition-colors focus:outline-none shadow-sm"

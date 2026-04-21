@@ -199,6 +199,11 @@ const saveMessage = async (data, io) => {
 const getAllChatRooms = async () => {
   try {
     const chatRooms = await db.Chat_room.findAll({
+      where: {
+        status: {
+          [Op.ne]: "CLOSE",
+        },
+      },
       include: [
         {
           model: db.User,

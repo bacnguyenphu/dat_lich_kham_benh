@@ -1,14 +1,16 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
-import { IoMdClose } from "react-icons/io"; // Import icon đóng
-import UserDropdown from "../components/UserDropdown";
+import { IoMdClose } from "react-icons/io";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import Sidebar from "../components/Receptionist/SideBar";
+import { useSelector } from "react-redux";
 
 function LayoutReceptionist() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const auth = useSelector((state) => state.auth);
+
+  const isChatPage = location.pathname.includes("chat");
 
   useEffect(() => {
     setIsSidebarOpen(false);
@@ -24,6 +26,7 @@ function LayoutReceptionist() {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-800 relative">
+      {/* Overlay cho Mobile */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] lg:hidden transition-opacity duration-300"
@@ -31,6 +34,7 @@ function LayoutReceptionist() {
         />
       )}
 
+      {/* SIDEBAR */}
       <aside
         className={`
           fixed lg:static inset-y-0 left-0 z-[70] w-[280px] h-full p-4 shrink-0 
@@ -48,7 +52,9 @@ function LayoutReceptionist() {
         <Sidebar />
       </aside>
 
+      {/* KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        {/* HEADER */}
         <header className="h-[76px] bg-white border-b border-slate-200 shadow-sm flex items-center justify-between px-4 sm:px-8 shrink-0 z-20">
           <div className="flex items-center gap-4">
             <button
@@ -59,12 +65,36 @@ function LayoutReceptionist() {
             </button>
           </div>
 
-          {/* <div className="flex items-center gap-4">
-            <UserDropdown />
-          </div> */}
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm ring-2 ring-transparent group-hover:ring-blue-100 transition-all">
+              <img
+                src={auth?.data?.avatar ? auth?.data?.avatar : defaultAvatar}
+                alt="Avatar"
+                className="w-full h-full object-center object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = defaultAvatar;
+                }}
+              />
+            </div>
+            <div className="hidden sm:flex flex-col items-start">
+              <p className="font-bold text-sm text-slate-700 leading-tight">
+                {auth?.data?.firstName} {auth?.data?.lastName}
+              </p>
+            </div>
+          </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 relative scroll-smooth bg-slate-50">
+        {/* MAIN (Nơi render Outlet) */}
+        <main
+          className={`flex-1 relative bg-slate-50 transition-all duration-300
+            ${
+              isChatPage
+                ? "p-0 overflow-hidden" // NẾU LÀ TRANG CHAT: Ép sát lề, bỏ cuộn ngoài để Chat tự xử lý cuộn trong
+                : "p-4 sm:p-6 lg:p-8 overflow-y-auto overflow-x-hidden scroll-smooth" // CÁC TRANG KHÁC: Giữ nguyên padding như cũ
+            }
+          `}
+        >
           <Outlet />
         </main>
       </div>

@@ -84,6 +84,29 @@ const handleSocketEvents = (io) => {
       }
     });
 
+    socket.on("end_room_chat", async (data) => {
+      const roomId = data.chat_room_id;
+
+      if (!roomId) return;
+      try {
+        await db.Chat_room.update(
+          { status: "CLOSE" },
+          { where: { id: roomId } },
+        );
+
+        io.in(roomId).emit("room_has_been_ended", {
+          roomId: roomId,
+          message: "Cuộc trò chuyện đã kết thúc.",
+        });
+
+        // io.in(roomId).socketsLeave(roomId);
+
+        console.log(`🔴 Đã đóng và giải tán phòng chat: ${roomId}`);
+      } catch (error) {
+        console.error("Lỗi khi đóng phòng:", error);
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`🔴 User ngắt kết nối: ${socket.id}`);
     });

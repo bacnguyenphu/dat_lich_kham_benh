@@ -15,6 +15,8 @@ import {
 import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 const socket = io("http://localhost:3001", {
   autoConnect: false,
@@ -22,6 +24,8 @@ const socket = io("http://localhost:3001", {
 
 function ReceptionistChat() {
   const auth = useSelector((state) => state.auth);
+  console.log(auth);
+
   const user_id = auth.data?.id;
   const [chatRooms, setChatRooms] = useState([]);
   const [currentRoomId, setCurrentRoomId] = useState(null);
@@ -77,13 +81,10 @@ function ReceptionistChat() {
 
   useEffect(() => {
     socket.on("new_room_created", (newRoom) => {
-      // Thêm phòng mới vào đầu danh sách
       setChatRooms((prevRooms) => [newRoom, ...prevRooms]);
     });
 
     const handleReceiveMessage = (newMessage) => {
-      // console.log("check receive: ", newMessage);
-
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 
@@ -100,8 +101,17 @@ function ReceptionistChat() {
 
     return () => {
       socket.off("receive_message", handleReceiveMessage);
-      socket.off("new_room_created");
-      socket.off("actived_room_chat");
+      socket.off("new_room_created", (newRoom) => {
+        setChatRooms((prevRooms) => [newRoom, ...prevRooms]);
+      });
+      socket.off("actived_room_chat", (updateRoom) => {
+        setActiveChat((prev) => {
+          if (prev && prev.id === updateRoom.id) {
+            return { ...prev, ...updateRoom };
+          }
+          return prev;
+        });
+      });
     };
   }, []);
 
@@ -159,9 +169,39 @@ function ReceptionistChat() {
     setMessages((prev) => [...prev, messageData]);
   };
 
+  const handleEndChat = (roomId) => {
+    if (!roomId) return;
+
+    Swal.fire({
+      title: "Kết thúc trò chuyện?",
+      text: "Bệnh nhân sẽ nhận được thông báo cuộc trò chuyện đã kết thúc. Bạn có chắc chắn không?",
+      icon: "warning", // Dùng warning để báo hiệu hành động đóng/dừng
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444", // Màu đỏ (Red-500) đồng bộ với ý nghĩa "Kết thúc"
+      cancelButtonColor: "#94a3b8", // Màu xám (Slate-400) cho nút Hủy
+      confirmButtonText: "Đồng ý Kết thúc",
+      cancelButtonText: "Quay lại",
+      customClass: {
+        popup: "rounded-2xl", // Bo góc chuẩn UI hiện đại
+      },
+    }).then((result) => {
+      // Nếu người dùng bấm "Đồng ý"
+      if (result.isConfirmed) {
+        socket.emit("end_room_chat", {
+          chat_room_id: roomId,
+        });
+        let temp = chatRooms.filter((room) => room.id !== roomId);
+        setChatRooms(temp);
+        setActiveChat(null);
+        setCurrentRoomId(null);
+        toast.success("Đã kết thúc cuộc trò chuyện!");
+      }
+    });
+  };
+
   return (
-    <div className="bg-slate-50 min-h-screen animate-[fadeIn_0.3s_ease-out]">
-      <div className="max-w-7xl mx-auto h-[calc(100vh-120px)] bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex">
+    <div className="bg-slate-50 h-full animate-[fadeIn_0.3s_ease-out]">
+      <div className="max-w-7xl mx-auto h-[calc(100vh-120px)] bg-white rounded-3xl mt-4 shadow-sm border border-slate-200 overflow-hidden flex">
         {/* ==========================================
             BÊN TRÁI: DANH SÁCH BỆNH NHÂN (SIDEBAR)
         ========================================== */}
@@ -272,7 +312,7 @@ function ReceptionistChat() {
                   <button
                     className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-bold rounded-full shadow-sm transition-all active:scale-95"
                     title="Tiếp nhận cuộc trò chuyện này"
-                    onClick={() => handleAcceptChat(activeChat.id)} // Hàm gọi API của bạn
+                    onClick={() => handleAcceptChat(activeChat.id)}
                   >
                     <IoCheckmarkCircleOutline size="1.2rem" />
                     <span>Tiếp nhận</span>
@@ -283,7 +323,7 @@ function ReceptionistChat() {
                   <button
                     className="flex items-center gap-1.5 px-4 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-[13px] font-bold rounded-full shadow-sm transition-all active:scale-95"
                     title="Kết thúc cuộc trò chuyện"
-                    // onClick={() => handleEndChat(activeChat.id)} // Hàm gọi API của bạn
+                    onClick={() => handleEndChat(activeChat.id)}
                   >
                     <IoStopCircleOutline size="1.2rem" />
                     <span>Kết thúc</span>
