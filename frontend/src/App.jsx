@@ -99,7 +99,7 @@ function App() {
     location.pathname.startsWith("/receptionist") ||
     location.pathname.startsWith("/doctor");
 
-  const auth = useSelector((state) => state?.auth?.data?.id) || null;
+  const auth = useSelector((state) => state?.auth?.data?.role) || null;
   return (
     <>
       <Routes>
@@ -201,7 +201,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
-      {!isAdminRoute && auth && <ChatWidget />}
+      {!isAdminRoute && auth === "R3" && <ChatWidget />}
     </>
   );
 }

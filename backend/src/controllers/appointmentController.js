@@ -68,8 +68,13 @@ const handleUpdateStatusAppointment = async (req, res) => {
   try {
     const idAppointment = req.query.idAppointment;
     const status = req.query.status;
+    const cancel_reason = req.query?.cancel_reason;
 
-    const message = await updateStatusAppointment(idAppointment, +status);
+    const message = await updateStatusAppointment(
+      idAppointment,
+      +status,
+      cancel_reason,
+    );
     return res.status(200).json(message);
   } catch (error) {
     console.log(`Lỗi ở handleDeleteAppointment: `, error);

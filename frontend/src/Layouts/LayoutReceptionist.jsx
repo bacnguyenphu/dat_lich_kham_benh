@@ -4,6 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Receptionist/SideBar";
 import { useSelector } from "react-redux";
+import defaultAvatar from "../assets/defaultAvatar.png";
 
 function LayoutReceptionist() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

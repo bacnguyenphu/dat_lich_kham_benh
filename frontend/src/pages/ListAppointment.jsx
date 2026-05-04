@@ -8,7 +8,7 @@ import {
   updateStatusAppointment,
 } from "../services/appointment";
 import { InfoAppointment, Pagination } from "../components";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoInformationCircleOutline } from "react-icons/io5";
 import { GiSandsOfTime } from "react-icons/gi";
 import { FaCheck } from "react-icons/fa6";
 import { PiWarningCircleLight } from "react-icons/pi";
@@ -57,7 +57,8 @@ function ListAppointment() {
               payment_status: item?.payment_status,
               doctorId: item?.doctor?.id,
               medicalPackageId: null,
-              infoPatient: item?.patient, // Data patient từ API
+              infoPatient: item?.patient,
+              cancel_reason: item?.cancel_reason,
             };
           }
           if (item?.medical_package) {
@@ -72,7 +73,8 @@ function ListAppointment() {
               payment_status: item?.payment_status,
               medicalPackageId: item?.medical_package?.id,
               doctorId: null,
-              infoPatient: item?.patient, // Data patient từ API
+              infoPatient: item?.patient,
+              cancel_reason: item?.cancel_reason,
             };
           }
           return null;
@@ -92,17 +94,35 @@ function ListAppointment() {
     if (idAppointmemt) {
       Swal.fire({
         title: "Hủy lịch khám?",
-        text: "Bạn có chắc chắn muốn hủy lịch khám này không?",
+        text: "Vui lòng cho biết lý do bạn muốn hủy lịch khám này:",
         icon: "warning",
+        input: "textarea", // Thêm ô nhập liệu dạng textarea
+        inputPlaceholder: "Nhập lý do hủy tại đây...",
+        inputAttributes: {
+          "aria-label": "Nhập lý do hủy",
+        },
         showCancelButton: true,
         confirmButtonColor: "#EF4444",
         cancelButtonColor: "#94A3B8",
         confirmButtonText: "Đồng ý Hủy",
         cancelButtonText: "Quay lại",
-        customClass: { popup: "rounded-2xl" }, // Thêm bo góc cho mượt
+        customClass: { popup: "rounded-2xl" },
+        // Bắt buộc người dùng phải nhập lý do
+        inputValidator: (value) => {
+          if (!value || value.trim() === "") {
+            return "Bạn cần nhập lý do để tiếp tục!";
+          }
+        },
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const res = await updateStatusAppointment(idAppointmemt, 0);
+          const cancelReason = result.value;
+
+          const res = await updateStatusAppointment(
+            idAppointmemt,
+            0,
+            cancelReason,
+          );
+
           if (res.err === 0) {
             toast.success("Đã hủy lịch khám thành công!");
             await fetchAppointment();
@@ -254,6 +274,18 @@ function ListAppointment() {
                       </span>
                     )}
                   </div>
+                  {item?.cancel_reason && status === 0 && (
+                    <div className="mt-4 ml-2 px-4 py-3 bg-red-50/80 border border-red-100 rounded-xl flex items-start gap-2.5">
+                      <IoInformationCircleOutline
+                        className="text-red-500 mt-0.5 shrink-0"
+                        size="1.2rem"
+                      />
+                      <p className="text-sm text-red-700">
+                        <span className="font-semibold">Lý do hủy:</span>{" "}
+                        {item.cancel_reason}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })

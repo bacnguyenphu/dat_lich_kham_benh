@@ -89,6 +89,13 @@ function AppointmentSchedule() {
           confirmText: "Hủy lịch ngay",
           confirmColor: "#ef4444", // Màu đỏ cảnh báo
           successMsg: "Đã hủy lịch hẹn thành công!",
+          input: "textarea",
+          inputPlaceholder: "Vui lòng nhập lý do hủy lịch (*)",
+          inputValidator: (value) => {
+            if (!value || !value.trim()) {
+              return "Bạn cần nhập lý do để hủy lịch!";
+            }
+          },
         };
         break;
       case 2:
@@ -119,6 +126,9 @@ function AppointmentSchedule() {
       title: config.title,
       text: config.text,
       icon: config.icon,
+      input: config.input,
+      inputPlaceholder: config.inputPlaceholder,
+      inputValidator: config.inputValidator,
       showCancelButton: true,
       confirmButtonColor: config.confirmColor,
       cancelButtonColor: "#94a3b8",
@@ -131,7 +141,12 @@ function AppointmentSchedule() {
       // 3. Xử lý gọi API nếu người dùng chọn OK
       if (result.isConfirmed) {
         try {
-          const res = await updateStatusAppointment(idAppointment, status);
+          const reason = status === DA_HUY ? result.value : "";
+          const res = await updateStatusAppointment(
+            idAppointment,
+            status,
+            reason,
+          );
 
           if (res.err === 0) {
             toast.success(config.successMsg);

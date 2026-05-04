@@ -205,6 +205,7 @@ const createAppointment = async (data) => {
         payment_status: data?.payment_status || false,
         isCheckIn: data?.isCheckIn || false,
         diseaseDescription: data?.diseaseDescription || "",
+        cancel_reason: data?.cancel_reason || "",
       },
       { transaction: t },
     );
@@ -240,6 +241,7 @@ const getAppointmentOfUser = async (idUser, limit, page) => {
         "time",
         "status",
         "payment_status",
+        "cancel_reason",
         "createdAt",
       ],
       include: [
@@ -405,7 +407,11 @@ const getAppointmentOfPatient = async (idPatient, limit, page) => {
   }
 };
 
-const updateStatusAppointment = async (idAppointment, status) => {
+const updateStatusAppointment = async (
+  idAppointment,
+  status,
+  cancel_reason,
+) => {
   try {
     if (!idAppointment) {
       return {
@@ -428,6 +434,7 @@ const updateStatusAppointment = async (idAppointment, status) => {
     await db.Appointment.update(
       {
         status: status,
+        cancel_reason: cancel_reason || null, // Cập nhật cancel_reason nếu có, nếu không thì giữ nguyên giá trị cũ
       },
       {
         where: { id: idAppointment },
@@ -687,6 +694,7 @@ const getAppointments = async (
         "createdAt",
         "isCheckIn",
         "diseaseDescription",
+        "cancel_reason",
       ],
       include: [
         {
@@ -871,6 +879,10 @@ const getAppointmentById = async (idAppointment) => {
         "time",
         "status",
         "payment_status",
+        "cancel_reason",
+        "createdAt",
+        "isCheckIn",
+        "diseaseDescription",
       ],
       include: [
         {

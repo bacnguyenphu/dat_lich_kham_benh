@@ -51,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
       payment_status: DataTypes.BOOLEAN,
       isCheckIn: DataTypes.BOOLEAN,
       diseaseDescription: DataTypes.TEXT("medium"),
+      cancel_reason: DataTypes.STRING,
     },
     {
       sequelize,

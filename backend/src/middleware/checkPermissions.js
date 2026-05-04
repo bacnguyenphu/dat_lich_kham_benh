@@ -95,6 +95,7 @@ const ROLE_PERMISSIONS = {
     PAYMENT_CONFIRMATION,
     GET_PATIENTS_BY_ID_USER,
     GET_HISTORY_CHAT_BY_CUSTOMER,
+    UPDATE_STATUS_APPOINTMENT,
   ], // User thường không có quyền quản trị
 };
 

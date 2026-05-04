@@ -24,8 +24,6 @@ const socket = io("http://localhost:3001", {
 
 function ReceptionistChat() {
   const auth = useSelector((state) => state.auth);
-  console.log(auth);
-
   const user_id = auth.data?.id;
   const [chatRooms, setChatRooms] = useState([]);
   const [currentRoomId, setCurrentRoomId] = useState(null);

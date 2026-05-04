@@ -20,11 +20,11 @@ const getAppointmetOfPatient = (idPatient, limit, page) => {
   });
 };
 
-const updateStatusAppointment = (idAppointment, status) => {
+const updateStatusAppointment = (idAppointment, status, cancel_reason = "") => {
   return axios.put(
     "update-status-appointment",
     {},
-    { params: { idAppointment, status } },
+    { params: { idAppointment, status, cancel_reason } },
   );
 };
 

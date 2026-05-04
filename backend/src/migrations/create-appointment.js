@@ -48,6 +48,10 @@ module.exports = {
       diseaseDescription: {
         type: Sequelize.TEXT("medium"),
       },
+      cancel_reason: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
