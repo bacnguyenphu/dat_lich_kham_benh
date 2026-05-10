@@ -9,6 +9,7 @@ const handleGetHistoryChatByCustomer = async (req, res) => {
     const limit = 20; // Số lượng tin nhắn tối đa trả về
     const offset = 0; // Bắt đầu từ tin nhắn đầu tiên
     const id_user = req.user.id; // Lấy id_user từ JWT đã giải mã trong middleware
+
     const message = await getChatHistoryByCustomer(id_user, limit, offset);
     return res.status(200).json(message);
   } catch (error) {

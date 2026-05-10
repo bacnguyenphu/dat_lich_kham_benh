@@ -2,6 +2,7 @@ import { col, fn, Op, Sequelize, where } from "sequelize";
 import db from "../models/index";
 import time_frame from "../models/time_frame";
 import { v4 as uuidv4 } from "uuid";
+import { sendEmailCreatedAppointment } from "./emailService";
 
 const getInfoToMakeAppointment = async (data) => {
   try {
@@ -192,9 +193,10 @@ const createAppointment = async (data) => {
       }
     }
 
-    await db.Appointment.create(
+    const idAppoinment = uuidv4();
+    const appointment = await db.Appointment.create(
       {
-        id: uuidv4(),
+        id: idAppoinment,
         id_doctor: data?.idDoctor,
         id_user: data?.id_user,
         id_patient: idPatient,
@@ -212,6 +214,10 @@ const createAppointment = async (data) => {
 
     // LƯU TOÀN BỘ VÀO DB
     await t.commit();
+
+    if (appointment) {
+      sendEmailCreatedAppointment(idAppoinment);
+    }
 
     return {
       err: 0,
@@ -911,7 +917,7 @@ const getAppointmentById = async (idAppointment) => {
         {
           model: db.User,
           as: "user",
-          attributes: ["id", "firstName", "lastName", "phone"],
+          attributes: ["id", "firstName", "lastName", "phone", "email"],
         },
         {
           model: db.Patient,
