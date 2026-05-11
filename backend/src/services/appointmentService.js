@@ -2,7 +2,12 @@ import { col, fn, Op, Sequelize, where } from "sequelize";
 import db from "../models/index";
 import time_frame from "../models/time_frame";
 import { v4 as uuidv4 } from "uuid";
-import { sendEmailCreatedAppointment } from "./emailService";
+import {
+  sendEmailCancelAppointment,
+  sendEmailConfirmAppointment,
+  sendEmailCreatedAppointment,
+  sendEmailDoneAppointment,
+} from "./emailService";
 
 const getInfoToMakeAppointment = async (data) => {
   try {
@@ -447,12 +452,21 @@ const updateStatusAppointment = async (
       },
     );
 
+    // Quy ước: 0 - CANCELLED, 1 - WAITING, 2 - CONFIRMED, 3 - DONE
+    if (status === 2) {
+      sendEmailConfirmAppointment(idAppointment);
+    } else if (status === 3) {
+      sendEmailDoneAppointment(idAppointment);
+    } else if (status === 0) {
+      sendEmailCancelAppointment(idAppointment, cancel_reason);
+    }
+
     return {
       err: 0,
       message: "Update status appointment success !",
     };
   } catch (error) {
-    console.log("Lỗi ở deleteAppointment :", error);
+    console.log("Lỗi ở updateStatusAppointment :", error);
     return {
       err: -999,
       message: `Error server: ${error}`,
