@@ -46,8 +46,8 @@ const getAppointmentById = (id) => {
   return axios.get("get-appointment-by-id", { params: { id } });
 };
 
-const paymentConfirmation = (id) => {
-  return axios.put("payment-confirmation", {}, { params: { id } });
+const paymentConfirmation = (id, status) => {
+  return axios.put("payment-confirmation", {}, { params: { id, status } });
 };
 
 const checkInConfirmation = (idAppointment, isCheckIn) => {

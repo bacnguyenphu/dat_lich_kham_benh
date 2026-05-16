@@ -322,7 +322,7 @@ function CreateAppointment() {
         idDoctor: appointmentData.idDoctor || null,
         idMedicalPackage: appointmentData.idMedicalPackage || null,
         diseaseDescription: appointmentData.diseaseDescription,
-        payment_status: appointmentData.payment_status,
+        payment_status: appointmentData.payment_status ? "paid" : "unpaid",
         isCheckIn: appointmentData.isCheckIn,
         status: 2, // Confirmed status for walk-in patients
         id_user: authReceptionist?.id, // Add receptionist ID

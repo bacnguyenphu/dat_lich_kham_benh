@@ -125,8 +125,9 @@ const handleGetAppointmentById = async (req, res) => {
 const handlePaymentConfirmation = async (req, res) => {
   try {
     const idAppointment = req.query.id;
+    const status = req.query.status;
 
-    const message = await paymentConfirmation(idAppointment);
+    const message = await paymentConfirmation(idAppointment, status);
     return res.status(200).json(message);
   } catch (error) {
     console.log(`Lỗi ở handlePaymentConfirmation: `, error);

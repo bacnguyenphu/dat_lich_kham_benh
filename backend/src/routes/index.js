@@ -14,6 +14,7 @@ import search from "./search";
 import statistical from "./statistical";
 import patient from "./patient";
 import chat from "./chat";
+import payment from "./payment";
 import { checkUserPermission } from "../middleware/checkPermissions";
 
 const initRoutes = (app) => {
@@ -44,7 +45,7 @@ const initRoutes = (app) => {
   app.use("/api", statistical);
   app.use("/api", patient);
   app.use("/api", chat);
-
+  app.use("/api", payment);
   app.use("/api", insert);
 
   return app.use("/", (req, res) => {

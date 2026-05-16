@@ -50,6 +50,8 @@ import {
   GET_HISTORY_CHAT_BY_CUSTOMER,
   GET_HISTORY_CHAT_BY_RECEPTIONIST,
   GET_ALL_CHAT_ROOM,
+  CREATE_PAYMENT,
+  VNPAY_IPN,
 } from "../utils/routeUrlApi";
 import { checkUserJWT, verifyJWT } from "./JWTaction";
 
@@ -132,6 +134,8 @@ const BLACKIST = [
   GET_APPOINTMENT_OF_PATIENT,
   GET_MEDICAL_PACKAGE_FOLLOW_ID_DOCTOR,
   GET_ALL_PATIENT,
+  CREATE_PAYMENT,
+  VNPAY_IPN,
 ]; // những route nào có trong đây không cần đăng nhập vẫn truy cập được
 
 export const checkUserPermission = async (req, res, next) => {

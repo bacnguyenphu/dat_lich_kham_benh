@@ -26,11 +26,11 @@ function Header() {
               <img
                 className="object-cover h-full w-full"
                 src={logo}
-                alt="Nger Hospital"
+                alt="MediBooking"
               />
             </div>
             <p className="text-[28px] font-bold text-blue-600 font-Lobster tracking-wide mt-1">
-              Nger Hospital
+              MediBooking
             </p>
           </div>
 

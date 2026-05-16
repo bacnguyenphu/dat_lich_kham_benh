@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Statistical } from "../../components/Admin";
 import { getAppointments } from "../../services/appointment";
 import { CiSearch } from "react-icons/ci";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaCheck, FaRegCheckCircle, FaTimes, FaUndo } from "react-icons/fa";
 import { LuCalendarClock } from "react-icons/lu";
 import { FaRegEye } from "react-icons/fa6";
 import dayjs from "dayjs";
 import Pagination from "../../components/Pagination";
 import ModalInfoAppointment from "../../components/Receptionist/ModalInfoAppointment";
 import { useLocation, useNavigate } from "react-router-dom";
+import { PiWarningCircleLight } from "react-icons/pi";
 
 function Overview() {
   const [appointments, setAppointments] = useState([]);
@@ -160,13 +161,19 @@ function Overview() {
 
                       {/* Thanh toán */}
                       <td className="px-6 py-4">
-                        {apt.payment_status ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full text-xs font-bold uppercase tracking-wider">
-                            <FaCheck size="0.7rem" /> Đã thanh toán
+                        {apt?.payment_status === "paid" ? (
+                          <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                            <FaRegCheckCircle size="1rem" /> Đã thanh toán
+                          </span>
+                        ) : apt?.payment_status === "refunded" ? (
+                          <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-semibold bg-amber-50 text-amber-600 border border-amber-200">
+                            {/* Nhớ import icon FaUndo từ react-icons/fa hoặc dùng icon hoàn tiền của riêng bạn */}
+                            <FaUndo size="1rem" /> Đã hoàn tiền
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-500 border border-slate-200 rounded-full text-xs font-bold uppercase tracking-wider">
-                            Chưa thanh toán
+                          <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                            <PiWarningCircleLight size="1.1rem" /> Chưa thanh
+                            toán
                           </span>
                         )}
                       </td>

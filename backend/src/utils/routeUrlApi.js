@@ -99,3 +99,7 @@ export const GET_HISTORY_CHAT_BY_CUSTOMER = "/get-history-chat-by-customer";
 export const GET_HISTORY_CHAT_BY_RECEPTIONIST =
   "/get-history-chat-by-receptionist";
 export const GET_ALL_CHAT_ROOM = "/get-all-chat-room";
+
+// Route api vnpay
+export const CREATE_PAYMENT = "/create-payment";
+export const VNPAY_IPN = "/vnpay-ipn";

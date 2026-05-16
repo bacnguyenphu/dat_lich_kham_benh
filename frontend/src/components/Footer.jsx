@@ -21,11 +21,11 @@ function Footer() {
                 <img
                   className="object-cover h-full w-full"
                   src={logo}
-                  alt="Nger Hospital Logo"
+                  alt="MediBooking Logo"
                 />
               </div>
               <p className="text-3xl font-bold text-blue-700 font-Lobster tracking-wide">
-                Nger Hospital
+                MediBooking
               </p>
             </div>
 

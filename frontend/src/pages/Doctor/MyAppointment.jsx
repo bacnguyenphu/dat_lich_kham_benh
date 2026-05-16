@@ -393,7 +393,7 @@ function MyAppointment() {
                               )}
 
                               {/* Nút: Hủy lịch (Chỉ hiện khi đang chờ xác nhận hoặc chờ khám) */}
-                              {(appointment?.status === 1 ||
+                              {/* {(appointment?.status === 1 ||
                                 appointment?.status === 2) && (
                                 <button
                                   className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors active:scale-95"
@@ -407,7 +407,7 @@ function MyAppointment() {
                                 >
                                   <MdDeleteOutline size="1.4rem" />
                                 </button>
-                              )}
+                              )} */}
                             </div>
                           </td>
                         </tr>

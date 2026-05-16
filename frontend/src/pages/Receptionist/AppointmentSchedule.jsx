@@ -188,7 +188,7 @@ function AppointmentSchedule() {
       if (result.isConfirmed) {
         try {
           // Gọi API cập nhật trạng thái thanh toán
-          const res = await paymentConfirmation(idAppointment);
+          const res = await paymentConfirmation(idAppointment, "paid");
 
           if (res.err === 0) {
             toast.success("Xác nhận thanh toán thành công!");
@@ -418,14 +418,19 @@ function AppointmentSchedule() {
                             )}
 
                             {/* 2. Trạng thái Thanh toán */}
-                            {!appointment?.payment_status ? (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-500 border border-slate-200 rounded-full text-[11px] font-bold uppercase tracking-wider">
-                                <PiWarningCircleLight size="1rem" /> Chưa thanh
-                                toán
+                            {appointment?.payment_status === "paid" ? (
+                              <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                                <FaRegCheckCircle size="1rem" /> Đã thanh toán
+                              </span>
+                            ) : appointment?.payment_status === "refunded" ? (
+                              <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-semibold bg-amber-50 text-amber-600 border border-amber-200">
+                                {/* Nhớ import icon FaUndo từ react-icons/fa hoặc dùng icon hoàn tiền của riêng bạn */}
+                                <FaUndo size="1rem" /> Đã hoàn tiền
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full text-[11px] font-bold uppercase tracking-wider">
-                                <FaRegCheckCircle size="0.9rem" /> Đã thanh toán
+                              <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                                <PiWarningCircleLight size="1.1rem" /> Chưa
+                                thanh toán
                               </span>
                             )}
 
@@ -459,7 +464,7 @@ function AppointmentSchedule() {
                             </button>
 
                             {/* Nút Thanh toán */}
-                            {!appointment?.payment_status &&
+                            {appointment?.payment_status === "unpaid" &&
                               appointment?.status !== 0 && (
                                 <button
                                   className="flex items-center justify-center w-8 h-8 text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-all active:scale-95 border border-teal-100"

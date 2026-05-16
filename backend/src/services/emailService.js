@@ -127,9 +127,39 @@ const sendEmailCancelAppointment = async (idAppoinment, reason) => {
   }
 };
 
+const sendEmailPaidVnpay = async (idAppoinment) => {
+  try {
+    const appointment = await getAppointmentById(idAppoinment);
+    const data = appointment.data;
+    const email = data?.user?.email;
+    if (!email) {
+      return false;
+    }
+    await transporter.sendMail({
+      from: `"Phòng khám Đa khoa" `,
+      to: email,
+      subject: "Xác nhận thanh toán VNPAY thành công",
+      html: `
+        <h3>Xin chào</h3>
+        <p>Thanh toán qua VNPAY cho lịch hẹn của bạn với ${data.doctor ? `bác sĩ ${data?.doctor?.user?.firstName} ${data?.doctor?.user?.lastName}` : `gói khám ${data?.medical_package?.name}`} vào khung giờ ${data.time} ngày ${new Date(data.appointment_date).toLocaleDateString("en-GB")} đã thành công.</p>
+        <p>Mã thanh toán :${idAppoinment}</p>
+        <p>Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
+        <p>Trân trọng,</p>
+        <p>Đội ngũ y tế</p>
+      `,
+    });
+    console.log("Email thông báo thanh toán VNPAY thành công đã được gửi!");
+    return true;
+  } catch (error) {
+    console.error("Lỗi khi gửi email thanh toán VNPAY: ", error);
+    return false;
+  }
+};
+
 export {
   sendEmailCreatedAppointment,
   sendEmailConfirmAppointment,
   sendEmailDoneAppointment,
   sendEmailCancelAppointment,
+  sendEmailPaidVnpay,
 };

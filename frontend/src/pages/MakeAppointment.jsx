@@ -8,7 +8,7 @@ import { FaPhone, FaTransgender, FaMoneyBillWave } from "react-icons/fa6";
 import { ImUser } from "react-icons/im";
 import { CiCalendarDate } from "react-icons/ci";
 import { GiPositionMarker } from "react-icons/gi";
-import { FaUser, FaUserFriends } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaRegCreditCard } from "react-icons/fa";
 import { IoIosCalendar, IoIosMail } from "react-icons/io";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
@@ -18,6 +18,7 @@ import { IoShieldCheckmark } from "react-icons/io5";
 import dayjs from "dayjs";
 import { getPatientsByIdUser } from "../services/patientService";
 import Select from "react-select";
+import { createPaymentVnpay } from "../services/paymentService";
 dayjs.locale("vi");
 
 const customSelectStyles = {
@@ -51,6 +52,7 @@ function MakeAppointment() {
   const [infoPatient, setInfoPatient] = useState({});
   const [patients, setPatients] = useState([]); // danh sách người quen trước có đặt lịch
   const [listItems, setListItems] = useState([]); // dùng để lưu cho Select nguoiewf quentrước có đặt lịch
+  const [paymentMethod, setPaymentMethod] = useState("OFFLINE"); // "OFFLINE" hoặc "VNPAY"
 
   const idDoctor = searchParams.get("idDoctor");
   const idMedicalPackage = searchParams.get("idMedicalPackage");
@@ -150,7 +152,7 @@ function MakeAppointment() {
         appointment_date,
         time_frame: infoAppointment?.time_frame,
         status: 1,
-        payment_status: false,
+        payment_status: "unpaid",
         isCheckIn: false,
         diseaseDescription: infoPatient?.diseaseDescription || "",
         patient: { id: auth?.id },
@@ -164,7 +166,7 @@ function MakeAppointment() {
         appointment_date,
         time_frame: infoAppointment?.time_frame,
         status: 1,
-        payment_status: false,
+        payment_status: "unpaid",
         isCheckIn: false,
         patient: infoPatient,
         diseaseDescription: infoPatient?.diseaseDescription || "",
@@ -208,14 +210,45 @@ function MakeAppointment() {
       if (result.isConfirmed) {
         const res = await createAppointment(payload);
         if (res.err === 0) {
-          Swal.fire({
-            title: "Thành công!",
-            text: "Lịch khám của bạn đã được ghi nhận.",
-            icon: "success",
-            confirmButtonColor: "#3B82F6",
-          }).then(() => {
-            navigate(APPOINTMENT);
-          });
+          // Nếu người dùng chọn thanh toán VNPay
+          if (paymentMethod === "VNPAY") {
+            // Tuỳ thuộc API trả về, lấy ID của lịch hẹn vừa tạo
+            const appointmentId = res.data?.id || res.id || res.appointmentId;
+
+            try {
+              const paymentRes = await createPaymentVnpay({
+                appointmentId: appointmentId,
+                amount: infoAppointment?.price,
+              });
+              const url =
+                paymentRes?.paymentUrl || paymentRes?.data?.paymentUrl;
+
+              if (url) {
+                window.location.href = url; // Chuyển hướng sang trang VNPay
+              } else {
+                Swal.fire(
+                  "Lỗi thanh toán",
+                  "Không thể tạo URL thanh toán VNPay",
+                  "error",
+                ).then(() => navigate(APPOINTMENT));
+              }
+            } catch (error) {
+              Swal.fire(
+                "Lỗi thanh toán",
+                "Có lỗi kết nối đến cổng thanh toán",
+                "error",
+              ).then(() => navigate(APPOINTMENT));
+            }
+          } else {
+            Swal.fire({
+              title: "Thành công!",
+              text: "Lịch khám của bạn đã được ghi nhận.",
+              icon: "success",
+              confirmButtonColor: "#3B82F6",
+            }).then(() => {
+              navigate(APPOINTMENT);
+            });
+          }
         } else if (res.err === 5) {
           Swal.fire({
             title: "Trùng lịch!",
@@ -603,18 +636,69 @@ function MakeAppointment() {
                 <p className="text-sm font-semibold text-slate-600 mb-3">
                   Hình thức
                 </p>
-                <label className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-xl cursor-not-allowed opacity-90">
-                  <input
-                    type="radio"
-                    checked
-                    readOnly
-                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="flex-1 text-sm font-medium text-blue-800">
-                    Thanh toán tại cơ sở y tế
-                  </span>
-                  <FaMoneyBillWave className="text-blue-600" />
-                </label>
+                <div className="flex flex-col gap-3">
+                  {/* Thanh toán tại cơ sở y tế */}
+                  <label
+                    className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors ${
+                      paymentMethod === "OFFLINE"
+                        ? "bg-blue-50 border-blue-500"
+                        : "bg-white border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="OFFLINE"
+                      checked={paymentMethod === "OFFLINE"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span
+                      className={`flex-1 text-sm font-medium ${paymentMethod === "OFFLINE" ? "text-blue-800" : "text-slate-700"}`}
+                    >
+                      Thanh toán tại cơ sở y tế
+                    </span>
+                    <FaMoneyBillWave
+                      className={
+                        paymentMethod === "OFFLINE"
+                          ? "text-blue-600"
+                          : "text-slate-400"
+                      }
+                      size="1.2rem"
+                    />
+                  </label>
+
+                  {/* Thanh toán trực tuyến VNPay */}
+                  <label
+                    className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors ${
+                      paymentMethod === "VNPAY"
+                        ? "bg-blue-50 border-blue-500"
+                        : "bg-white border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="VNPAY"
+                      checked={paymentMethod === "VNPAY"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span
+                      className={`flex-1 text-sm font-medium ${paymentMethod === "VNPAY" ? "text-blue-800" : "text-slate-700"}`}
+                    >
+                      Thanh toán trực tuyến (VNPay)
+                    </span>
+                    <FaRegCreditCard
+                      className={
+                        paymentMethod === "VNPAY"
+                          ? "text-blue-600"
+                          : "text-slate-400"
+                      }
+                      size="1.2rem"
+                    />
+                  </label>
+                </div>
               </div>
 
               {/* Chi tiết chi phí */}

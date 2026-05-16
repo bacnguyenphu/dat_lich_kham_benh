@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thanh toán thất bại</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 1rem;
+      }
+      .card {
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 450px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #f1f5f9;
+      }
+      .header {
+        background-color: #fff1f2;
+        padding: 2rem;
+        text-align: center;
+        border-bottom: 1px solid #ffe4e6;
+      }
+      .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background-color: #ffe4e6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px auto;
+      }
+      .icon-wrapper svg {
+        width: 32px;
+        height: 32px;
+        color: #e11d48;
+      }
+      .title {
+        color: #9f1239;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        color: #e11d48;
+        font-size: 0.875rem;
+      }
+      .content {
+        padding: 24px;
+      }
+      .message {
+        text-align: center;
+        font-size: 0.875rem;
+        color: #475569;
+        line-height: 1.5;
+        margin-bottom: 24px;
+      }
+      .message strong {
+        color: #0f172a;
+      }
+      .btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background-color: #1e293b;
+        color: white;
+        text-decoration: none;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition:
+          background-color 0.2s,
+          transform 0.1s;
+      }
+      .btn:hover {
+        background-color: #0f172a;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="header">
+        <div class="icon-wrapper">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </div>
+        <h2 class="title">Giao dịch thất bại!</h2>
+        <p class="subtitle">
+          Hệ thống đã hủy hoặc giao dịch bị lỗi từ ngân hàng
+        </p>
+      </div>
+
+      <div class="content">
+        <p class="message">
+          Rất tiếc, việc thanh toán cho mã lịch hẹn
+          <strong>{{bookingId}}</strong> chưa hoàn tất. Vui lòng quay lại màn
+          hình đặt lịch để thực hiện lại thao tác.
+        </p>
+        <a href="http://localhost:5173" class="btn">Quay lại ứng dụng chính</a>
+      </div>
+    </div>
+  </body>
+</html>

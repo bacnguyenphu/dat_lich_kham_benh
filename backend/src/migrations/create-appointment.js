@@ -38,7 +38,7 @@ module.exports = {
         defaultValue: 1,
       },
       payment_status: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.STRING,
         allowNull: true,
       },
       isCheckIn: {

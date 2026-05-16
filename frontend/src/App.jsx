@@ -92,6 +92,7 @@ import CreateAppointment from "./pages/Receptionist/CreateAppointment";
 import ChatWidget from "./components/ChatWidget";
 import ReceptionistChat from "./pages/Receptionist/ReceptionistChat";
 import { useSelector } from "react-redux";
+import PaymentResult from "./components/PaymentResult";
 
 function App() {
   const isAdminRoute =
@@ -188,6 +189,7 @@ function App() {
           <Route path={CREATE_APPOINTMENT} element={<CreateAppointment />} />
           <Route path={RECEPTIONIST_CHAT} element={<ReceptionistChat />} />
         </Route>
+        <Route path="payment-result" element={<PaymentResult />} />
       </Routes>
       <ToastContainer
         position="top-center"

@@ -16,7 +16,7 @@ export const createRefreshToken = (payload) => {
 export const createJWT = (payload) => {
   let token = null;
   try {
-    token = jwt.sign(payload, process.env.JWT_ACCESS_KEY, { expiresIn: "4h" });
+    token = jwt.sign(payload, process.env.JWT_ACCESS_KEY, { expiresIn: "24h" });
   } catch (error) {
     console.log("Lỗi ở createJWT", error);
   }

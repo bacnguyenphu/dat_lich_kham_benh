@@ -209,7 +209,7 @@ const createAppointment = async (data) => {
         appointment_date: data?.appointment_date,
         time: data?.time_frame,
         status: data?.status,
-        payment_status: data?.payment_status || false,
+        payment_status: data?.payment_status,
         isCheckIn: data?.isCheckIn || false,
         diseaseDescription: data?.diseaseDescription || "",
         cancel_reason: data?.cancel_reason || "",
@@ -227,6 +227,7 @@ const createAppointment = async (data) => {
     return {
       err: 0,
       message: "Create appointment success !",
+      data: appointment,
     };
   } catch (error) {
     await t.rollback();
@@ -969,7 +970,7 @@ const getAppointmentById = async (idAppointment) => {
   }
 };
 
-const paymentConfirmation = async (idAppointment) => {
+const paymentConfirmation = async (idAppointment, status) => {
   try {
     if (!idAppointment) {
       return {
@@ -989,7 +990,7 @@ const paymentConfirmation = async (idAppointment) => {
       };
     }
 
-    appointment.payment_status = true;
+    appointment.payment_status = status;
     await appointment.save();
 
     return {

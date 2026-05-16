@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thanh toán thành công - Phòng khám trực tuyến</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 1rem;
+      }
+      .card {
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 450px;
+        border-radius: 16px;
+        box-shadow:
+          0 10px 25px -5px rgba(0, 0, 0, 0.1),
+          0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #f1f5f9;
+      }
+      .header {
+        background-color: #ecfdf5;
+        padding: 2rem;
+        text-align: center;
+        border-bottom: 1px solid #d1fae5;
+      }
+      .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background-color: #d1fae5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px auto;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+      }
+      .icon-wrapper svg {
+        width: 32px;
+        height: 32px;
+        color: #059669;
+      }
+      .title {
+        color: #065f46;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        color: #059669;
+        font-size: 0.875rem;
+      }
+      .content {
+        padding: 24px;
+      }
+      .info-box {
+        background-color: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 0.875rem;
+      }
+      .info-row:last-child {
+        margin-bottom: 0;
+      }
+      .label {
+        color: #64748b;
+      }
+      .value {
+        color: #1e293b;
+        font-weight: 500;
+      }
+      .badge {
+        background-color: #ecfdf5;
+        color: #059669;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid #a7f3d0;
+      }
+      .booking-id {
+        background-color: #ffffff;
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+        font-weight: bold;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      .note {
+        text-align: center;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-style: italic;
+        margin-bottom: 24px;
+      }
+      .btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background-color: #059669;
+        color: white;
+        text-decoration: none;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition:
+          background-color 0.2s,
+          transform 0.1s;
+      }
+      .btn:hover {
+        background-color: #047857;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="header">
+        <div class="icon-wrapper">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+        </div>
+        <h2 class="title">Thanh toán thành công!</h2>
+        <p class="subtitle">Lịch khám của bạn đã được xác nhận</p>
+      </div>
+
+      <div class="content">
+        <div class="info-box">
+          <div class="info-row">
+            <span class="label">Mã lịch hẹn:</span>
+            <span class="value booking-id">{{bookingId}}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Trạng thái:</span>
+            <span class="badge">Đã gạch nợ thành công</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Phương thức:</span>
+            <span class="value">Cổng thanh toán VNPAY</span>
+          </div>
+        </div>
+
+        <p class="note">
+          Hệ thống đã gửi thông tin hướng dẫn khám bệnh qua Email của bạn.
+        </p>
+
+        <a href="http://localhost:5173" class="btn"
+          >Quay về ứng dụng (Trang chủ)</a
+        >
+      </div>
+    </div>
+  </body>
+</html>
