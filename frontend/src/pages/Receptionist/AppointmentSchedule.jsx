@@ -7,13 +7,19 @@ import {
 } from "../../services/appointment";
 import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 import { GiSandsOfTime } from "react-icons/gi";
-import { FaRegCheckCircle, FaRegEye, FaRegTrashAlt } from "react-icons/fa";
+import {
+  FaRegCheckCircle,
+  FaRegEye,
+  FaRegTrashAlt,
+  FaUndo,
+} from "react-icons/fa";
 import { PiWarningCircleLight } from "react-icons/pi";
 import { MdCheckBox } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaMoneyBillAlt, FaUserCheck, FaUserClock } from "react-icons/fa";
+import { TbCreditCardRefund } from "react-icons/tb";
 import dayjs from "dayjs";
 import Pagination from "../../components/Pagination";
 import Swal from "sweetalert2";
@@ -251,6 +257,50 @@ function AppointmentSchedule() {
             text: "Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng.",
             icon: "error",
             confirmButtonColor: "#3B82F6",
+            customClass: { popup: "rounded-2xl" },
+          });
+        }
+      }
+    });
+  };
+
+  const handleRefunded = async (idAppointment) => {
+    if (!idAppointment) return;
+
+    Swal.fire({
+      title: "Xác hoàn tiền?",
+      text: "Hệ thống sẽ ghi nhận lịch hẹn này đã được hoàn tiền.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#0d9488",
+      cancelButtonColor: "#94a3b8",
+      confirmButtonText: "Xác nhận hoàn tiền",
+      cancelButtonText: "Đóng",
+      customClass: {
+        popup: "rounded-2xl",
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Gọi API cập nhật trạng thái thanh toán
+          const res = await paymentConfirmation(idAppointment, "refunded");
+
+          if (res.err === 0) {
+            toast.success("Xác nhận hoàn tiền thành công!");
+            await fetchAppointment();
+          } else {
+            Swal.fire({
+              title: "Thao tác thất bại!",
+              text: res.message || "Vui lòng kiểm tra lại.",
+              icon: "error",
+              customClass: { popup: "rounded-2xl" },
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "Lỗi hệ thống!",
+            text: "Không thể kết nối đến máy chủ.",
+            icon: "error",
             customClass: { popup: "rounded-2xl" },
           });
         }
@@ -524,6 +574,18 @@ function AppointmentSchedule() {
                                 <MdDeleteOutline size="1.2rem" />
                               </button>
                             )}
+
+                            {/* Nút Hoàn tiền */}
+                            {appointment?.status === DA_HUY &&
+                              appointment?.payment_status === "paid" && (
+                                <button
+                                  className="flex items-center justify-center w-8 h-8 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors active:scale-95 border border-green-100"
+                                  onClick={() => handleRefunded(appointment.id)}
+                                  title="Hoàn tiền"
+                                >
+                                  <TbCreditCardRefund size="1.2rem" />
+                                </button>
+                              )}
                           </div>
                         </td>
                       </tr>

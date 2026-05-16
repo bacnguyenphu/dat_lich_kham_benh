@@ -12,13 +12,19 @@ import { IoClose, IoInformationCircleOutline } from "react-icons/io5";
 import { GiSandsOfTime } from "react-icons/gi";
 import { FaCheck } from "react-icons/fa6";
 import { PiWarningCircleLight } from "react-icons/pi";
-import { FaRegCheckCircle, FaRegTrashAlt, FaUserAlt } from "react-icons/fa"; // Nhớ import thêm FaUserAlt
+import {
+  FaRegCheckCircle,
+  FaRegTrashAlt,
+  FaUndo,
+  FaUserAlt,
+} from "react-icons/fa"; // Nhớ import thêm FaUserAlt
 import { VscFeedback } from "react-icons/vsc";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import ModalComment from "../components/ModalComment";
+import { createPaymentVnpay } from "../services/paymentService";
 
 function ListAppointment() {
   const navigate = useNavigate();
@@ -50,7 +56,7 @@ function ListAppointment() {
                 item?.doctor?.user?.firstName +
                 " " +
                 item?.doctor?.user?.lastName,
-              price: item?.doctor?.price.toLocaleString("vi-VN"),
+              price: item?.doctor?.price,
               image: item?.doctor?.user?.avatar,
               time_frame: item?.time,
               appointment_date: item?.appointment_date,
@@ -142,6 +148,49 @@ function ListAppointment() {
 
   const handleClickShowModalCmt = () => {
     setIsShowModalCmt(true);
+  };
+
+  const handlePayment = async (idAppointment, price) => {
+    if (!idAppointment) return;
+
+    Swal.fire({
+      title: "Xác nhận thanh toán?",
+      text: "Bạn có muốn thanh toán (qua ví VNPay) cho lịch hẹn này ngay bây giờ không?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#0d9488",
+      cancelButtonColor: "#94a3b8",
+      confirmButtonText: "Xác nhận thanh toán",
+      cancelButtonText: "Đóng",
+      customClass: {
+        popup: "rounded-2xl",
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const paymentRes = await createPaymentVnpay({
+            appointmentId: idAppointment,
+            amount: price,
+          });
+          const url = paymentRes?.paymentUrl || paymentRes?.data?.paymentUrl;
+          if (url) {
+            window.location.href = url; // Chuyển hướng sang trang VNPay
+          } else {
+            Swal.fire(
+              "Lỗi thanh toán",
+              "Không thể tạo URL thanh toán VNPay",
+              "error",
+            ).then(() => navigate(APPOINTMENT));
+          }
+        } catch (error) {
+          Swal.fire(
+            "Lỗi thanh toán",
+            "Có lỗi kết nối đến cổng thanh toán",
+            "error",
+          ).then(() => navigate(APPOINTMENT));
+        }
+      }
+    });
   };
 
   return (
@@ -270,11 +319,15 @@ function ListAppointment() {
                       </span>
                     ) : payment_status === "refunded" ? (
                       <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-semibold bg-amber-50 text-amber-600 border border-amber-200">
-                        {/* Nhớ import icon FaUndo từ react-icons/fa hoặc dùng icon hoàn tiền của riêng bạn */}
                         <FaUndo size="1rem" /> Đã hoàn tiền
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                      <span
+                        className="flex cursor-pointer items-center gap-1.5 py-1 px-3 rounded-full text-sm font-medium bg-slate-100 text-slate-500 border border-slate-200"
+                        onClick={() => {
+                          handlePayment(id, other?.price);
+                        }}
+                      >
                         <PiWarningCircleLight size="1.1rem" /> Chưa thanh toán
                       </span>
                     )}
