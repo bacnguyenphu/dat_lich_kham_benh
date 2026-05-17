@@ -67,8 +67,8 @@ function ReceptionistChat() {
         const res = await getAllChatRooms();
         // Giả sử API trả về mảng trực tiếp hoặc nằm trong res.data
         const roomsData = res.data || res;
-
-        setChatRooms(roomsData);
+        const temp = roomsData.filter((room) => room.last_message !== null);
+        setChatRooms(temp);
       } catch (error) {
         console.error("Lỗi khi tải danh sách phòng chat:", error);
       }

@@ -256,6 +256,13 @@ function MakeAppointment() {
             icon: "warning",
             confirmButtonColor: "#EF4444",
           });
+        } else if (res.err === 6) {
+          Swal.fire({
+            title: "Quá tải lịch hẹn!",
+            text: "Rất tiếc, khung giờ này đã đạt giới hạn số lượng lịch hẹn. Vui lòng chọn khung giờ khác.",
+            icon: "warning",
+            confirmButtonColor: "#EF4444",
+          });
         } else {
           Swal.fire({
             title: "Thất bại!",

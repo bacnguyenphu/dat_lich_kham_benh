@@ -20,7 +20,7 @@ function Header() {
           </div>
           <div>
             <p className="text-2xl font-bold font-Lobster text-slate-800 leading-none">
-              Nger Doctor
+              Doctor
             </p>
             <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-blue-600 mt-1">
               Medical Portal

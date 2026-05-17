@@ -77,7 +77,7 @@ function CreateAppointment() {
     idMedicalPackage: "",
     diseaseDescription: "",
     payment_status: false,
-    isCheckIn: true, // For walk-in patients
+    isCheckIn: false, // For walk-in patients
   });
 
   // Data for dropdowns
@@ -358,7 +358,7 @@ function CreateAppointment() {
             idMedicalPackage: "",
             diseaseDescription: "",
             payment_status: false,
-            isCheckIn: true,
+            isCheckIn: false,
           });
         });
       } else {
@@ -520,7 +520,7 @@ function CreateAppointment() {
                             type="radio"
                             name="gender"
                             value="male"
-                            checked={patientInfo.gender === "Nam"}
+                            checked={patientInfo.gender === "male"}
                             onChange={(e) =>
                               handlePatientInfoChange("gender", e.target.value)
                             }
@@ -534,7 +534,7 @@ function CreateAppointment() {
                             type="radio"
                             name="gender"
                             value="female"
-                            checked={patientInfo.gender === "Nữ"}
+                            checked={patientInfo.gender === "female"}
                             onChange={(e) =>
                               handlePatientInfoChange("gender", e.target.value)
                             }
